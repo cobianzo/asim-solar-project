@@ -132,70 +132,88 @@ function handlerClickDrawRectangleOverSegment(e) {
 
   // FIRST CLICK OF RECT DESIGN: Now we mark the first vertex of the rectangle
   if ( window.cocoDrawingRectangle.drawRectangleStep === 'step1.selectFirstVertex' ) {
-    window.paintAMarker(
-      segm.map,
-      { lat: e.latLng.lat(), lng: e.latLng.lng() },
-      `${window.cocoAssetsDir}vertex-ne.png`,
-      {
-        scaledSize: new window.google.maps.Size(10, 10),
-        anchor: new google.maps.Point(0, 10),
-        animation: google.maps.Animation.DROP,
-      }
-    );
-
-    window.cocoDrawingRectangle.firstVertexCoord = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-    window.cocoDrawingRectangle.firstVertexPoint = latLngToPoint(segm.map, { latitude: e.latLng.lat(), longitude: e.latLng.lng() });
-
-    // paint the first 2 lines
-    const inclinedAxis = paintInclinedAxisAsLinesFromCoordenates( segm.map, window.cocoDrawingRectangle.firstVertexPoint, segm.realInclinationAngle );
-    console.log(inclinedAxis);
-    window.cocoDrawingRectangle.boundariesLines = window.cocoDrawingRectangle.boundariesLines || [];
-    window.cocoDrawingRectangle.boundariesLines.push( inclinedAxis );
-
-    window.cocoDrawingRectangle.drawRectangleStep = 'step2.selectSecondVertex';
+    handleClickFirstVertexRectangle( segm.map, e, segm.realInclinationAngle );
+    segm.setOptions({ fillOpacity: 0.1 });
+    google.maps.event.addListener(segm, 'mousemove', function(e) {
+      console.log('moving:' , e);
+    });
   }
 
   // SECOND CLICK OF RECT DESIGN: Now we mark the opposite vertex of the rectangle
   else if ( window.cocoDrawingRectangle.drawRectangleStep === 'step2.selectSecondVertex' ) {
-    console.log('drawing second vertex', e.latLng.lat(), e.latLng.lng(), segm );
-    window.cocoDrawingRectangle.secondVertexCoord = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-    window.cocoDrawingRectangle.secondVertexPoint = latLngToPoint(segm.map, { latitude: e.latLng.lat(), longitude: e.latLng.lng() });
-    const inclinedAxis = paintInclinedAxisAsLinesFromCoordenates( segm.map, window.cocoDrawingRectangle.secondVertexPoint, segm.realInclinationAngle );
-    window.cocoDrawingRectangle.boundariesLines = window.cocoDrawingRectangle.boundariesLines || [];
-    window.cocoDrawingRectangle.boundariesLines.push( inclinedAxis );
 
-    // now get the 2 other points that we need
-    const axisFirstClick = window.cocoDrawingRectangle.boundariesLines[0];
-    const axisSecondClick = window.cocoDrawingRectangle.boundariesLines[1];
-    const intersectionPointB = getLineIntersection(
-      axisFirstClick.lineX[0].x, axisFirstClick.lineX[0].y,
-      axisFirstClick.lineX[1].x, axisFirstClick.lineX[1].y,
-      axisSecondClick.lineY[0].x, axisSecondClick.lineY[0].y,
-      axisSecondClick.lineY[1].x, axisSecondClick.lineY[1].y
-    );
-    const intersectionPointD = getLineIntersection(
-      axisFirstClick.lineY[0].x, axisFirstClick.lineY[0].y,
-      axisFirstClick.lineY[1].x, axisFirstClick.lineY[1].y,
-      axisSecondClick.lineX[0].x, axisSecondClick.lineX[0].y,
-      axisSecondClick.lineX[1].x, axisSecondClick.lineX[1].y
-    );
-
-    // const segment = window.paintAPoygonInMap(theMap, rectangleToPaint, { clickable: true, fillOpacity: 0.35 });
-    const polygonPath = convertPointsArrayToLatLngString(segm.map, [
-      window.cocoDrawingRectangle.firstVertexPoint, intersectionPointB, window.cocoDrawingRectangle.secondVertexPoint, intersectionPointD
-    ]);
-
-    segm.setOptions({ fillOpacity: 0.1 });
-
+    handleClickSecondVertexRectangle( segm.map, e, segm.realInclinationAngle );
     // WE PAINT THE NEW RECTANGLE - and we should set it up in the input field TODO:
-    window.paintAPoygonInMap(segm.map, polygonPath);
 
-    const input = document.getElementById(window.step2PolygonInputId);
-    input.value = polygonPath;
-    console.log('polygonPath', polygonPath);
 
   }
 
 }
 
 
+const handleClickFirstVertexRectangle = ( gmap, clickEvent, angle ) => {
+  window.paintAMarker(
+    gmap,
+    { lat: clickEvent.latLng.lat(), lng: clickEvent.latLng.lng() },
+    `${window.cocoAssetsDir}vertex-ne.png`,
+    {
+      scaledSize: new window.google.maps.Size(10, 10),
+      anchor: new google.maps.Point(0, 10),
+    }
+  );
+
+  window.cocoDrawingRectangle.firstVertexCoord = { lat: clickEvent.latLng.lat(), lng: clickEvent.latLng.lng() };
+  window.cocoDrawingRectangle.firstVertexPoint = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
+
+  // paint the first 2 lines
+  const inclinedAxis = paintInclinedAxisAsLinesFromCoordenates( gmap, window.cocoDrawingRectangle.firstVertexPoint, angle );
+  console.log(inclinedAxis);
+  window.cocoDrawingRectangle.boundariesLines = window.cocoDrawingRectangle.boundariesLines || [];
+  window.cocoDrawingRectangle.boundariesLines.push( inclinedAxis );
+
+  window.cocoDrawingRectangle.drawRectangleStep = 'step2.selectSecondVertex';
+}
+
+const handleClickSecondVertexRectangle = ( gmap, clickEvent, angle ) => {
+
+  // save the point where we clicked and project a line with the given angle
+  window.cocoDrawingRectangle.secondVertexCoord = { lat: clickEvent.latLng.lat(), lng: clickEvent.latLng.lng() };
+  window.cocoDrawingRectangle.secondVertexPoint = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
+  const inclinedAxis = paintInclinedAxisAsLinesFromCoordenates( gmap, window.cocoDrawingRectangle.secondVertexPoint, angle );
+  window.cocoDrawingRectangle.boundariesLines = window.cocoDrawingRectangle.boundariesLines || [];
+  window.cocoDrawingRectangle.boundariesLines.push( inclinedAxis );
+
+  // now get the 2 other points that we need
+  const axisFirstClick = window.cocoDrawingRectangle.boundariesLines[0];
+  const axisSecondClick = window.cocoDrawingRectangle.boundariesLines[1];
+  const intersectionPointB = getLineIntersection(
+    axisFirstClick.lineX[0].x, axisFirstClick.lineX[0].y,
+    axisFirstClick.lineX[1].x, axisFirstClick.lineX[1].y,
+    axisSecondClick.lineY[0].x, axisSecondClick.lineY[0].y,
+    axisSecondClick.lineY[1].x, axisSecondClick.lineY[1].y
+  );
+  const intersectionPointD = getLineIntersection(
+    axisFirstClick.lineY[0].x, axisFirstClick.lineY[0].y,
+    axisFirstClick.lineY[1].x, axisFirstClick.lineY[1].y,
+    axisSecondClick.lineX[0].x, axisSecondClick.lineX[0].y,
+    axisSecondClick.lineX[1].x, axisSecondClick.lineX[1].y
+  );
+
+  // with all the points, we draw the inclined rectangle created by the user
+  const polygonPath = convertPointsArrayToLatLngString( gmap, [
+    window.cocoDrawingRectangle.firstVertexPoint, intersectionPointB, window.cocoDrawingRectangle.secondVertexPoint, intersectionPointD
+  ]);
+
+  window.paintAPoygonInMap(gmap, polygonPath);
+
+  const input = document.getElementById(window.step2PolygonInputId);
+  input.value = polygonPath;
+  console.log('polygonPath', polygonPath);
+
+  return {
+    secondVertexCoord: window.cocoDrawingRectangle.secondVertexCoord,
+    secondVertexPoint: window.cocoDrawingRectangle.secondVertexPoint,
+    inclinedAxis: inclinedAxis,
+    polygonPath: polygonPath
+  }
+}
