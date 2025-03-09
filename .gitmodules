@@ -1,0 +1,4 @@
+[submodule "plugins/coco-gravity-form-map-field"]
+	path = plugins/coco-gravity-form-map-field
+	url = https://github.com/cobianzo/asim-gravity-form-map-field.git
+	branch = develop

@@ -1,0 +1,18 @@
+{
+  "$schema": "./schemas/wp-env.json",
+  "core": null,
+  "plugins": [
+    "./plugins/coco-gravity-form-map-field",
+    "./plugins/solar-project",
+    "./plugins/gravityforms"
+  ],
+  "config": {
+		"WP_DEBUG_DISPLAY": true,
+		"WP_DEBUG": true
+	},
+	"env": {
+		"tests": {
+			"phpVersion": "8.1"
+		}
+	}
+}

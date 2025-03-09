@@ -1,0 +1,21 @@
+{
+  "name": "solar",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "up": "wp-env start",
+    "down": "wp-env stop",
+    "clean": "wp-env clean",
+    "restart": "wp-env stop && wp-env start",
+    "dev": "concurrently \"npm run start --prefix plugins/coco-gravity-form-map-field\" \"npm run start --prefix plugins/solar-project\"",
+    "test": "wp-env run tests-cli wp plugin list"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@wordpress/env": "^7.0.0",
+    "concurrently": "^9.1.2"
+  }
+}
