@@ -24,10 +24,6 @@ class Hooks {
 		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_print_bounding_boxes_areas' ], 10, 3 );
 		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_paint_building_profile' ], 10, 3 );
 
-		// Step 3. We render a google map with the panels
-		// TODELETE: we ll use the stel3-functions.js
-		// add_filter('gform_field_content', [ __CLASS__, 'html_step_3_map' ], 10, 4 );
-
 	}
 
 	public static function inject_js_script_step_2_and_3() {
@@ -69,7 +65,6 @@ class Hooks {
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url(). "'; \n" .
-				"window.cocoRoofCcoordinates = '$coco_map_entry'; \n" .
 				"window.step2PolygonInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
 				"window.step2RectangleCoords = " . json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
 				"window.step3PolygonInputId = 'input_{$coco_mapfieldpanelli_instance->formId}_{$coco_mapfieldpanelli_instance->id}'; \n" .
@@ -96,12 +91,12 @@ class Hooks {
 			$step_map_rectangle = $step_map_panelli = null;
 
 			foreach ( $form['fields'] as $field ) {
-        if ( 'map-rectangle' === $field->adminLabel ) {
+				if ( 'map-rectangle' === $field->adminLabel ) {
 					$step_map_rectangle = $field->pageNumber; // 2
-        } elseif ( 'numero-panelli' === $field->adminLabel ) {
+				} elseif ( 'map-panelli' === $field->adminLabel ) {
 					$step_map_panelli = $field->pageNumber; // 3
 				}
-    	}
+			}
 			$current_page = \GFFormDisplay::get_current_page($form_id);
 			$current_page_is_rectangle = $current_page === $step_map_rectangle; // step 2
 			$current_page_is_panelli = $current_page === $step_map_panelli; // step 3
@@ -221,9 +216,9 @@ class Hooks {
 				anchor: new google.maps.Point(10, 10),
 				title: '<?php echo esc_js( $i + 1 ); ?>',
 				label: {
-    			text: '<?php echo esc_js( $i + 1 ); ?>',
-    			color: "#000000"
-  			}
+					text: '<?php echo esc_js( $i + 1 ); ?>',
+					color: "#000000"
+				}
 			};
 			window.paintAMarker( map, <?php echo json_encode( $center ); ?>, '<?php echo esc_url( $sun_marker ); ?>', window.optionsMarker);
 			window.paintAMarker( map, <?php echo json_encode( $sw ); ?>, '<?php echo esc_url( $sw_marker ); ?>', { scaledSize: new window.google.maps.Size(10, 10), anchor: new google.maps.Point(0, 10) });
@@ -285,60 +280,6 @@ class Hooks {
 		}
 	}
 
-	public static function html_step_3_map( $content, $field, $value, $entry_id ) {
-		// Verificar si el Admin Field Label es 'numero-panelli'
-		if ($field->adminLabel === 'numero-panelli') {
-				$custom_html = '<div class="custom-html">Este es tu contenido personalizado</div>';
-				$content .= $custom_html; // Añadir el HTML después del campo
-
-				$form       = \GFAPI::get_form( $field->formId );
-				$coordstr   = Helper::capture_coco_map_field_value_in_step_1( $form );
-				if ( ! $coordstr ) {
-					return '<p>No info from step 1</p>' . $content;
-				}
-				$coord      = explode( ',', $coordstr );
-				$sun_marker = Helper::get_icon_url( 'sun-marker.png' );
-				// TODO: crear el campo de google maps con los paneles
-				ob_start();
-			?>
-				<h1>Step 3. Le coordenate selezionate sono: <?php echo esc_html( $coordstr ); ?></h1>
-				<div id="map" class="gform-field-coco-map"></div>
-				<script>
-					// TODELETE. we use the coco-map, not our own map
-					var step3map;
-					function initMap() {
-						step3map = new window.google.maps.Map(document.getElementById('map'), {
-							center: {lat: <?php echo esc_html( $coord[0] ); ?>, lng: <?php echo esc_html( $coord[1] ); ?>},
-							zoom: 15
-						});
-
-						window.paintAMarker(
-							step3map,
-							{lat: <?php echo esc_html( $coord[0] ); ?>, lng: <?php echo esc_html( $coord[1] ); ?>},
-							'<?php echo esc_url( $sun_marker ); ?>',
-							{
-								scaledSize: new window.google.maps.Size(30, 30),
-							}
-						);
-					}
-
-					function waitForGoogleMaps() {
-						if (typeof google !== "undefined" && window.google.maps && typeof window.google.maps.Map === 'function') {
-								// Cuando la API esté lista, inicializa el mapa
-								initMap();
-						} else {
-								// Si aún no está lista, vuelve a intentarlo después de 100 ms
-								setTimeout(waitForGoogleMaps, 500);
-						}
-					}
-					document.addEventListener("DOMContentLoaded", waitForGoogleMaps);
-
-				</script>
-				<?php
-				$content = $content . ob_get_clean();
-		}
-		return $content;
-	}
 }
 
 Hooks::init();

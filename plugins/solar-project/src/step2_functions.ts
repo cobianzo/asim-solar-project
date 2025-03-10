@@ -1,28 +1,46 @@
+// types
+import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo } from './types';
 import {
   latLngToPoint,
   orthopedicRegtanglePoints,
   rotateRectangle,
   convertPointsArrayToLatLngString,
   getLineIntersection,
-} from './trigonometry-helpers.ts';
-
+} from './trigonometry-helpers';
 
 import {
   paintASunForSegment,
   paintInclinedAxisAsLinesFromCoordenates,
- } from './drawing-helpers.js';
-// import addGeoTIFFOverlayToMap from './geotiff_helpers.js';
+ } from './drawing-helpers';
 
-document.addEventListener("solarMapReady", function (event) {
+declare global {
+  interface Window {
+    cocoDrawingRectangle: CocoDrawingRectangleInfo;
+    cocoIsStepSelectRectangle: Boolean;
+    cocoIsStepSelectPanelli: Boolean;
 
+    cocoAssetsDir: string;
+    step2PolygonInputId: string;
+    step2RectangleCoords: string;
+    step3PolygonInputId: string;
+    gMapsKey: string;
+
+    cocoMaps: { [key: string]: CocoMapSetup }; // @TODO:
+    paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;
+  }
+}
+
+document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) => {
 
   if ( ! window.cocoIsStepSelectRectangle ) {
     return;
   }
 
-  const cocoMapSetup = event.detail; // Obtenemos la instancia de Google Maps
+  const cocoMapSetup = event.detail;
   console.log('map so far ', cocoMapSetup);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // @ts-ignore
   if ( window.step2PolygonInputId !== cocoMapSetup.inputElement.id ) {
     console.error( 'not found the input id', cocoMapSetup.inputElement );
     return;
@@ -31,33 +49,45 @@ document.addEventListener("solarMapReady", function (event) {
   const theMap = cocoMapSetup.map;
 
   // retrieve all roof segments
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // @ts-ignore
   const roofSegments = window.cocoBuildingRoofs;
   if ( roofSegments.length )
-    roofSegments.forEach((element,i) => {
+    roofSegments.forEach((element : RoofSegmentStats, i: number) => {
       console.log( 'Calculos par segment ', i, element);
 
       const {center, azimuthDegrees, boundingBox: {sw, ne}} = element;
 
       // calculations of coord of the new rotated rect
       const rectPoints = orthopedicRegtanglePoints(theMap, sw, ne);
-      const isPortrait = Math.abs(rectPoints[0].x - rectPoints[2].x) < Math.abs(rectPoints[0].y - rectPoints[1].y);
-      console.log(isPortrait ? 'portrait' : 'landscape');
+
+      if ( ! rectPoints ) {
+        return null;
+      }
+
+      const isPortrait = rectPoints ?
+        Math.abs(rectPoints[0].x - rectPoints[2].x) < Math.abs(rectPoints[0].y - rectPoints[1].y)
+        : false;
+
       // angle that we'll turn the drwan rectangle
       // here the API of gmaps is weird: if the rectangle is landscape, the angle is correct,
       // but if the rectangle is portrait, we need to add 90 degrees to the angle
       const angle90 = (azimuthDegrees + (isPortrait? 90 : 0) ) % 90;
       const centerPoint = latLngToPoint(theMap, center);
-      const newRectPoints = rotateRectangle(rectPoints, centerPoint, angle90);
-      console.log('newRectPoints', newRectPoints);
-      const rectangleToPaint = convertPointsArrayToLatLngString(theMap, newRectPoints);
+      const newRectPoints = centerPoint? rotateRectangle(rectPoints, centerPoint, angle90) : null;
+      const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
       console.log('rectangleToPaint', rectangleToPaint);
 
       // Finally paint the inclined rectangle, adding some properties for easy access
       cocoMapSetup.segments = cocoMapSetup.segments || [];
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const segment = window.paintAPoygonInMap(theMap, rectangleToPaint, { clickable: true, fillOpacity: 0.35 });
       segment.data = element; // to access to the solar API data of the segment
       segment.indexInMap = i;
-      segment.pointsInMap = newRectPoints;
+      segment.pointsInMap = newRectPoints || undefined;
       segment.sunMarker = paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` );
       segment.realInclinationAngle = angle90;
 
@@ -68,10 +98,15 @@ document.addEventListener("solarMapReady", function (event) {
       segment.addListener('mouseover', function() {
         console.log('hover on roof segment', segment);
         highlightSegment(segment);
+
+        // eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+
         window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
         window.cocoDrawingRectangle.hoveredSegment = segment;
+
         // hide all other segments
-        cocoMapSetup.segments.forEach((segm) => {
+        cocoMapSetup.segments?.forEach((segm) => {
           if ( segm.indexInMap !== segment.indexInMap ) {
             fadeSegment(segm);
           }
@@ -80,14 +115,17 @@ document.addEventListener("solarMapReady", function (event) {
 
       // Evento mouseout
       google.maps.event.addListener(segment, 'mouseout', function() {
-        if ( window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap
+        // @ts-ignore
+        if ( window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap // @ts-ignore
           || window.cocoDrawingRectangle?.selectedSegment?.indexInMap === segment.indexInMap
         ) {
           return;
         }
+        // @ts-ignore
         window.cocoDrawingRectangle.hoveredSegment = null;
         resetSegmentVisibility(segment);
-        // hide all other segments
+        // hide all other segments .
+        // @ts-ignore
         cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
       });
 
@@ -96,21 +134,21 @@ document.addEventListener("solarMapReady", function (event) {
 } );
 
 
-function highlightSegment(roofSegment, extraParams = {}) {
+function highlightSegment(roofSegment: ExtendedSegment, extraParams = {}) {
   roofSegment.setOptions({ fillOpacity: 0.7, strokeOpacity: 1, ...extraParams });
-  roofSegment.sunMarker.setIcon({
-    ...roofSegment.sunMarker.getIcon(),
+  roofSegment.sunMarker?.setIcon({ // @ts-ignore
+    ...roofSegment.sunMarker.getIcon(), // @ts-ignore
     url: window.cocoAssetsDir + 'sun-marker-hover.png',
   });
 }
-function resetSegmentVisibility(roofSegment) {
+function resetSegmentVisibility(roofSegment: ExtendedSegment) {
   roofSegment.setOptions({ fillOpacity: 0.35 });
-  roofSegment.sunMarker.setIcon({
-    ...roofSegment.sunMarker.getIcon(),
+  roofSegment.sunMarker?.setIcon({ // @ts-ignore
+    ...roofSegment.sunMarker.getIcon(), // @ts-ignore
     url: window.cocoAssetsDir + 'sun-marker.png'
   });
 }
-function fadeSegment(roofSegment) {
+function fadeSegment(roofSegment: ExtendedSegment) {
   roofSegment.setOptions({ fillOpacity: 0.1, strokeOpacity: 0 });
   // roofSegment.sunMarker.setIcon({
   //   ...roofSegment.sunMarker.getIcon(),
@@ -118,12 +156,12 @@ function fadeSegment(roofSegment) {
   // });
 }
 
-function handlerClickSelectSegment(e) {
-  const segm = this;
+function handlerClickSelectSegment(e: Event) {
+  const segm = this as ExtendedSegment;
   console.log('click on segment once', segm);
   // unhighlight all segments
-  const allSegments = cocoMaps[window.step2PolygonInputId].segments;;
-  allSegments.forEach( s => {
+  const allSegments = window.cocoMaps[window.step2PolygonInputId].segments;
+  allSegments.forEach( (s: ExtendedSegment) => {
     if ( s.indexInMap !== segm.indexInMap ) {
       s.setVisible(false);
     }
@@ -237,7 +275,7 @@ const handlerMouseMoveSecondVertexRectangle = ( gmap, clickEvent, angle ) => {
   // with all the points, we draw the inclined rectangle created by the user
   window.cocoDrawingRectangle.rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, [
     window.cocoDrawingRectangle.firstVertexPoint, intersectionPointB, secondVertexPoint, intersectionPointD
-  ]);
+  ]) ?? '';;
 
   // paint!
   window.cocoDrawingRectangle.polygon = window.paintAPoygonInMap(

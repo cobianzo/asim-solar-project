@@ -1,0 +1,140 @@
+// types
+import { ExtendedSegment } from './types';
+import {
+  pointToLatLng,
+  projectLineFromXY,
+} from './trigonometry-helpers';
+
+/**
+ * Paints a sun marker in the map at the center of a segment.
+ *
+ * This function is meant to be used to paint a sun icon in the map at the position
+ * of a segment's center. The icon is a little sun image, and it is anchored at
+ * the bottom, so it appears to be at the position of the segment's center.
+ *
+ * @param gmap The Google Map instance
+ * @param seg The segment for which we want to paint a sun marker
+ * @param icon The icon to use (defaults to 'sun-marker.png')
+ * @returns The marker object
+ */
+export const paintASunForSegment = (
+  gmap: google.maps.Map,
+  seg: ExtendedSegment,
+  icon: string = 'sun-marker.png'
+): google.maps.Marker => {
+
+  // paintAMarker is a function defined by coco plugin
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return window.paintAMarker(
+    gmap,
+    { lat: seg.data.center.latitude, lng: seg.data.center.longitude },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+    `${(window as any).cocoAssetsDir}${icon}`,
+    {
+      scaledSize: new google.maps.Size(10, 10),
+      anchor: new google.maps.Point(5, 5),
+    }
+  );
+};
+
+/**
+ * Draws a line in the map from an array of LatLng coordinates.
+ *
+ * @param gmap The Google Map instance
+ * @param path The array of LatLng coordinates to draw the line
+ * @param extraparams Extra parameters to pass to the `google.maps.Polyline` constructor
+ * @returns The `google.maps.Polyline` object
+ */
+export const drawALine = (
+  gmap: google.maps.Map,
+  path: google.maps.LatLngLiteral[],
+  extraparams: google.maps.PolylineOptions = {}
+): google.maps.Polyline => {
+  return new google.maps.Polyline({
+    path,
+    strokeColor: '#800080',
+    strokeOpacity: 0.8,
+    strokeWeight: 1,
+    map: gmap,
+    ...extraparams
+  });
+};
+
+/**
+ * Calculates the 2 right lines that define the an inclined axis.
+ * Every line is defined by two points in an array
+ * @param gmap
+ * @param crossPointInMap
+ * @param degrees
+ * @returns
+ */
+export const paintInclinedAxisAsLinesFromCoordenates = (
+  gmap: google.maps.Map,
+  crossPointInMap: google.maps.Point,
+  degrees: number
+): {
+  axisLinesDefinedByPoints: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
+  line1: null;
+  line2: null;
+} => {
+
+  const axisLinesDefinedByPoints
+    : { lineX: google.maps.Point[]; lineY: google.maps.Point[] }
+    = { lineX: [], lineY: [] };
+
+  // draw line 1
+  const angle90 = (degrees + 90) % 360;
+  let tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle90,
+    100
+  );
+  axisLinesDefinedByPoints.lineX.push(tempPoint);
+
+  tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle90,
+    -100
+  );
+  axisLinesDefinedByPoints.lineX.push(tempPoint);
+
+  // drawing a line in Gmaps - it works, painting the axis but it stops listening to click event, so I remove it
+  // let temp1 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
+  // const coordPointALine1 = temp1 ? { lat: temp1.lat(), lng: temp1.lng() } : null;
+  // temp1 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
+  // const coordPointBLine1 = temp1 ? { lat: temp1.lat(), lng: temp1.lng() } : null;
+  // const line1 = drawALine( Gmap, [ coordPointALine1, coordPointBLine1 ]);
+
+  // --- line 2 (Y)
+  const angle0 = (degrees + 0) % 360;
+  tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle0,
+    100
+  );
+  axisLinesDefinedByPoints.lineY.push(tempPoint);
+  tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle0,
+    -100
+  );
+  axisLinesDefinedByPoints.lineY.push(tempPoint);
+
+  // drawing a line in Gmaps: same as above
+  // let temp2 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
+  // const coordPointALine2 = temp2? { lat: temp2.lat(), lng: temp2.lng() } : null;
+  // temp2 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
+  // const coordPointBLine2 = temp2? { lat: temp2.lat(), lng: temp2.lng() } : null;
+  // const line2 = drawALine( Gmap, [ coordPointALine2, coordPointBLine2 ]);
+
+  return {
+    axisLinesDefinedByPoints,
+    line1: null,
+    line2: null,
+  };
+};
