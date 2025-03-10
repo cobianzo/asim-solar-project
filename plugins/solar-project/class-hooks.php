@@ -20,9 +20,9 @@ class Hooks {
 		add_filter( 'coco_gravity_form_map_field_default_lat', [ __CLASS__, 'set_default_lat' ], 10, 2 );
 		add_filter( 'coco_gravity_form_map_field_default_lng', [ __CLASS__, 'set_default_lng' ], 10, 2 );
 
-		// JS to draw rectangles and polygons and markers
+		// JS to draw rectangles and polygons and markers: both work but I have deactivated, info not needed.
 		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_print_bounding_boxes_areas' ], 10, 3 );
-		add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_paint_building_profile' ], 10, 3 );
+		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_paint_building_profile' ], 10, 3 );
 
 		// Step 3. We render a google map with the panels
 		// TODELETE: we ll use the stel3-functions.js
@@ -134,7 +134,7 @@ class Hooks {
 	public static function set_default_zoom( $zoom, $form ) {
 		$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
 		if ( $coco_map_entry ) {
-			return 19;
+			return 20;
 		}
 		return $zoom;
 	}
@@ -304,6 +304,7 @@ class Hooks {
 				<h1>Step 3. Le coordenate selezionate sono: <?php echo esc_html( $coordstr ); ?></h1>
 				<div id="map" class="gform-field-coco-map"></div>
 				<script>
+					// TODELETE. we use the coco-map, not our own map
 					var step3map;
 					function initMap() {
 						step3map = new window.google.maps.Map(document.getElementById('map'), {
