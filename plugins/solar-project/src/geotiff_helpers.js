@@ -1,3 +1,4 @@
+// NOT IN USE @TODELETE
 // Asegúrate de que geotiff.js está cargado en tu proyecto
 import * as GeoTIFF from 'geotiff';
 

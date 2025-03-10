@@ -38,3 +38,4 @@ logs
 /test-results
 .phpunit.result.cache
 plugins/solar-project/dist/solar-project.zip
+/dist

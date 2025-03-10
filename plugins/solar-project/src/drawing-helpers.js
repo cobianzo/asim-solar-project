@@ -1,4 +1,8 @@
-import { projectLineFromXY, pointToLatLng } from './trigonometry-helpers';
+import {
+  pointToLatLng,
+  projectLineFromXY
+} from './trigonometry-helpers.ts';
+
 
 export const paintASunForSegment = function( gmap, seg, icon = 'sun-marker.png' ) {
   return window.paintAMarker(

@@ -1,9 +1,11 @@
-import { rotateRectangle,
-  convertPointsArrayToLatLngString,
-  orthopedicRegtanglePoints,
+import {
   latLngToPoint,
+  orthopedicRegtanglePoints,
+  rotateRectangle,
+  convertPointsArrayToLatLngString,
   getLineIntersection,
-} from './trigonometry-helpers.js';
+} from './trigonometry-helpers.ts';
+
 
 import {
   paintASunForSegment,
