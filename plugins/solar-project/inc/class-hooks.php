@@ -56,9 +56,9 @@ class Hooks {
 			// }
 
 			// From here we continue in the ES6 script, loading build/index.js
-			$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php' );
+			$asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
 			wp_register_script( 'coco-solar-functions',
-				plugins_url( 'build/index.js', __FILE__ ),
+				plugins_url( 'build/index.js', __DIR__ ),
 				$asset_file['dependencies'],
 				$asset_file['version'],
 				true

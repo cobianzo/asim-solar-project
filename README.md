@@ -10,18 +10,19 @@
   - The first step of the form, the user selects a roof with a marker
   - The second step the user sees the shape of the roof he just selected, the interaction type of this coco-map is ´Developer´
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
+- The map in step 1 must have the adminLabel === 'map-roof'
 - The map in step 2 must have the adminLabel === 'map-rectangle'
 - The map in step 3 must have the adminLabel === 'map-panelli'
 
-  # Develop
+# Develop
 
   in this folder
   `npm run start` for wp scripts compilation into /build
   `npm run bs` for browser sync
 
-  ## folders 
+## deploy of the work in a website
 
-  cd /Users/alvaroblancocobian/LocalSites/solarpanels/app/public/wp-content/themes/twentytwentyfive/solar-functions
-  cd /Users/alvaroblancocobian/LocalSites/solarpanels/app/public/wp-content/plugins/coco-gravity-form-map-field
+Export both plugins in the zip into `./dist`
+`npm run plugins-zip`
 
   Sieglberg 31, Passau-Sieglgut, Germany

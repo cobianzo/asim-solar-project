@@ -1,0 +1,32 @@
+{
+  "imageryDate": {
+    "year": 2022,
+    "month": 4,
+    "day": 6
+  },
+  "imageryProcessedDate": {
+    "year": 2023,
+    "month": 8,
+    "day": 4
+  },
+  "dsmUrl": "https://solar.googleapis.com/v1/geoTiff:get?id=NzJhOTc4NjY0ZWI4MmVhYzI1ZTA2NjFjYjIyNWFmZGEtNjY0NmVhMmFiZmJiNWU2YzEwNzk1NjBhNjJmYmRiNzE6RFNNOkhJR0g",
+  "rgbUrl": "https://solar.googleapis.com/v1/geoTiff:get?id=NTdlZmI5NDliZWRlZGU0ZTU1ZWZjNjBhNzg3YmM1NDktYWZmNzk1NDEyNTI3YTRkNThmOTI3YWZkOGE4OWVlZDg6UkdCOkhJR0g",
+  "maskUrl": "https://solar.googleapis.com/v1/geoTiff:get?id=YzJmM2E3Yzg5Yjg5MTgwZmFlMDM0YTMwNTM0NTAzY2QtNjRkZWZjZjY1OGRmYmJjOWU0ZWM3NzcyNDJhMjk4NDA6TUFTSzpISUdI",
+  "annualFluxUrl": "https://solar.googleapis.com/v1/geoTiff:get?id=ZGVmNTZhNWMzMTdiNTQ5NDdiMjNmOTlhODlmNjUxNTQtZjZkNDNmYjQ1YTQ3M2JjNWZjZDViYTU0YWY1MDcxOTU6QU5OVUFMX0ZMVVg6SElHSA",
+  "monthlyFluxUrl": "https://solar.googleapis.com/v1/geoTiff:get?id=MmNiYWI2ZWNjYjUwZmI4NzkyZTAzOGE3MGUwNjliY2UtODA0NDVmNTlkZTg4OTcyYTc4ZGU1NDUyMWQ5NWY4YWY6TU9OVEhMWV9GTFVYOkhJR0g",
+  "hourlyShadeUrls": [
+    "https://solar.googleapis.com/v1/geoTiff:get?id=M2UwYzQ4NTAzYWJlYTE2MTVmMTlkYzMxOTg5ZTRlYzktZjdkMWY5NjhlMWQ4M2FjYWI2YmZiNWJiNjRmNjRlZTE6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=ZWQwNGYyMjI5MWM1OWVmMWExZmMyYzlmM2YwNTY5NDAtOGE2Yjk0ZDk0NTkxNzA3Zjg3YjNlYTdkNmMzODY3Y2Y6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=ZjJkNGVhZDM3MzNkZjYzMjdlYzM0MmZiYWUxOGM5ZWItY2Q1N2U1MjBlZjY1N2FhZDM4NzI0YWU2MWEyNWM3MGU6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=MTQ0ZjRjYWIyYTk4MjRjNzdhZmY4MjlkMWJmZDAwNjMtNTk3ZTY5MjI0N2RkODQxYjcxMDBmN2JhZjJhMjEwNzg6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=MTQ0ZTFlNTBjZjA3YTliMjUyZjc2MzcyOWUzZDFiMGEtNzkzY2U2YmYyYTQxOWIzYmVjNTU3NGEzMDFmMzQ3OTc6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=ZGYzYmJkNTZjN2JiNzgwMzYxOWU2MTk5OGY1ZGJhYWItNzRkNDEzNzVmOThlNjRjZjljMzMxYzFmYTlmNjdkZTg6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=YmM4ZGFmY2RjNjJlZDEzYWE2NmYzNzI5NjVjNGJiOTctMTg3OTc0NzY1ODJmOGEwMDIxYjk0OWY5MmVmZGQ5Yzk6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=ZjM2NTg2MjhjMDhiMTMzMDUxNjc3ZWE2ODNjOTk2NjQtMDZkYjdlZWYwMzY2NjVjMTVjY2NiYTJjMWFmNTUxY2M6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=NzlkODcyOTZmNjdlZjI1OGVkYTI5NzQ2ODE3NTM2MzgtNzlhOWUzZjE2YjVmOTYxZTQ4MzFiMWNlYTk4Y2U5NjY6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=MWI1ODc3OGQ1ZDIxMzE4YTJmOGVmMTczOWY5YmZjYjgtMzlhZjJhZWNlMGE5YTg2ZTRjZThmOTE3ZTQ5N2VjYzQ6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=NWI5Zjk3ODM3YjBiNDZhOTc1ODZmZjdjYTk2MmM5ZTMtNzU5MTFjNjRlNTQ2ZDZmMWYyYzVjMWQ5YTFiYzdmY2Y6SE9VUkxZX1NIQURFOkhJR0g",
+    "https://solar.googleapis.com/v1/geoTiff:get?id=NGIyM2M1MTdkYWU2ZmI1MzBjYjM5NDA0MzQyZWFmNjQtMDI0NGI1NGE3NmU5MDBmYTIwMDJlY2ZjYTJkYzI0NDg6SE9VUkxZX1NIQURFOkhJR0g"
+  ],
+  "imageryQuality": "HIGH"
+}

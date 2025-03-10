@@ -76,7 +76,7 @@ class Helper {
 	}
 
 	public static function get_icon_url( $icon_file = '' ) {
-		$sun_marker = plugin_dir_url( __FILE__ ) . "assets/$icon_file";
+		$sun_marker = plugin_dir_url( __DIR__ )  . "assets/$icon_file";
 		// when using browser sync it returns a weird url, so we send it relative not absolute
 		$sun_marker = str_replace( get_option( 'siteurl'), '', $sun_marker );
 		return $sun_marker;
