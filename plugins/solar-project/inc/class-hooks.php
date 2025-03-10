@@ -22,8 +22,7 @@ class Hooks {
 
 		// JS to draw rectangles and polygons and markers: both work but I have deactivated, info not needed.
 		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_print_bounding_boxes_areas' ], 10, 3 );
-		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_paint_building_profile' ], 10, 3 );
-
+		add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_paint_building_profile' ], 10, 3 );
 	}
 
 	public static function inject_js_script_step_2_and_3() {
@@ -61,7 +60,7 @@ class Hooks {
 			);
 
 			$previous_marker_value = explode( ',', $coco_map_entry );
-			$data_layers           = \Coco_Solar\Solar_API::get_datalayer_urls( $previous_marker_value[0], $previous_marker_value[1] );
+			// $data_layers           = \Coco_Solar\Solar_API::get_datalayer_urls( $previous_marker_value[0], $previous_marker_value[1] );
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url(). "'; \n" .
@@ -73,20 +72,33 @@ class Hooks {
 			);
 
 			// new calculated data
-			$building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
-			$stats = $building_data['solarPotential']['roofSegmentStats'] ?? null;
+			$solar_building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+			$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
 			if ( $stats ) {
 				wp_add_inline_script( 'coco-solar-functions',
 					"window.cocoBuildingRoofs = " . json_encode( $stats ) . "; \n"
 				);
 			}
 
-			// TODELETE:
-			if ( $data_layers ) {
+			// building profile data
+			$building_profile_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+			if ( isset( $building_profile_data['results'] ) ) {
+				$buildings_coords = \Coco_Solar\Solar_API::extract_building_profile_from_map_geocode_response( $building_profile_data );
 				wp_add_inline_script( 'coco-solar-functions',
-					"window.cocoDataLayers = " . json_encode( $data_layers ) . "; \n"
+					"window.cocoBuildingProfile = []; \n"
 				);
+				foreach ( $buildings_coords as $i => $building_coords ) {
+					wp_add_inline_script( 'coco-solar-functions',
+						"window.cocoBuildingProfile[" . $i . "] = " . json_encode( $building_coords ) . "; \n"
+					);
+				}
 			}
+			// TODELETE:
+			// if ( $data_layers ) {
+			// 	wp_add_inline_script( 'coco-solar-functions',
+			// 		"window.cocoDataLayers = " . json_encode( $data_layers ) . "; \n"
+			// 	);
+			// }
 
 			$step_map_rectangle = $step_map_panelli = null;
 
@@ -120,9 +132,12 @@ class Hooks {
 		$building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 		$stats = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		if ( $stats ) foreach ( $stats as $i => $segment ){
-			echo '<pre>';
+			echo "<div id='segment-info-$i' class='segment-info-modal hidden'>";
+			echo '<div>';
 			echo $i . ' => ' . intval($segment['azimuthDegrees']) . '° / ' . intval($segment['stats']['areaMeters2']) . 'm2';
-			echo '</pre>';
+			echo '<pre style="background-color: white; padding: 10px;">' . json_encode( $segment, JSON_PRETTY_PRINT ) . '</pre>';
+			echo '</div>';
+			echo '</div>';
 		}
 	}
 

@@ -35,24 +35,25 @@ export interface ExtendedSegment extends google.maps.Polygon {
   sunMarker?: google.maps.Marker;
   pointsInMap?: google.maps.Point[];
   realInclinationAngle?: number;
+  map: google.maps.Map;
 }
 
 // object with many properties saving the info of the rectangle that the user is painting in step 2
 export interface CocoDrawingRectangleInfo {
   hoveredSegment?: ExtendedSegment;
   selectedSegment?: ExtendedSegment;
-  drawRectangleStep: string;
-  rectanglePolygonCoords: string;
-  firstVertexCoord: google.maps.LatLngLiteral;
-  firstVertexPoint: google.maps.Point;
-  boundariesLinesAxisFirstClick: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
-  firstClickAxislineX: google.maps.Polyline | null;
-  firstClickAxislineY: google.maps.Polyline | null;
+  drawRectangleStep?: string;
+  rectanglePolygonCoords?: string;
+  firstVertexCoord?: google.maps.LatLngLiteral;
+  firstVertexPoint?: google.maps.Point;
+  boundariesLinesAxisFirstClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
+  firstClickAxislineX?: google.maps.Polyline | null;
+  firstClickAxislineY?: google.maps.Polyline | null;
 
-  polygon: google.maps.Polygon;
+  polygon?: google.maps.Polygon;
 
-  boundariesLinesAxisSecondClick: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
-  secondClickAxislineX: google.maps.Polyline | null;
-  secondClickAxislineY: google.maps.Polyline | null;
+  boundariesLinesAxisSecondClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
+  secondClickAxislineX?: google.maps.Polyline | null;
+  secondClickAxislineY?: google.maps.Polyline | null;
 
 }

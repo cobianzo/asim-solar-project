@@ -26,3 +26,9 @@ Export both plugins in the zip into `./dist`
 `npm run plugins-zip`
 
   Sieglberg 31, Passau-Sieglgut, Germany
+
+
+# PHPCS
+
+composer run-script lint plugins/solar-project/solar-project.php
+composer run-script format plugins/solar-project/solar-project.php

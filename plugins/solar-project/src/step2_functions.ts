@@ -11,6 +11,8 @@ import {
 import {
   paintASunForSegment,
   paintInclinedAxisAsLinesFromCoordenates,
+  designBuildingProfile,
+  createUnselectSegmentButton
  } from './drawing-helpers';
 
 declare global {
@@ -23,12 +25,17 @@ declare global {
     step2PolygonInputId: string;
     step2RectangleCoords: string;
     step3PolygonInputId: string;
-    gMapsKey: string;
+    cocoBuildingProfile: Array<string>;
+    gMapsKey: string; // not in use
 
     cocoMaps: { [key: string]: CocoMapSetup }; // @TODO:
+    cocoMapSetup?: CocoMapSetup;
     paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;
   }
 }
+
+
+/** Start everything  */
 
 document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) => {
 
@@ -36,19 +43,27 @@ document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) =>
     return;
   }
 
-  const cocoMapSetup = event.detail;
-  console.log('map so far ', cocoMapSetup);
+  window.cocoMapSetup = event.detail;
+  console.log('map so far ', window.cocoMapSetup);
 
+  // Verification, we get info of the map of step 2.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-ignore
-  if ( window.step2PolygonInputId !== cocoMapSetup.inputElement.id ) {
-    console.error( 'not found the input id', cocoMapSetup.inputElement );
+  if ( window.step2PolygonInputId !== window.cocoMapSetup.inputElement.id ) {
+    console.error( 'not found the input id', window.cocoMapSetup.inputElement );
     return;
   }
-  console.log(' Exectued cocoMap for field', cocoMapSetup);
-  const theMap = cocoMapSetup.map;
+  console.log(' Exectued cocoMap for field', window.cocoMapSetup);
+  const theMap = window.cocoMapSetup.map;
 
-  // retrieve all roof segments
+  // design polygon of the whole roof profile
+  if (window.cocoBuildingProfile?.length) {
+    console.log('>>>>> design of', window.cocoBuildingProfile);
+    designBuildingProfile(theMap, window.cocoBuildingProfile, 'black');
+  }
+
+
+  // retrieve all roof segments and paint them
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-ignore
@@ -80,55 +95,27 @@ document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) =>
       console.log('rectangleToPaint', rectangleToPaint);
 
       // Finally paint the inclined rectangle, adding some properties for easy access
-      cocoMapSetup.segments = cocoMapSetup.segments || [];
+      window.cocoMapSetup.segments = window.cocoMapSetup.segments || [];
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const segment = window.paintAPoygonInMap(theMap, rectangleToPaint, { clickable: true, fillOpacity: 0.35 });
+      const segment = window.paintAPoygonInMap(theMap, rectangleToPaint, { clickable: true, fillOpacity: 0.35, fillColor: '#FF0000' });
       segment.data = element; // to access to the solar API data of the segment
       segment.indexInMap = i;
       segment.pointsInMap = newRectPoints || undefined;
       segment.sunMarker = paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` );
       segment.realInclinationAngle = angle90;
 
-      cocoMapSetup.segments.push( segment );
+      window.cocoMapSetup.segments.push( segment );
 
 
       // Evento mouseover
-      segment.addListener('mouseover', function() {
-        console.log('hover on roof segment', segment);
-        highlightSegment(segment);
-
-        // eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-
-        window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
-        window.cocoDrawingRectangle.hoveredSegment = segment;
-
-        // hide all other segments
-        cocoMapSetup.segments?.forEach((segm) => {
-          if ( segm.indexInMap !== segment.indexInMap ) {
-            fadeSegment(segm);
-          }
-        })
-      });
+      segment.addListener('mouseover', handlerMouseOverHighlightSegment );
 
       // Evento mouseout
-      google.maps.event.addListener(segment, 'mouseout', function() {
-        // @ts-ignore
-        if ( window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap // @ts-ignore
-          || window.cocoDrawingRectangle?.selectedSegment?.indexInMap === segment.indexInMap
-        ) {
-          return;
-        }
-        // @ts-ignore
-        window.cocoDrawingRectangle.hoveredSegment = null;
-        resetSegmentVisibility(segment);
-        // hide all other segments .
-        // @ts-ignore
-        cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
-      });
+      google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
 
+      // Evento click to select
       google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
     });
 } );
@@ -142,7 +129,7 @@ function highlightSegment(roofSegment: ExtendedSegment, extraParams = {}) {
   });
 }
 function resetSegmentVisibility(roofSegment: ExtendedSegment) {
-  roofSegment.setOptions({ fillOpacity: 0.35 });
+  roofSegment.setOptions({ fillOpacity: 0.35, fillColor: '#FF0000', clickable: true });
   roofSegment.sunMarker?.setIcon({ // @ts-ignore
     ...roofSegment.sunMarker.getIcon(), // @ts-ignore
     url: window.cocoAssetsDir + 'sun-marker.png'
@@ -156,12 +143,49 @@ function fadeSegment(roofSegment: ExtendedSegment) {
   // });
 }
 
+
+// handlers
+function handlerMouseOverHighlightSegment (e) {
+  const segment = this;
+  console.log('hover on roof segment', segment);
+  highlightSegment(segment);
+
+  // eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+
+  window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
+  window.cocoDrawingRectangle.hoveredSegment = segment;
+
+  // hide all other segments
+  window.cocoMapSetup.segments?.forEach((segm: ExtendedSegment) => {
+    if ( segm.indexInMap !== segment.indexInMap ) {
+      fadeSegment(segm);
+    }
+  })
+}
+
+const handlerMouseOutUnhighlightSegment = function(e) {
+  const segment: ExtendedSegment  = this;
+  // @ts-ignore
+  if ( window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap // @ts-ignore
+    || window.cocoDrawingRectangle?.selectedSegment?.indexInMap === segment.indexInMap
+  ) {
+    return;
+  }
+  // @ts-ignore
+  window.cocoDrawingRectangle.hoveredSegment = null;
+  resetSegmentVisibility(segment);
+  // hide all other segments .
+  // @ts-ignore
+  window.cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
+}
+
 function handlerClickSelectSegment(e: Event) {
   const segm = this as ExtendedSegment;
   console.log('click on segment once', segm);
   // unhighlight all segments
   const allSegments = window.cocoMaps[window.step2PolygonInputId].segments;
-  allSegments.forEach( (s: ExtendedSegment) => {
+  allSegments?.forEach( (s: ExtendedSegment) => {
     if ( s.indexInMap !== segm.indexInMap ) {
       s.setVisible(false);
     }
@@ -169,9 +193,66 @@ function handlerClickSelectSegment(e: Event) {
   } );
   highlightSegment(segm, { fillColor: 'green', fillOpacity: 0.5, strokeWeight: 5, draggableCursor: 'crosshair'  }); // green
 
+  // show popoover info
+  const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
+  if (popoverInfo) {
+    popoverInfo.classList.remove('hidden');
+    popoverInfo.style.display = 'block';
+    popoverInfo.style.left = `10px`;
+    popoverInfo.style.top = `10px`;
+
+// Create a popup element
+const popup = document.createElement('div');
+popup.id = `popup-info`;
+popup.classList.add('popup', 'hidden');
+popup.style.position = 'fixed';
+popup.style.overflow = 'scroll';
+popup.style.maxHeight = '90%';
+popup.style.marginTop = '40px';
+popup.style.backgroundColor = 'white';
+popup.style.border = '1px solid black';
+popup.style.padding = '10px';
+popup.style.zIndex = '1000';
+// Add content to the popup
+popup.innerHTML = popoverInfo.innerHTML;
+// Append the popup to the document body
+document.body.appendChild(popup);
+// Position and display the popup
+const positionPopup = (x: number, y: number) => {
+  popup.style.left = `${x}px`;
+  popup.style.top = `${y}px`;
+  popup.classList.remove('hidden');
+};
+
+// Example: Position the popup near the clicked segment
+if (popoverInfo) {
+  const rect = popoverInfo.getBoundingClientRect();
+  positionPopup(rect.right + 10, rect.top);
+}
+  }
+
+
+  const unselectButton = createUnselectSegmentButton(segm.map);
+  unselectButton.onclick = () => {
+    window.cocoDrawingRectangle.polygon?.setMap(null);
+    window.cocoDrawingRectangle = {};
+    unselectButton.remove();
+    if (document.getElementById('popup-info')) {
+      document.getElementById('popup-info').remove();
+    }
+    segm.addListener('mouseover', handlerMouseOverHighlightSegment );
+    // mouseout
+    google.maps.event.addListener(segm, 'click', handlerClickSelectSegment);
+    // reset visibility of all segments
+    window.cocoMapSetup.segments?.forEach( (s: ExtendedSegment) => {
+      s.setVisible(true);
+      resetSegmentVisibility(s);
+    } );
+  };
+
   window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
   window.cocoDrawingRectangle.selectedSegment = segm;
-  window.cocoDrawingRectangle.hoveredSegment = null;
+  delete window.cocoDrawingRectangle.hoveredSegment;
 
   window.cocoDrawingRectangle.drawRectangleStep = 'step1.selectFirstVertex';
   google.maps.event.clearListeners(segm, 'click');
@@ -277,7 +358,7 @@ const handlerMouseMoveSecondVertexRectangle = ( gmap, clickEvent, angle ) => {
     window.cocoDrawingRectangle.firstVertexPoint, intersectionPointB, secondVertexPoint, intersectionPointD
   ]) ?? '';;
 
-  // paint!
+  // paint the rectangle created by the user!
   window.cocoDrawingRectangle.polygon = window.paintAPoygonInMap(
     gmap,
     window.cocoDrawingRectangle.rectanglePolygonCoords

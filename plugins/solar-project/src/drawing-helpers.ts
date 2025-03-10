@@ -138,3 +138,25 @@ export const paintInclinedAxisAsLinesFromCoordenates = (
     line2: null,
   };
 };
+
+
+export const designBuildingProfile = (
+  gmap: google.maps.Map,
+  buildingProfiles: Array<string>,
+  color: string
+) => {
+  buildingProfiles.forEach( building => {
+    window.paintAPoygonInMap(gmap, building, { strokeColor: color, fillColor: 'black', fillOpacity: 0.1, clickable: false });
+  } );
+}
+
+
+export const createUnselectSegmentButton = ( gmap : google.maps.Map ) => {
+  const unselectButton = document.createElement('button');
+  unselectButton.textContent = 'Unselect';
+  unselectButton.style.position = 'absolute';
+  unselectButton.style.top = '10px';
+  unselectButton.style.right = '10px';
+  gmap.controls[google.maps.ControlPosition.TOP_RIGHT].push(unselectButton);
+  return unselectButton;
+}

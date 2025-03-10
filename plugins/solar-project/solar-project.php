@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:disable WordPress.Files.FileName.InvalidClassFileName
 /**
  * Plugin Name: Solar Project
  * Plugin URI: http://example.com/plugin
@@ -29,10 +29,23 @@ class Solar_Project {
 
 	public function init_plugin() {
 			// Code to run during plugin initialization
-			add_action('wp_head', function() {
+			add_action('wp_head', function () {
 				echo '<style>
 				.gform-field-coco-map {
 					min-height: 500px;
+				}
+				.segment-info-modal {
+					position: fixed;
+					background: #FFFFFFEE;
+					padding: 10px;
+					top: 30px;
+					border: 5px solid #000000AA;
+					box-shadow: 0 0 10px 0 rgba(0,0,0,0.75);
+					left: 0;
+					z-index: 9999;
+				}
+				.hidden {
+					display: none;
 				}
 				</style>';
 			});
