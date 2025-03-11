@@ -1,9 +1,12 @@
 // types
 import { ExtendedSegment } from './types';
 import {
+  getPolygonCenterByVertexPoints,
   pointToLatLng,
   projectLineFromXY,
 } from './trigonometry-helpers';
+import { Draggable } from '@wordpress/components';
+import { BorderControl } from '@wordpress/components/build-types/border-control';
 
 /**
  * Paints a sun marker in the map at the center of a segment.
@@ -186,15 +189,66 @@ export const fadeSegment =function(roofSegment: ExtendedSegment) {
 }
 
 // Rectangle painted by the user
-export const paintRectangleInMap = (gmap: google.maps.Map, rectangleAsStringOfCoords: string) => {
+export const paintRectangleInMap = (gmap: google.maps.Map, rectangleAsStringOfCoords: string, vertexPoints?: Array<google.maps.Point>) => {
+
+  if (window.cocoDrawingRectangle?.polygon) {
+    removeRectangleInMap(gmap, false);
+  }
+
   window.cocoDrawingRectangle.polygon = window.paintAPoygonInMap(
     gmap,
-    rectangleAsStringOfCoords
+    rectangleAsStringOfCoords,
+    // { clickable: true }
   );
+
+  window.cocoDrawingRectangle.polygonPoints = vertexPoints ?? [];
+  window.cocoDrawingRectangle.polygonCenterPoint = vertexPoints? getPolygonCenterByVertexPoints(vertexPoints) : null;
+
+  if (window.cocoDrawingRectangle.polygonCenterPoint) {
+    window.cocoDrawingRectangle.polygonCenterCoords = pointToLatLng(
+      gmap,
+      window.cocoDrawingRectangle.polygonCenterPoint.x,
+      window.cocoDrawingRectangle.polygonCenterPoint.y
+    );
+  }
 }
-export const removeRectangleInMap = (gmap: google.maps.Map) => {
+
+  /**
+   * Removes the drawn rectangle from the map
+   * @param gmap the google map object
+   */
+export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = false) => {
   if (window.cocoDrawingRectangle?.polygon) {
     window.cocoDrawingRectangle.polygon.setMap(null);
-    window.cocoDrawingRectangle = {};
+    if (window.cocoDrawingRectangle.polygonCenterMarker) {
+      window.cocoDrawingRectangle.polygonCenterMarker.map = null;
+    }
+    if (clearDrawingInfo)
+      window.cocoDrawingRectangle = {};
+  }
+}
+
+export const paintCenterOfRectangleInMap = (gmap: google.maps.Map) => {
+  // paint hte center of the polygon
+  if (window.cocoDrawingRectangle.polygonCenterMarker)
+    window.cocoDrawingRectangle.polygonCenterMarker.map = null;
+  console.log('center polygon is ', window.cocoDrawingRectangle.polygonCenterCoords?.lat(), window.cocoDrawingRectangle.polygonCenterCoords?.lng());
+  if (window.cocoDrawingRectangle.polygonCenterCoords) {
+    window.paintAMarker(
+      gmap,
+      window.cocoDrawingRectangle.polygonCenterCoords,
+      `${(window as any).cocoAssetsDir}${'target.png'}`,
+      {
+        style: {
+          width: '20px',
+          height: '20px',
+          transform: 'translate(0px, 10px)',
+          border:'2px solid white',
+          borderRadius:'50%',
+        },
+      }
+    ).then(marker => {
+      window.cocoDrawingRectangle.polygonCenterMarker = marker;
+    });
   }
 }

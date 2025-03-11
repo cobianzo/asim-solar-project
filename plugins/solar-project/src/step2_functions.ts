@@ -12,6 +12,7 @@ import {
   paintInclinedAxisAsLinesFromCoordenates,
   designBuildingProfile,
   paintRectangleInMap,
+  paintCenterOfRectangleInMap,
  } from './drawing-helpers';
 
  import { debugSetup } from './debug';
@@ -81,8 +82,10 @@ export const handlerClickDrawRectangleOverSegment = function (e) {
   // SECOND CLICK OF RECT DESIGN: Now we mark the opposite vertex of the rectangle
   else if ( window.cocoDrawingRectangle.drawRectangleStep === 'step2.selectSecondVertex' ) {
 
-    const input = document.getElementById(window.step2PolygonInputId);
-    input.value = window.cocoDrawingRectangle.rectanglePolygonCoords;
+    const input = document.getElementById(window.step2PolygonInputId) as HTMLInputElement;
+    if (input) {
+      input.value = window.cocoDrawingRectangle.rectanglePolygonCoords || '';
+    }
     console.log('window.cocoDrawingRectangle.rectanglePolygonCoords', window.cocoDrawingRectangle.rectanglePolygonCoords);
 
     // Clear the mouseover listener
@@ -90,6 +93,17 @@ export const handlerClickDrawRectangleOverSegment = function (e) {
     window.google.maps.event.clearListeners(segm, 'mousemove');
     window.google.maps.event.clearListeners(segm, 'click');
     window.cocoDrawingRectangle.drawRectangleStep = 'step3.finished';
+
+    window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
+    paintCenterOfRectangleInMap(segm.map);
+    if (window.cocoDrawingRectangle.polygon) {
+      window.cocoDrawingRectangle.polygon.addListener('click', function(this: google.maps.Polygon, event: google.maps.MapMouseEvent) {
+        console.log('Polygon clicked at', this, event.latLng.lat(), event.latLng.lng());
+        // Add desired behavior or function call here
+
+        // rotate the pixels of the polygon, and repaint it
+      });
+    }
 
   }
 
@@ -146,18 +160,16 @@ const handlerMouseMoveSecondVertexRectangle = (
 
   // with all the points, we draw the inclined rectangle created by the user
   if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && secondVertexPoint && intersectionPointD ) {
-    const rectanglePolygonCoords = convertPointsArrayToLatLngString(
-      gmap,
-      [
-        window.cocoDrawingRectangle.firstVertexPoint,
-        intersectionPointB,
-        secondVertexPoint,
-        intersectionPointD
-      ]
-    ) ?? '';;
+    const vertexPoints = [
+      window.cocoDrawingRectangle.firstVertexPoint,
+      intersectionPointB,
+      secondVertexPoint,
+      intersectionPointD
+    ]
+    const rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, vertexPoints ) ?? '';;
 
     // paint the rectangle created by the user!
-    paintRectangleInMap(gmap, rectanglePolygonCoords);
+    paintRectangleInMap(gmap, rectanglePolygonCoords, vertexPoints);
 
     return true;
   }

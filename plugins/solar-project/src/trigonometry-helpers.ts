@@ -206,3 +206,11 @@ export const getLineIntersection = function(
   return new google.maps.Point(px, py);
 }
 
+export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Array<google.maps.Point>) {
+
+  const sumX = polygonVertexPoints.reduce((acc, point) => acc + point.x, 0);
+  const sumY = polygonVertexPoints.reduce((acc, point) => acc + point.y, 0);
+
+  return new google.maps.Point(sumX / polygonVertexPoints.length, sumY / polygonVertexPoints.length);
+
+}

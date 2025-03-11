@@ -62,7 +62,7 @@ export const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extr
   }
 
   // If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
-  removeRectangleInMap(theMap);
+  removeRectangleInMap(theMap, true);
 
   /** ========================================
    * PAINT THE SEGMENTS

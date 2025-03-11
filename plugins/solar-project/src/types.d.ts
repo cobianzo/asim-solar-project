@@ -52,6 +52,10 @@ export interface CocoDrawingRectangleInfo {
   firstClickAxislineY?: google.maps.Polyline | null;
 
   polygon?: google.maps.Polygon;
+  polygonPoints?: Array<google.maps.Point>;
+  polygonCenterPoint?: google.maps.Point | null;
+  polygonCenterCoords?: google.maps.LatLng | null;
+  polygonCenterMarker?: AdvancedMarkerElement | null;
 
   boundariesLinesAxisSecondClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
   secondClickAxislineX?: google.maps.Polyline | null;
