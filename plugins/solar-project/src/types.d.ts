@@ -2,7 +2,7 @@
 export interface CocoMapSetup {
   map: google.maps.Map;
   inputElement: HTMLInputElement;
-  segments?: ExtendedSegment[];
+  segments?: ExtendedSegment[]; // the google.map.Polygons with extra data
 }
 
 // remember there is also a google.maps.LatLngLiteral which uses {lat: ... , lng: ... }
@@ -32,10 +32,11 @@ export interface RoofSegmentStats {
 export interface ExtendedSegment extends google.maps.Polygon {
   data?: RoofSegmentStats;
   indexInMap?: number;
-  sunMarker?: google.maps.Marker;
+  sunMarker?: AdvancedMarkerElement;
   pointsInMap?: google.maps.Point[];
-  realInclinationAngle?: number;
+  realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees
   map: google.maps.Map;
+  isPortrait?: boolean;
 }
 
 // object with many properties saving the info of the rectangle that the user is painting in step 2

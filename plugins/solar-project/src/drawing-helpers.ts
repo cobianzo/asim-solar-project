@@ -17,23 +17,30 @@ import {
  * @param icon The icon to use (defaults to 'sun-marker.png')
  * @returns The marker object
  */
-export const paintASunForSegment = (
+export const paintASunForSegment = async(
   gmap: google.maps.Map,
   seg: ExtendedSegment,
   icon: string = 'sun-marker.png'
-): google.maps.Marker => {
+): Promise<AdvancedMarkerElement> => {
+
+  if ( ! seg.data ) {
+    return Promise.reject(new Error('Segment does not have center coordinates'));
+  }
 
   // paintAMarker is a function defined by coco plugin
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return window.paintAMarker(
+  return await window.paintAMarker(
     gmap,
-    { lat: seg.data.center.latitude, lng: seg.data.center.longitude },
+    new google.maps.LatLng(seg.data.center.latitude, seg.data.center.longitude),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
     `${(window as any).cocoAssetsDir}${icon}`,
     {
-      scaledSize: new google.maps.Size(10, 10),
-      anchor: new google.maps.Point(5, 5),
+      style: {
+        width: '20px',
+        height: '20px',
+        transform: 'translate(-10px, 10px)'
+      },
     }
   );
 };
@@ -159,4 +166,35 @@ export const createUnselectSegmentButton = ( gmap : google.maps.Map ) => {
   unselectButton.style.right = '10px';
   gmap.controls[google.maps.ControlPosition.TOP_RIGHT].push(unselectButton);
   return unselectButton;
+}
+
+export const highlightSegment = function(roofSegment: ExtendedSegment, extraParams = {}) {
+  roofSegment.setOptions({ fillOpacity: 0.7, strokeOpacity: 1, ...extraParams });
+  if (roofSegment.sunMarker?.content) {
+    roofSegment.sunMarker.content.style.border = '1px solid orange';
+    roofSegment.sunMarker.content.style.borderRadius = '50%';
+  }
+}
+export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
+  roofSegment.setOptions({ fillOpacity: 0.35, fillColor: '#FF0000', clickable: true });
+  if (roofSegment.sunMarker?.content) {
+    roofSegment.sunMarker.content.style.border = 'none'
+  }
+}
+export const fadeSegment =function(roofSegment: ExtendedSegment) {
+  roofSegment.setOptions({ fillOpacity: 0.1, strokeOpacity: 0 });
+}
+
+// Rectangle painted by the user
+export const paintRectangleInMap = (gmap: google.maps.Map, rectangleAsStringOfCoords: string) => {
+  window.cocoDrawingRectangle.polygon = window.paintAPoygonInMap(
+    gmap,
+    rectangleAsStringOfCoords
+  );
+}
+export const removeRectangleInMap = (gmap: google.maps.Map) => {
+  if (window.cocoDrawingRectangle?.polygon) {
+    window.cocoDrawingRectangle.polygon.setMap(null);
+    window.cocoDrawingRectangle = {};
+  }
 }

@@ -1,38 +1,20 @@
 // types
-import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo } from './types';
+import { CocoMapSetup } from './types';
+
+import  { getStep2CocoMapSetup, setupSegments } from './1-setup-segments';
 import {
   latLngToPoint,
-  orthopedicRegtanglePoints,
-  rotateRectangle,
   convertPointsArrayToLatLngString,
   getLineIntersection,
 } from './trigonometry-helpers';
 
 import {
-  paintASunForSegment,
   paintInclinedAxisAsLinesFromCoordenates,
   designBuildingProfile,
-  createUnselectSegmentButton
+  paintRectangleInMap,
  } from './drawing-helpers';
 
-declare global {
-  interface Window {
-    cocoDrawingRectangle: CocoDrawingRectangleInfo;
-    cocoIsStepSelectRectangle: Boolean;
-    cocoIsStepSelectPanelli: Boolean;
-
-    cocoAssetsDir: string;
-    step2PolygonInputId: string;
-    step2RectangleCoords: string;
-    step3PolygonInputId: string;
-    cocoBuildingProfile: Array<string>;
-    gMapsKey: string; // not in use
-
-    cocoMaps: { [key: string]: CocoMapSetup }; // @TODO:
-    cocoMapSetup?: CocoMapSetup;
-    paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;
-  }
-}
+ import { debugSetup } from './debug';
 
 
 /** Start everything  */
@@ -43,18 +25,21 @@ document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) =>
     return;
   }
 
-  window.cocoMapSetup = event.detail;
-  console.log('map so far ', window.cocoMapSetup);
+  const cocoMapSetup = getStep2CocoMapSetup();
+
+
+  console.log('We are in the step of select rectangle. map so far ', );
 
   // Verification, we get info of the map of step 2.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-ignore
-  if ( window.step2PolygonInputId !== window.cocoMapSetup.inputElement.id ) {
-    console.error( 'not found the input id', window.cocoMapSetup.inputElement );
+  if ( cocoMapSetup.inputElement.id !== event.detail.inputElement.id ) {
+    console.error( 'not found the input id', cocoMapSetup.inputElement );
     return;
   }
+
   console.log(' Exectued cocoMap for field', window.cocoMapSetup);
-  const theMap = window.cocoMapSetup.map;
+  const theMap = cocoMapSetup.map;
 
   // design polygon of the whole roof profile
   if (window.cocoBuildingProfile?.length) {
@@ -62,206 +47,18 @@ document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) =>
     designBuildingProfile(theMap, window.cocoBuildingProfile, 'black');
   }
 
-
-  // retrieve all roof segments and paint them
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // @ts-ignore
-  const roofSegments = window.cocoBuildingRoofs;
-  if ( roofSegments.length )
-    roofSegments.forEach((element : RoofSegmentStats, i: number) => {
-      console.log( 'Calculos par segment ', i, element);
-
-      const {center, azimuthDegrees, boundingBox: {sw, ne}} = element;
-
-      // calculations of coord of the new rotated rect
-      const rectPoints = orthopedicRegtanglePoints(theMap, sw, ne);
-
-      if ( ! rectPoints ) {
-        return null;
-      }
-
-      const isPortrait = rectPoints ?
-        Math.abs(rectPoints[0].x - rectPoints[2].x) < Math.abs(rectPoints[0].y - rectPoints[1].y)
-        : false;
-
-      // angle that we'll turn the drwan rectangle
-      // here the API of gmaps is weird: if the rectangle is landscape, the angle is correct,
-      // but if the rectangle is portrait, we need to add 90 degrees to the angle
-      const angle90 = (azimuthDegrees + (isPortrait? 90 : 0) ) % 90;
-      const centerPoint = latLngToPoint(theMap, center);
-      const newRectPoints = centerPoint? rotateRectangle(rectPoints, centerPoint, angle90) : null;
-      const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
-      console.log('rectangleToPaint', rectangleToPaint);
-
-      // Finally paint the inclined rectangle, adding some properties for easy access
-      window.cocoMapSetup.segments = window.cocoMapSetup.segments || [];
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const segment = window.paintAPoygonInMap(theMap, rectangleToPaint, { clickable: true, fillOpacity: 0.35, fillColor: '#FF0000' });
-      segment.data = element; // to access to the solar API data of the segment
-      segment.indexInMap = i;
-      segment.pointsInMap = newRectPoints || undefined;
-      segment.sunMarker = paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` );
-      segment.realInclinationAngle = angle90;
-
-      window.cocoMapSetup.segments.push( segment );
+  // design all segments
+  setupSegments();
 
 
-      // Evento mouseover
-      segment.addListener('mouseover', handlerMouseOverHighlightSegment );
+  // things related to debugging
+  debugSetup();
 
-      // Evento mouseout
-      google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
-
-      // Evento click to select
-      google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
-    });
 } );
 
 
-function highlightSegment(roofSegment: ExtendedSegment, extraParams = {}) {
-  roofSegment.setOptions({ fillOpacity: 0.7, strokeOpacity: 1, ...extraParams });
-  roofSegment.sunMarker?.setIcon({ // @ts-ignore
-    ...roofSegment.sunMarker.getIcon(), // @ts-ignore
-    url: window.cocoAssetsDir + 'sun-marker-hover.png',
-  });
-}
-function resetSegmentVisibility(roofSegment: ExtendedSegment) {
-  roofSegment.setOptions({ fillOpacity: 0.35, fillColor: '#FF0000', clickable: true });
-  roofSegment.sunMarker?.setIcon({ // @ts-ignore
-    ...roofSegment.sunMarker.getIcon(), // @ts-ignore
-    url: window.cocoAssetsDir + 'sun-marker.png'
-  });
-}
-function fadeSegment(roofSegment: ExtendedSegment) {
-  roofSegment.setOptions({ fillOpacity: 0.1, strokeOpacity: 0 });
-  // roofSegment.sunMarker.setIcon({
-  //   ...roofSegment.sunMarker.getIcon(),
-  //   url: window.cocoAssetsDir + 'sun-marker.png'
-  // });
-}
 
-
-// handlers
-function handlerMouseOverHighlightSegment (e) {
-  const segment = this;
-  console.log('hover on roof segment', segment);
-  highlightSegment(segment);
-
-  // eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-
-  window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
-  window.cocoDrawingRectangle.hoveredSegment = segment;
-
-  // hide all other segments
-  window.cocoMapSetup.segments?.forEach((segm: ExtendedSegment) => {
-    if ( segm.indexInMap !== segment.indexInMap ) {
-      fadeSegment(segm);
-    }
-  })
-}
-
-const handlerMouseOutUnhighlightSegment = function(e) {
-  const segment: ExtendedSegment  = this;
-  // @ts-ignore
-  if ( window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap // @ts-ignore
-    || window.cocoDrawingRectangle?.selectedSegment?.indexInMap === segment.indexInMap
-  ) {
-    return;
-  }
-  // @ts-ignore
-  window.cocoDrawingRectangle.hoveredSegment = null;
-  resetSegmentVisibility(segment);
-  // hide all other segments .
-  // @ts-ignore
-  window.cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
-}
-
-function handlerClickSelectSegment(e: Event) {
-  const segm = this as ExtendedSegment;
-  console.log('click on segment once', segm);
-  // unhighlight all segments
-  const allSegments = window.cocoMaps[window.step2PolygonInputId].segments;
-  allSegments?.forEach( (s: ExtendedSegment) => {
-    if ( s.indexInMap !== segm.indexInMap ) {
-      s.setVisible(false);
-    }
-    resetSegmentVisibility(s);
-  } );
-  highlightSegment(segm, { fillColor: 'green', fillOpacity: 0.5, strokeWeight: 5, draggableCursor: 'crosshair'  }); // green
-
-  // show popoover info
-  const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
-  if (popoverInfo) {
-    popoverInfo.classList.remove('hidden');
-    popoverInfo.style.display = 'block';
-    popoverInfo.style.left = `10px`;
-    popoverInfo.style.top = `10px`;
-
-// Create a popup element
-const popup = document.createElement('div');
-popup.id = `popup-info`;
-popup.classList.add('popup', 'hidden');
-popup.style.position = 'fixed';
-popup.style.overflow = 'scroll';
-popup.style.maxHeight = '90%';
-popup.style.marginTop = '40px';
-popup.style.backgroundColor = 'white';
-popup.style.border = '1px solid black';
-popup.style.padding = '10px';
-popup.style.zIndex = '1000';
-// Add content to the popup
-popup.innerHTML = popoverInfo.innerHTML;
-// Append the popup to the document body
-document.body.appendChild(popup);
-// Position and display the popup
-const positionPopup = (x: number, y: number) => {
-  popup.style.left = `${x}px`;
-  popup.style.top = `${y}px`;
-  popup.classList.remove('hidden');
-};
-
-// Example: Position the popup near the clicked segment
-if (popoverInfo) {
-  const rect = popoverInfo.getBoundingClientRect();
-  positionPopup(rect.right + 10, rect.top);
-}
-  }
-
-
-  const unselectButton = createUnselectSegmentButton(segm.map);
-  unselectButton.onclick = () => {
-    window.cocoDrawingRectangle.polygon?.setMap(null);
-    window.cocoDrawingRectangle = {};
-    unselectButton.remove();
-    if (document.getElementById('popup-info')) {
-      document.getElementById('popup-info').remove();
-    }
-    segm.addListener('mouseover', handlerMouseOverHighlightSegment );
-    // mouseout
-    google.maps.event.addListener(segm, 'click', handlerClickSelectSegment);
-    // reset visibility of all segments
-    window.cocoMapSetup.segments?.forEach( (s: ExtendedSegment) => {
-      s.setVisible(true);
-      resetSegmentVisibility(s);
-    } );
-  };
-
-  window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
-  window.cocoDrawingRectangle.selectedSegment = segm;
-  delete window.cocoDrawingRectangle.hoveredSegment;
-
-  window.cocoDrawingRectangle.drawRectangleStep = 'step1.selectFirstVertex';
-  google.maps.event.clearListeners(segm, 'click');
-  google.maps.event.clearListeners(segm, 'mouseover');
-  google.maps.event.clearListeners(segm, 'mouseout');
-  google.maps.event.addListener(segm, 'click', handlerClickDrawRectangleOverSegment);
-}
-
-function handlerClickDrawRectangleOverSegment(e) {
+export const handlerClickDrawRectangleOverSegment = function (e) {
   const segm = this;
   console.log('click on the segment', segm);
   console.log('step', window.cocoDrawingRectangle.drawRectangleStep );
@@ -269,12 +66,12 @@ function handlerClickDrawRectangleOverSegment(e) {
 
   // FIRST CLICK OF RECT DESIGN: Now we mark the first vertex of the rectangle
   if ( window.cocoDrawingRectangle.drawRectangleStep === 'step1.selectFirstVertex' ) {
-    handlerClickFirstVertexRectangle( segm.map, e, segm.realInclinationAngle );
+    handlerClickFirstVertexRectangle( segm.map, e, segm.realRotationAngle );
     window.cocoDrawingRectangle.drawRectangleStep = 'step2.selectSecondVertex';
     segm.setOptions({ fillOpacity: 0.1 });
     segm.addListener('mousemove', function( ev ) {
       console.log( 'Moving >>>> ' + ev.latLng.lat() );
-      handlerMouseMoveSecondVertexRectangle( segm.map, ev, segm.realInclinationAngle );
+      handlerMouseMoveSecondVertexRectangle( segm.map, ev, segm.realRotationAngle );
     } );
     segm.addListener('click', function( ev ) {
       console.log('Paso a step2'); // handlerClickDrawRectangleOverSegment
@@ -299,17 +96,7 @@ function handlerClickDrawRectangleOverSegment(e) {
 }
 
 
-const handlerClickFirstVertexRectangle = ( gmap, clickEvent, angle ) => {
-  window.paintAMarker(
-    gmap,
-    { lat: clickEvent.latLng.lat(), lng: clickEvent.latLng.lng() },
-    `${window.cocoAssetsDir}vertex-ne.png`,
-    {
-      scaledSize: new window.google.maps.Size(10, 10),
-      anchor: new google.maps.Point(0, 10),
-    }
-  );
-
+const handlerClickFirstVertexRectangle = ( gmap: google.maps.Map, clickEvent: google.maps.event, angle: number ) => {
   window.cocoDrawingRectangle.firstVertexCoord = { lat: clickEvent.latLng.lat(), lng: clickEvent.latLng.lng() };
   window.cocoDrawingRectangle.firstVertexPoint = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
 
@@ -321,7 +108,11 @@ const handlerClickFirstVertexRectangle = ( gmap, clickEvent, angle ) => {
   window.cocoDrawingRectangle.firstClickAxislineY = line2;
 }
 
-const handlerMouseMoveSecondVertexRectangle = ( gmap, clickEvent, angle ) => {
+const handlerMouseMoveSecondVertexRectangle = (
+  gmap: google.maps.Map,
+  clickEvent: google.maps.event,
+  angle: number
+) => {
 
   // if the polygon is drawn, we remove it
   window.cocoDrawingRectangle.polygon?.setMap(null);
@@ -354,15 +145,23 @@ const handlerMouseMoveSecondVertexRectangle = ( gmap, clickEvent, angle ) => {
   );
 
   // with all the points, we draw the inclined rectangle created by the user
-  window.cocoDrawingRectangle.rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, [
-    window.cocoDrawingRectangle.firstVertexPoint, intersectionPointB, secondVertexPoint, intersectionPointD
-  ]) ?? '';;
+  if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && secondVertexPoint && intersectionPointD ) {
+    const rectanglePolygonCoords = convertPointsArrayToLatLngString(
+      gmap,
+      [
+        window.cocoDrawingRectangle.firstVertexPoint,
+        intersectionPointB,
+        secondVertexPoint,
+        intersectionPointD
+      ]
+    ) ?? '';;
 
-  // paint the rectangle created by the user!
-  window.cocoDrawingRectangle.polygon = window.paintAPoygonInMap(
-    gmap,
-    window.cocoDrawingRectangle.rectanglePolygonCoords
-  );
+    // paint the rectangle created by the user!
+    paintRectangleInMap(gmap, rectanglePolygonCoords);
 
-  return true;
+    return true;
+  }
+
+  return false;
+
 }

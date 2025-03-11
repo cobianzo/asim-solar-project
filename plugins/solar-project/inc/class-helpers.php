@@ -34,6 +34,20 @@ class Helper {
 		return self::capture_coco_map_field_instance( $form, 'map-panelli' );
 	}
 
+	// not in use, not tested.
+	public static function capture_coco_map_field_instances_in_page( $form ) {
+		$page_number = \GFFormDisplay::get_current_page( $form['id'] );
+
+		$coco_map_fields_in_page = array();
+		foreach ( $form['fields'] as $field ) {
+			if ( 'coco-map' === rgar( $field, 'type' ) &&
+			   ( $field->pageNumber === $page_number ) ) {
+				$coco_map_fields_in_page[] = $field;
+			}
+		}
+		return $coco_map_fields_in_page;
+	}
+
 	public static function capture_coco_map_field_instance( $form, $adminLabel ) {
 		$entry = \GFFormsModel::get_current_lead(); // get all data already inputted in the form
 		if ( $entry ) {

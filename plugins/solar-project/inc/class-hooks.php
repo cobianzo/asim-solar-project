@@ -6,8 +6,14 @@ class Hooks {
 
 
 	public static function init() {
-		// not in use:
+
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'inject_js_script_step_2_and_3' ] );
+
+		add_action( 'wp_enqueue_scripts', function() {
+			$url_style = plugins_url( 'src/style.css', __DIR__ );
+			wp_register_style( 'coco-solar-project', $url_style, [], null );
+			wp_enqueue_style( 'coco-solar-project' );
+		} );
 
 		// hook for the backend, edit form: adds the option 'developer' to the interaction type
 		add_action( 'coco_gf_map_field_interaction_type_extra_options', function() {
@@ -67,8 +73,8 @@ class Hooks {
 				"window.step2PolygonInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
 				"window.step2RectangleCoords = " . json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
 				"window.step3PolygonInputId = 'input_{$coco_mapfieldpanelli_instance->formId}_{$coco_mapfieldpanelli_instance->id}'; \n" .
-				"window.gMapsKey = '" . \Coco_Solar\Solar_API::get_google_api() . "'; \n"
-
+				"window.gMapsKey = '" . \Coco_Solar\Solar_API::get_google_api() . "'; \n" .
+				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
 			// new calculated data
@@ -76,7 +82,7 @@ class Hooks {
 			$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
 			if ( $stats ) {
 				wp_add_inline_script( 'coco-solar-functions',
-					"window.cocoBuildingRoofs = " . json_encode( $stats ) . "; \n"
+					"window.cocoBuildingSegments = " . json_encode( $stats ) . "; \n"
 				);
 			}
 
@@ -131,14 +137,21 @@ class Hooks {
 		$previous_marker_value = explode( ',', $coco_map_entry );
 		$building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 		$stats = $building_data['solarPotential']['roofSegmentStats'] ?? null;
+		echo '<div class="grid-h">';
 		if ( $stats ) foreach ( $stats as $i => $segment ){
-			echo "<div id='segment-info-$i' class='segment-info-modal hidden'>";
+
+			echo '<div class="segment-basic-info" id="segment-basic-info-' . $i . '">';
+			echo $i . ' => ' . intval($segment['azimuthDegrees']) . '° / ' . intval($segment['stats']['areaMeters2']);
+			echo '</div>';
+
+			echo "<div id='segment-info-$i' data-segment='$i' class='segment-info-modal hidden'>";
 			echo '<div>';
 			echo $i . ' => ' . intval($segment['azimuthDegrees']) . '° / ' . intval($segment['stats']['areaMeters2']) . 'm2';
 			echo '<pre style="background-color: white; padding: 10px;">' . json_encode( $segment, JSON_PRETTY_PRINT ) . '</pre>';
 			echo '</div>';
 			echo '</div>';
 		}
+		echo '</div>';
 	}
 
 	public static function set_default_zoom( $zoom, $form ) {
