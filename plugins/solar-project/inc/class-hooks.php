@@ -154,8 +154,9 @@ class Hooks {
 		echo '</div>';
 
 		// now the info for debugging for the building profile
-		$current_page = $field_instance->pageNumber;
+		$current_page          = $field_instance->pageNumber;
 		$building_profile_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+		$solar_building_data   = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 		?>
 		<p>Clicca qui per mostrare le informazione del palazzo da Google Maps.
 			Da qui si disegna il poligono del profilo del palazzo. Cerca i campi <u>buildings</u></p>
@@ -175,6 +176,22 @@ class Hooks {
 			}
 		</script>
 
+
+		<button onClick="showSolarAPIReponse_<?php echo esc_attr( $current_page ); ?>(event); return false;">Mostra risposta Solar API</button>
+		<div id="buildingSolarResponsePopover_<?php echo esc_attr( $current_page ); ?>" class="popup-info hidden" onclick="this.classList.toggle('hidden');">
+			<div class="popover-content">
+				<pre>
+					<?php echo json_encode( $solar_building_data, JSON_PRETTY_PRINT ); ?>
+				</pre>
+			</div>
+		</div>
+		<script>
+			function showSolarAPIReponse_<?php echo esc_attr( $current_page ); ?>(e) {
+				e.preventDefault();
+				const popover = document.getElementById('buildingSolarResponsePopover_<?php echo esc_attr( $current_page ); ?>');
+				popover.classList.toggle('hidden')
+			}
+		</script>
 		<?php
 	}
 

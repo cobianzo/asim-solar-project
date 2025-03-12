@@ -74,5 +74,22 @@ const rectangleRotationInteractionSetup = function() {
       }
     });
   });
+
+
+  // Not so important
+
+  window.cocoDrawingRectangle.polygon.addListener('mouseover', function() {
+    const icon = `${(window as any).cocoAssetsDir}${'rotate-marker.png'}`;
+    if (window.cocoDrawingRectangle.polygonCenterMarker?.content )  {
+      window.cocoDrawingRectangle.polygonCenterMarker.content.style.backgroundImage = `url(${icon})`;
+    }
+  });
+  window.cocoDrawingRectangle.polygon.addListener('mouseout', function() {
+    const icon = `${(window as any).cocoAssetsDir}${'target.png'}`;
+    if (window.cocoDrawingRectangle.polygonCenterMarker?.content )  {
+      window.cocoDrawingRectangle.polygonCenterMarker.content.style.backgroundImage = `url(${icon})`;
+    }
+  });
 }
+
 export default rectangleRotationInteractionSetup;
