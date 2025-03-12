@@ -1,4 +1,4 @@
-import { setupSegments } from "./1-setup-segments";
+import setupSegments from "./setup-segments-interactive-functions";
 import { ExtendedSegment } from "./types";
 
 
@@ -30,6 +30,9 @@ export const createPopup = function (elementContentToClone: Element) {
   popup.innerHTML = elementContentToClone.innerHTML;
   document.body.appendChild(popup);
 
+  popup.addEventListener('click', (event) => {
+    popup.remove();
+  });
 
 }
 

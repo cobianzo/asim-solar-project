@@ -1,54 +1,63 @@
 // types
-import { CocoMapSetup } from './types';
+import { CocoMapSetup, ExtendedSegment } from './types';
 
-import  { getStep2CocoMapSetup, setupSegments } from './1-setup-segments';
+import  setupSegments from './setup-segments-interactive-functions';
 import {
   latLngToPoint,
   convertPointsArrayToLatLngString,
   getLineIntersection,
+  rotateRectangle,
+  pointToLatLng,
+  convertStringCoordinatesIntoGMapCoordinates,
 } from './trigonometry-helpers';
 
 import {
   paintInclinedAxisAsLinesFromCoordenates,
   designBuildingProfile,
   paintRectangleInMap,
-  paintCenterOfRectangleInMap,
+  paintCenterOfUsersRectangleInMap,
  } from './drawing-helpers';
 
  import { debugSetup } from './debug';
+import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 
+
+/**
+ * Returns the CocoMapSetup object for the step2 map (the one with the input text element
+ * identified by window.step2PolygonInputId). The default export of this script
+ *
+ * @returns {CocoMapSetup | null}
+ */
+const getStep2CocoMapSetup = () : CocoMapSetup | null => {
+  const cocoMapSetup = window.cocoMaps[window.step2PolygonInputId];
+  return cocoMapSetup ?? null;
+}
 
 /** Start everything  */
 
-document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) => {
+document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Event) => {
 
-  if ( ! window.cocoIsStepSelectRectangle ) {
-    return;
-  }
-
+  // setup and validations
+  const customEvent = event as CustomEvent<CocoMapSetup>;
   const cocoMapSetup = getStep2CocoMapSetup();
-
-
-  console.log('We are in the step of select rectangle. map so far ', );
-
-  // Verification, we get info of the map of step 2.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // @ts-ignore
-  if ( cocoMapSetup.inputElement.id !== event.detail.inputElement.id ) {
-    console.error( 'not found the input id', cocoMapSetup.inputElement );
+  if ( ! window.cocoIsStepSelectRectangle || ! cocoMapSetup
+    || ( cocoMapSetup.inputElement.id !== customEvent.detail.inputElement.id )
+  ) {
     return;
   }
 
   console.log(' Exectued cocoMap for field', window.cocoMapSetup);
   const theMap = cocoMapSetup.map;
 
+  /**  ================ ================ ================ ================
+   *  PAINTS THE PROFILE OF THE BUILDING. The data has been exposed with PHP.
+   *  ================ ================ ================ ================*/
   // design polygon of the whole roof profile
   if (window.cocoBuildingProfile?.length) {
-    console.log('>>>>> design of', window.cocoBuildingProfile);
     designBuildingProfile(theMap, window.cocoBuildingProfile, 'black');
   }
 
-  // design all segments
+  // design all segments, one by one, and applyes the inreactivity.
   setupSegments();
 
 
@@ -59,74 +68,84 @@ document.addEventListener("solarMapReady", (event: CustomEvent<CocoMapSetup>) =>
 
 
 
-export const handlerClickDrawRectangleOverSegment = function (e) {
-  const segm = this;
+
+export const handlerFirstClickDrawRectangleOverSegment = function (e: google.maps.MapMouseEvent) {
+  const segm = window.cocoDrawingRectangle.selectedSegment;
+  if ( !segm ) {
+    console.error('we need the selected segment , but its not saved.', segm);
+    return;
+  }
+
   console.log('click on the segment', segm);
-  console.log('step', window.cocoDrawingRectangle.drawRectangleStep );
   console.log('event', e, e.latLng.lat(), e.latLng.lng() );
 
   // FIRST CLICK OF RECT DESIGN: Now we mark the first vertex of the rectangle
-  if ( window.cocoDrawingRectangle.drawRectangleStep === 'step1.selectFirstVertex' ) {
-    handlerClickFirstVertexRectangle( segm.map, e, segm.realRotationAngle );
-    window.cocoDrawingRectangle.drawRectangleStep = 'step2.selectSecondVertex';
-    segm.setOptions({ fillOpacity: 0.1 });
-    segm.addListener('mousemove', function( ev ) {
-      console.log( 'Moving >>>> ' + ev.latLng.lat() );
-      handlerMouseMoveSecondVertexRectangle( segm.map, ev, segm.realRotationAngle );
-    } );
-    segm.addListener('click', function( ev ) {
-      console.log('Paso a step2'); // handlerClickDrawRectangleOverSegment
-    });
-  }
+  const latLng = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+  setFirstVertexOfRectangle( segm.map, latLng, segm.realRotationAngle ?? 0 );
 
-  // SECOND CLICK OF RECT DESIGN: Now we mark the opposite vertex of the rectangle
-  else if ( window.cocoDrawingRectangle.drawRectangleStep === 'step2.selectSecondVertex' ) {
+  segm.setOptions({ fillOpacity: 0.1 });
 
-    const input = document.getElementById(window.step2PolygonInputId) as HTMLInputElement;
-    if (input) {
-      input.value = window.cocoDrawingRectangle.rectanglePolygonCoords || '';
-    }
-    console.log('window.cocoDrawingRectangle.rectanglePolygonCoords', window.cocoDrawingRectangle.rectanglePolygonCoords);
+  google.maps.event.clearListeners(segm, 'click');
 
-    // Clear the mouseover listener
-    console.log('Clear mousemove listener');
-    window.google.maps.event.clearListeners(segm, 'mousemove');
-    window.google.maps.event.clearListeners(segm, 'click');
-    window.cocoDrawingRectangle.drawRectangleStep = 'step3.finished';
-
-    window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
-    paintCenterOfRectangleInMap(segm.map);
-    if (window.cocoDrawingRectangle.polygon) {
-      window.cocoDrawingRectangle.polygon.addListener('click', function(this: google.maps.Polygon, event: google.maps.MapMouseEvent) {
-        console.log('Polygon clicked at', this, event.latLng.lat(), event.latLng.lng());
-        // Add desired behavior or function call here
-
-        // rotate the pixels of the polygon, and repaint it
-      });
-    }
-
-  }
+  console.log('The map where we apply mousemove: ', segm.map);
+  segm.map.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
+  // we don't need to add the click because it already has it
+  segm.map.addListener('click', handlerSecondClickDrawRectangle);
+  segm.setOptions({ clickable: false });
+  segm.setVisible(false);
 
 }
 
+export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouseEvent) {
 
-const handlerClickFirstVertexRectangle = ( gmap: google.maps.Map, clickEvent: google.maps.event, angle: number ) => {
-  window.cocoDrawingRectangle.firstVertexCoord = { lat: clickEvent.latLng.lat(), lng: clickEvent.latLng.lng() };
-  window.cocoDrawingRectangle.firstVertexPoint = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
+  const segm = window.cocoDrawingRectangle.selectedSegment;
+  if ( ! segm ) {
+    console.error('Segment not found:', segm);
+    return;
+  }
 
+  const input = document.getElementById(window.step2PolygonInputId) as HTMLInputElement;
+  if (input) {
+    input.value = window.cocoDrawingRectangle.rectanglePolygonCoords || '';
+  }
+  console.log('window.cocoDrawingRectangle.rectanglePolygonCoords', window.cocoDrawingRectangle.rectanglePolygonCoords);
+
+  // Clear the mouseover listener
+  console.log('Clear mousemove listener');
+  window.google.maps.event.clearListeners(segm.map, 'mousemove');
+  window.google.maps.event.clearListeners(segm.map, 'click');
+
+  window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
+  paintCenterOfUsersRectangleInMap(segm.map);
+
+  // assign the event listeners that allow the user to rotate the rectangle on the map
+  rectangleRotationInteractionSetup();
+
+}
+
+const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.LatLngLiteral, angle: number ) => {
+  window.cocoDrawingRectangle.firstVertexCoord = latLng;
+  window.cocoDrawingRectangle.firstVertexPoint = latLngToPoint(gmap, { latitude: latLng.lat, longitude: latLng.lng });
+
+  if (! window.cocoDrawingRectangle.firstVertexPoint ) {
+    console.error('window.cocoDrawingRectangle.firstVertexPoint is null. This is a problem. Check the code.', window.cocoDrawingRectangle);
+    return;
+  }
   // paint the first 2 lines
   const { axisLinesDefinedByPoints, line1, line2 } = paintInclinedAxisAsLinesFromCoordenates( gmap, window.cocoDrawingRectangle.firstVertexPoint, angle );
   console.log(axisLinesDefinedByPoints); // object with {lineX, lineY}
   window.cocoDrawingRectangle.boundariesLinesAxisFirstClick = axisLinesDefinedByPoints;
   window.cocoDrawingRectangle.firstClickAxislineX = line1;
   window.cocoDrawingRectangle.firstClickAxislineY = line2;
+  console.log('we saved the first vertex on ', window.cocoDrawingRectangle.firstVertexPoint);
 }
 
-const handlerMouseMoveSecondVertexRectangle = (
-  gmap: google.maps.Map,
-  clickEvent: google.maps.event,
-  angle: number
-) => {
+const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
+
+  const gmap = window.cocoDrawingRectangle.selectedSegment?.map;
+  const angle = window.cocoDrawingRectangle.selectedSegment?.realRotationAngle;
+
+  if (!gmap || angle === null) return;
 
   // if the polygon is drawn, we remove it
   window.cocoDrawingRectangle.polygon?.setMap(null);
@@ -141,6 +160,9 @@ const handlerMouseMoveSecondVertexRectangle = (
   window.cocoDrawingRectangle.boundariesLinesAxisSecondClick = axisLinesDefinedByPoints;
   window.cocoDrawingRectangle.secondClickAxislineX = line1;
   window.cocoDrawingRectangle.secondClickAxislineY = line2;
+
+
+  console.log('moving the mouse to build a rectangle: ', secondVertexPoint);
 
   // now get the 2 other points that we need
   const axisFirstClick = window.cocoDrawingRectangle.boundariesLinesAxisFirstClick;
@@ -177,3 +199,6 @@ const handlerMouseMoveSecondVertexRectangle = (
   return false;
 
 }
+
+
+export default getStep2CocoMapSetup;

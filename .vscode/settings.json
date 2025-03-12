@@ -1,0 +1,8 @@
+{
+  "php.validate.executablePath": "/usr/local/bin/php",
+  "phpcs.standard": "phpcs.xml.dist",
+  "phpcs.executablePath": "./vendor/bin/phpcs",
+  "phpcs.autoConfigSearch": true,
+  "phpcbf.executablePath": "./vendor/bin/phpcbf",
+  "svn.ignoreMissingSvnWarning": true
+}

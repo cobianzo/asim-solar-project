@@ -43,10 +43,10 @@ export interface ExtendedSegment extends google.maps.Polygon {
 export interface CocoDrawingRectangleInfo {
   hoveredSegment?: ExtendedSegment;
   selectedSegment?: ExtendedSegment;
-  drawRectangleStep?: string;
-  rectanglePolygonCoords?: string;
+
+  rectanglePolygonCoords?: string | null;
   firstVertexCoord?: google.maps.LatLngLiteral;
-  firstVertexPoint?: google.maps.Point;
+  firstVertexPoint?: google.maps.Point | null;
   boundariesLinesAxisFirstClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
   firstClickAxislineX?: google.maps.Polyline | null;
   firstClickAxislineY?: google.maps.Polyline | null;
@@ -56,6 +56,10 @@ export interface CocoDrawingRectangleInfo {
   polygonCenterPoint?: google.maps.Point | null;
   polygonCenterCoords?: google.maps.LatLng | null;
   polygonCenterMarker?: AdvancedMarkerElement | null;
+
+  rotatingRectangleStartingPoint?: google.maps.Point | null;
+  tempRotatedPoints?: Array<google.maps.Point>;
+  tempRotatedCoords?: string | null;
 
   boundariesLinesAxisSecondClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
   secondClickAxislineX?: google.maps.Polyline | null;

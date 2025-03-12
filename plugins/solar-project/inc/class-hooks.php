@@ -152,6 +152,30 @@ class Hooks {
 			echo '</div>';
 		}
 		echo '</div>';
+
+		// now the info for debugging for the building profile
+		$current_page = $field_instance->pageNumber;
+		$building_profile_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+		?>
+		<p>Clicca qui per mostrare le informazione del palazzo da Google Maps.
+			Da qui si disegna il poligono del profilo del palazzo. Cerca i campi <u>buildings</u></p>
+		<button onClick="showBuildingProfile_<?php echo esc_attr( $current_page ); ?>(event); return false;">Mostra profilo di palazzo</button>
+		<div id="buildingProfilePopover_<?php echo esc_attr( $current_page ); ?>" class="popup-info hidden" onclick="this.classList.toggle('hidden');">
+			<div class="popover-content">
+				<pre>
+					<?php echo json_encode( $building_profile_data, JSON_PRETTY_PRINT ); ?>
+				</pre>
+			</div>
+		</div>
+		<script>
+			function showBuildingProfile_<?php echo esc_attr( $current_page ); ?>(e) {
+				e.preventDefault();
+				const popover = document.getElementById('buildingProfilePopover_<?php echo esc_attr( $current_page ); ?>');
+				popover.classList.toggle('hidden')
+			}
+		</script>
+
+		<?php
 	}
 
 	public static function set_default_zoom( $zoom, $form ) {

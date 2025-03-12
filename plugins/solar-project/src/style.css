@@ -13,6 +13,7 @@ body {
     background: #ffcccc;
   }
   #popup-info,
+  .popup-info,
   .segment-info-modal {
     position: fixed;
     background: #ffffffee;

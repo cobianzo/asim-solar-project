@@ -3,8 +3,8 @@ import { LatLngObject } from './types';
 /**
  * Converts a LatLng coordinate to a Point on the map's viewport.
  * @param m - The Google Map instance
- * @param latLngObject - An object containing latitude and longitude properties
- * @returns The pixel coordinates on the map or null if bounds are not defined
+ * @param latLngObject - An object containing latitude and longitude properties { latitude: number, longitude: number }
+ * @returns The pixel coordinates {x, y} on the map or null if bounds are not defined
  */
 export const latLngToPoint = function(
   m: google.maps.Map,
@@ -154,6 +154,24 @@ export const convertPointsArrayToLatLngString = function(
   // Unir los puntos LatLng en una cadena separada por espacios
   return latLngPoints.join(' ');
 }
+
+
+
+/**
+ * Converts a string of coordinates into an array of Google Maps LatLng objects.
+ *
+ * @param coordinatesAsString - A string containing coordinates separated by spaces.
+ * Each coordinate should be in the format "latitude,longitude".
+ * @returns An array of `google.maps.LatLng` objects representing the coordinates. {lat: number, lng: number}
+ */
+export const convertStringCoordinatesIntoGMapCoordinates = function (coordinatesAsString: string) {
+	const coordinatesArray = coordinatesAsString.split(' ');
+	const newPolygonCoords = coordinatesArray.map((coord) => {
+		const [lat, lng] = coord.split(',');
+		return new window.google.maps.LatLng({ lat: parseFloat(lat), lng: parseFloat(lng) });
+	});
+	return newPolygonCoords;
+};
 
 /**
  * Projects a line of a given length from a point (x, y) at a given angle

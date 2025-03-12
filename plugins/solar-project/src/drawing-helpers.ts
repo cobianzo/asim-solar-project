@@ -228,7 +228,13 @@ export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = f
   }
 }
 
-export const paintCenterOfRectangleInMap = (gmap: google.maps.Map) => {
+/**
+ * The user paints a rectangle using the mouse. This fn
+ * paints a circle at the center of the user-drawn rectangle in the map.
+ * @param gmap The Google Map instance
+ * @returns void
+ */
+export const paintCenterOfUsersRectangleInMap = (gmap: google.maps.Map) => {
   // paint hte center of the polygon
   if (window.cocoDrawingRectangle.polygonCenterMarker)
     window.cocoDrawingRectangle.polygonCenterMarker.map = null;
@@ -248,6 +254,7 @@ export const paintCenterOfRectangleInMap = (gmap: google.maps.Map) => {
         },
       }
     ).then(marker => {
+      // we save the marker for future access.
       window.cocoDrawingRectangle.polygonCenterMarker = marker;
     });
   }

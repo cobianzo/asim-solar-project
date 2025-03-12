@@ -28,6 +28,6 @@ declare global {
 
 
 // imports
-import './1-setup-segments';
+import './setup-segments-interactive-functions';
 import './step2_functions';
 import './step3_functions';

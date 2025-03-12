@@ -27,8 +27,18 @@ Export both plugins in the zip into `./dist`
 
   Sieglberg 31, Passau-Sieglgut, Germany
 
+// California
+37.4449739,-122.13914659999998
 
 # PHPCS
 
 composer run-script lint plugins/solar-project/solar-project.php
 composer run-script format plugins/solar-project/solar-project.php
+
+
+# Terminology:
+
+- segment: when selecting a roof, Solar API provides several areas with radiance information. Everyone of them is a segment.
+- rectangle: the user will draw a rectangle over the roof, which is the area where the panels will go. That's the rectangle
+- azimuth: the angle of orientation of every segment, 0 degrees is set to North.
+- building profile: Google Maps API gives the path of a polygon defining the shape of the roof.

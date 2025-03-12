@@ -1,7 +1,13 @@
+/**
+ * All these functions are related to the step 2, setting up the map
+ * to paint the segments over the building and assign the listeners to
+ * interact with them.
+ */
+
 // types
 import { ExtendedSegment, RoofSegmentStats } from './types';
 
-// internal dependencies
+// internal dependencies, trigonometrical functions
 import {
   orthopedicRegtanglePoints,
   latLngToPoint,
@@ -9,6 +15,7 @@ import {
   convertPointsArrayToLatLngString,
 } from './trigonometry-helpers';
 
+// internal dependencies, paiting on the map
 import {
   paintASunForSegment,
   highlightSegment,
@@ -17,13 +24,9 @@ import {
   createUnselectSegmentButton,
   removeRectangleInMap,
  } from './drawing-helpers';
-import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
-import { handlerClickDrawRectangleOverSegment } from './step2_functions';
 
-export const getStep2CocoMapSetup = () => {
-  const cocoMapSetup = window.cocoMaps[window.step2PolygonInputId];
-  return cocoMapSetup ?? null;
-}
+import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
+import getStep2CocoMapSetup, { handlerFirstClickDrawRectangleOverSegment } from './step2_functions';
 
 /**
  * Initializes and sets up the roof segments for the map.
@@ -33,7 +36,7 @@ export const getStep2CocoMapSetup = () => {
  *
  * This uses the exposed js vars set up in class-hooks.php
  */
-export const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all' = 'no-extra-rotation' ) => {
+const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all' = 'no-extra-rotation' ) => {
 
   const cocoMapSetup = getStep2CocoMapSetup();
   if ( ! cocoMapSetup ) {
@@ -142,8 +145,8 @@ export const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extr
 
 
 // handlers
-function handlerMouseOverHighlightSegment (this: ExtendedSegment,e: Event) {
-  const segment = this;
+function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
+  const segment: ExtendedSegment = this;
   const cocoMapSetup = getStep2CocoMapSetup();
   if ( ! cocoMapSetup ) {
     console.error(`Not found the coco-map of step 2 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
@@ -193,7 +196,7 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
 
 function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   // init vars
-  const segm = this;
+  const segm: ExtendedSegment = this;
   const cocoMapSetup = getStep2CocoMapSetup();
   if ( ! cocoMapSetup ) {
     console.error(`Not found the coco-map of step 2 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
@@ -233,10 +236,16 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   window.cocoDrawingRectangle.selectedSegment = segm;
   delete window.cocoDrawingRectangle.hoveredSegment;
 
-  window.cocoDrawingRectangle.drawRectangleStep = 'step1.selectFirstVertex';
   ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
     google.maps.event.clearListeners(segm, eventName);
+    google.maps.event.clearListeners(segm.map, eventName);
   });
 
-  google.maps.event.addListener(segm, 'click', handlerClickDrawRectangleOverSegment);
+  // this makes that the user starts painting the rectangle at the same time that he selects the segment
+  handlerFirstClickDrawRectangleOverSegment(e);
+  // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
+  // google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
 }
+
+
+export default setupSegments;
