@@ -6,20 +6,20 @@ import {
   latLngToPoint,
   convertPointsArrayToLatLngString,
   getLineIntersection,
-  rotateRectangle,
-  pointToLatLng,
-  convertStringCoordinatesIntoGMapCoordinates,
 } from './trigonometry-helpers';
 
 import {
   paintInclinedAxisAsLinesFromCoordenates,
-  designBuildingProfile,
+  paintPolygonsByArrayOfStrings,
   paintRectangleInMap,
   paintCenterOfUsersRectangleInMap,
+  paintBoundingBoxAsPolygon,
+  paintBoundingBoxAsRectangle,
  } from './drawing-helpers';
 
- import { debugSetup } from './debug';
 import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
+import { getRotationPortraitSelected } from './command-rotate-portrait-segments';
+import { createDraggableBoundingBoxForMovingAllSegments } from './setup-drag-all-segments-interaction';
 
 
 /**
@@ -54,15 +54,16 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
    *  ================ ================ ================ ================*/
   // design polygon of the whole roof profile
   if (window.cocoBuildingProfile?.length) {
-    designBuildingProfile(theMap, window.cocoBuildingProfile, 'black');
+    paintPolygonsByArrayOfStrings(theMap, window.cocoBuildingProfile, { strokeColor: 'black' });
   }
 
   // design all segments, one by one, and applyes the inreactivity.
-  setupSegments();
+  const rotationPortraitSegments = getRotationPortraitSelected();
+  setupSegments( rotationPortraitSegments );
 
-
-  // things related to debugging
-  debugSetup();
+  if (cocoMapSetup.segments) {
+    createDraggableBoundingBoxForMovingAllSegments();
+  }
 
 } );
 

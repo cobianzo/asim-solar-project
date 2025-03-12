@@ -1,8 +1,9 @@
-import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo } from './types';
+import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo, boxBySWNE } from './types';
 
 
 declare global {
   interface Window {
+
     cocoDrawingRectangle: CocoDrawingRectangleInfo;
     cocoIsStepSelectRectangle: Boolean;
     cocoIsStepSelectPanelli: Boolean;
@@ -12,13 +13,14 @@ declare global {
     step2RectangleCoords: string;
     step3PolygonInputId: string;
     cocoBuildingProfile: Array<string>;
-    gMapsKey: string; // not in use
     gf_current_page: number;
 
     cocoMaps: { [key: string]: CocoMapSetup }; // @TODO:
     cocoMapSetup?: CocoMapSetup;
 
     cocoBuildingSegments: Array<RoofSegmentStats>;
+    cocoAllSegmentBoundingBox: boxBySWNE;
+    cocoRectangleBoundingBox: google.maps.Rectangle | null;
 
     // this fn is exposed by the external plugin coco-map0-field
     paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;

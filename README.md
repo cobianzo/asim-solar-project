@@ -13,6 +13,7 @@
 - The map in step 1 must have the adminLabel === 'map-roof'
 - The map in step 2 must have the adminLabel === 'map-rectangle'
 - The map in step 3 must have the adminLabel === 'map-panelli'
+- The radio select for the orientation of the segments must have the class === 'segment-rotation'
 
 # Develop
 
@@ -33,7 +34,7 @@ Export both plugins in the zip into `./dist`
 # PHPCS
 
 composer run-script lint plugins/solar-project/solar-project.php
-composer run-script format plugins/solar-project/solar-project.php
+para el plugin coco- ... you need to enter the project and see its README.
 
 
 # Terminology:

@@ -1,5 +1,5 @@
 // types
-import { ExtendedSegment } from './types';
+import { boxBySWNE, ExtendedSegment } from './types';
 import {
   getPolygonCenterByVertexPoints,
   pointToLatLng,
@@ -149,17 +149,67 @@ export const paintInclinedAxisAsLinesFromCoordenates = (
   };
 };
 
-
-export const designBuildingProfile = (
+/**
+ * Paints a polygon in the map from a string of coordinates.
+ * @param gmap
+ * @param buildingProfiles [ '43.43242,11.432143 44.432132,12.43234 ...']
+ * @param extraParams
+ */
+export const paintPolygonsByArrayOfStrings = (
   gmap: google.maps.Map,
   buildingProfiles: Array<string>,
-  color: string
+  extraParams: google.maps.PolygonOptions = {}
 ) => {
-  buildingProfiles.forEach( building => {
-    window.paintAPoygonInMap(gmap, building, { strokeColor: color, fillColor: 'black', fillOpacity: 0.1, clickable: false });
-  } );
+  buildingProfiles.forEach(building => {
+    const initialParams: google.maps.PolygonOptions = {
+      strokeColor: 'black',
+      fillColor: 'black',
+      fillOpacity: 0.1,
+      clickable: false
+    };
+    window.paintAPoygonInMap(gmap, building, { ...initialParams, ...extraParams });
+  });
 }
 
+export const paintBoundingBoxAsPolygon = (
+  gmap: google.maps.Map,
+  boundingBox: boxBySWNE,
+  extraParams: google.maps.PolygonOptions = {}
+) => {
+  const boundingBoxCoords = `${boundingBox.sw.latitude},${boundingBox.sw.longitude} ${boundingBox.sw.latitude},${boundingBox.ne.longitude} ${boundingBox.ne.latitude},${boundingBox.ne.longitude} ${boundingBox.ne.latitude},${boundingBox.sw.longitude}`;
+  const initialParams: google.maps.PolygonOptions = {
+    strokeColor: 'black', fillColor: 'black', fillOpacity: 0.1, clickable: false
+  };
+  window.paintAPoygonInMap(gmap, boundingBoxCoords, { ...initialParams, ...extraParams });
+}
+
+export const paintBoundingBoxAsRectangle = (
+  gmap: google.maps.Map,
+  boundingBox: boxBySWNE,
+  extraParams: google.maps.RectangleOptions = {}
+): google.maps.Rectangle | null => {
+  const bounds = {
+    north: boundingBox.ne.latitude,
+    south: boundingBox.sw.latitude,
+    east: boundingBox.ne.longitude,
+    west: boundingBox.sw.longitude,
+  };
+
+  const rectangle = new google.maps.Rectangle({
+    bounds: bounds,
+    editable: false,   // No permite editar vértices
+    draggable: true,   // Se puede mover
+    map: gmap,
+    strokeColor: "#FF0000",
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: "#FF0000",
+    fillOpacity: 0.35,
+    ...extraParams
+  });
+
+  return rectangle?? null;
+}
 
 export const createUnselectSegmentButton = ( gmap : google.maps.Map ) => {
   const unselectButton = document.createElement('button');

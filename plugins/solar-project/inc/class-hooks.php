@@ -7,39 +7,40 @@ class Hooks {
 
 	public static function init() {
 
-		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'inject_js_script_step_2_and_3' ] );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'inject_js_script_step_2_and_3' ) );
 
-		add_action( 'wp_enqueue_scripts', function() {
+		add_action( 'wp_enqueue_scripts', function () {
 			$url_style = plugins_url( 'src/style.css', __DIR__ );
-			wp_register_style( 'coco-solar-project', $url_style, [], null );
+			wp_register_style( 'coco-solar-project', $url_style, array(), null );
 			wp_enqueue_style( 'coco-solar-project' );
 		} );
 
 		// hook for the backend, edit form: adds the option 'developer' to the interaction type
-		add_action( 'coco_gf_map_field_interaction_type_extra_options', function() {
+		add_action( 'coco_gf_map_field_interaction_type_extra_options', function () {
 			echo '<option value="developer">' . esc_html( 'Developer', 'coco-gravity-forms-map-addon' ) . '</option>';
 		} );
 		// Hooks who applied in the page 2 of the form, on the coco-map field with polygon interaction
-		add_action( 'coco_gravity_form_map_field_previous_to_field', [ __CLASS__, 'form_top_message' ], 10, 3 );
+		add_action( 'coco_gravity_form_map_field_previous_to_field', array( __CLASS__, 'form_top_message' ), 10, 3 );
 
-		add_filter( 'coco_gravity_form_map_field_default_zoom', [ __CLASS__, 'set_default_zoom' ], 10, 2 );
-		add_filter( 'coco_gravity_form_map_field_default_lat', [ __CLASS__, 'set_default_lat' ], 10, 2 );
-		add_filter( 'coco_gravity_form_map_field_default_lng', [ __CLASS__, 'set_default_lng' ], 10, 2 );
+		add_filter( 'coco_gravity_form_map_field_default_zoom', array( __CLASS__, 'set_default_zoom' ), 10, 2 );
+		add_filter( 'coco_gravity_form_map_field_default_lat', array( __CLASS__, 'set_default_lat' ), 10, 2 );
+		add_filter( 'coco_gravity_form_map_field_default_lng', array( __CLASS__, 'set_default_lng' ), 10, 2 );
 
 		// JS to draw rectangles and polygons and markers: both work but I have deactivated, info not needed.
 		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_print_bounding_boxes_areas' ], 10, 3 );
-		add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_paint_building_profile' ], 10, 3 );
+		add_action( 'coco_gravity_form_script_after_map_created', array( __CLASS__, 'js_script_to_paint_building_profile' ), 10, 3 );
 	}
 
 	public static function inject_js_script_step_2_and_3() {
-		$form_id = $_POST['gform_submit'] ?? null;;
+		$form_id = $_POST['gform_submit'] ?? null;
+
 		if ( $form_id ) {
 
-			$form = \GFAPI::get_form($form_id);
+			$form           = \GFAPI::get_form( $form_id );
 			$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
 			if ( $coco_map_entry ) {
 				$coco_mapfieldrectangle_instance = Helper::capture_coco_map_field_map_rectangle_step_2_instance( $form );
-				$coco_mapfieldpanelli_instance = Helper::capture_coco_map_field_map_panelli_step_3_instance( $form );
+				$coco_mapfieldpanelli_instance   = Helper::capture_coco_map_field_map_panelli_step_3_instance( $form );
 			}
 
 			if ( ! $coco_mapfieldrectangle_instance ) {
@@ -47,13 +48,13 @@ class Hooks {
 			}
 
 			// wp_enqueue_script( 'geotiff-js',
-			// 	'https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.min.js',
-			// 	[], null, true );
+			//  'https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.min.js',
+			//  [], null, true );
 
 
 			// $current_page = \GFFormDisplay::get_current_page($form_id);
 			// if ( $current_page !== 2 ) {
-			// 	return;
+			//  return;
 			// }
 
 			// From here we continue in the ES6 script, loading build/index.js
@@ -69,11 +70,10 @@ class Hooks {
 			// $data_layers           = \Coco_Solar\Solar_API::get_datalayer_urls( $previous_marker_value[0], $previous_marker_value[1] );
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
-				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url(). "'; \n" .
+				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url() . "'; \n" .
 				"window.step2PolygonInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
-				"window.step2RectangleCoords = " . json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
+				'window.step2RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
 				"window.step3PolygonInputId = 'input_{$coco_mapfieldpanelli_instance->formId}_{$coco_mapfieldpanelli_instance->id}'; \n" .
-				"window.gMapsKey = '" . \Coco_Solar\Solar_API::get_google_api() . "'; \n" .
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
@@ -82,7 +82,8 @@ class Hooks {
 			$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
 			if ( $stats ) {
 				wp_add_inline_script( 'coco-solar-functions',
-					"window.cocoBuildingSegments = " . json_encode( $stats ) . "; \n"
+					'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
+					'window.cocoAllSegmentBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n"
 				);
 			}
 
@@ -95,15 +96,15 @@ class Hooks {
 				);
 				foreach ( $buildings_coords as $i => $building_coords ) {
 					wp_add_inline_script( 'coco-solar-functions',
-						"window.cocoBuildingProfile[" . $i . "] = " . json_encode( $building_coords ) . "; \n"
+						'window.cocoBuildingProfile[' . $i . '] = ' . wp_json_encode( $building_coords ) . "; \n"
 					);
 				}
 			}
 			// TODELETE:
 			// if ( $data_layers ) {
-			// 	wp_add_inline_script( 'coco-solar-functions',
-			// 		"window.cocoDataLayers = " . json_encode( $data_layers ) . "; \n"
-			// 	);
+			//  wp_add_inline_script( 'coco-solar-functions',
+			//      "window.cocoDataLayers = " . wp_json_encode( $data_layers ) . "; \n"
+			//  );
 			// }
 
 			$step_map_rectangle = $step_map_panelli = null;
@@ -115,13 +116,13 @@ class Hooks {
 					$step_map_panelli = $field->pageNumber; // 3
 				}
 			}
-			$current_page = \GFFormDisplay::get_current_page($form_id);
+			$current_page              = \GFFormDisplay::get_current_page( $form_id );
 			$current_page_is_rectangle = $current_page === $step_map_rectangle; // step 2
-			$current_page_is_panelli = $current_page === $step_map_panelli; // step 3
+			$current_page_is_panelli   = $current_page === $step_map_panelli; // step 3
 
 			wp_add_inline_script( 'coco-solar-functions',
-					"window.cocoIsStepSelectRectangle = " . json_encode( $current_page_is_rectangle ) . "; \n" .
-					"window.cocoIsStepSelectPanelli = " . json_encode( $current_page_is_panelli ) . "; \n"
+				'window.cocoIsStepSelectRectangle = ' . wp_json_encode( $current_page_is_rectangle ) . "; \n" .
+					'window.cocoIsStepSelectPanelli = ' . wp_json_encode( $current_page_is_panelli ) . "; \n"
 			);
 			wp_enqueue_script( 'coco-solar-functions' );
 
@@ -135,21 +136,23 @@ class Hooks {
 		}
 		echo 'You have selected the roof at : ' . $coco_map_entry;
 		$previous_marker_value = explode( ',', $coco_map_entry );
-		$building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
-		$stats = $building_data['solarPotential']['roofSegmentStats'] ?? null;
+		$building_data         = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+		$stats                 = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		echo '<div class="grid-h">';
-		if ( $stats ) foreach ( $stats as $i => $segment ){
+		if ( $stats ) {
+			foreach ( $stats as $i => $segment ) {
 
-			echo '<div class="segment-basic-info" id="segment-basic-info-' . $i . '">';
-			echo $i . ' => ' . intval($segment['azimuthDegrees']) . '° / ' . intval($segment['stats']['areaMeters2']);
-			echo '</div>';
+				echo '<div class="segment-basic-info" id="segment-basic-info-' . $i . '">';
+				echo $i . ' => ' . intval( $segment['azimuthDegrees'] ) . '° / ' . intval( $segment['stats']['areaMeters2'] );
+				echo '</div>';
 
-			echo "<div id='segment-info-$i' data-segment='$i' class='segment-info-modal hidden'>";
-			echo '<div>';
-			echo $i . ' => ' . intval($segment['azimuthDegrees']) . '° / ' . intval($segment['stats']['areaMeters2']) . 'm2';
-			echo '<pre style="background-color: white; padding: 10px;">' . json_encode( $segment, JSON_PRETTY_PRINT ) . '</pre>';
-			echo '</div>';
-			echo '</div>';
+				echo "<div id='segment-info-$i' data-segment='$i' class='segment-info-modal hidden'>";
+				echo '<div>';
+				echo $i . ' => ' . intval( $segment['azimuthDegrees'] ) . '° / ' . intval( $segment['stats']['areaMeters2'] ) . 'm2';
+				echo '<pre style="background-color: white; padding: 10px;">' . wp_json_encode( $segment, JSON_PRETTY_PRINT ) . '</pre>';
+				echo '</div>';
+				echo '</div>';
+			}
 		}
 		echo '</div>';
 
@@ -164,7 +167,7 @@ class Hooks {
 		<div id="buildingProfilePopover_<?php echo esc_attr( $current_page ); ?>" class="popup-info hidden" onclick="this.classList.toggle('hidden');">
 			<div class="popover-content">
 				<pre>
-					<?php echo json_encode( $building_profile_data, JSON_PRETTY_PRINT ); ?>
+					<?php echo wp_json_encode( $building_profile_data, JSON_PRETTY_PRINT ); ?>
 				</pre>
 			</div>
 		</div>
@@ -181,7 +184,7 @@ class Hooks {
 		<div id="buildingSolarResponsePopover_<?php echo esc_attr( $current_page ); ?>" class="popup-info hidden" onclick="this.classList.toggle('hidden');">
 			<div class="popover-content">
 				<pre>
-					<?php echo json_encode( $solar_building_data, JSON_PRETTY_PRINT ); ?>
+					<?php echo wp_json_encode( $solar_building_data, JSON_PRETTY_PRINT ); ?>
 				</pre>
 			</div>
 		</div>
@@ -253,29 +256,38 @@ class Hooks {
 		}
 
 		$sun_marker = Helper::get_icon_url( 'sun-marker.png' );
-		$sw_marker = Helper::get_icon_url( 'vertex-sw.png' );
-		$ne_marker = Helper::get_icon_url( 'vertex-ne.png' );
-		$stats = $building_data['solarPotential']['roofSegmentStats'] ?? null;
+		$sw_marker  = Helper::get_icon_url( 'vertex-sw.png' );
+		$ne_marker  = Helper::get_icon_url( 'vertex-ne.png' );
+		$stats      = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		if ( ! $stats ) {
 			echo 'alert("No info about that building");';
 			echo 'console.log("Error getting $building_data[solarPotential][roofSegmentStats]", '
-				. json_encode( $building_data ) . ' );';
+				. wp_json_encode( $building_data ) . ' );';
 			return;
 		}
 		foreach ( $stats as $i => $segment ) {
-			$center = [ 'lat' => $segment['center']['latitude'], 'lng' => $segment['center']['longitude'] ];
-			$sw = [ 'lat' => $segment['boundingBox']['sw']['latitude'], 'lng' => $segment['boundingBox']['sw']['longitude'] ];
-			$ne = [ 'lat' => $segment['boundingBox']['ne']['latitude'], 'lng' => $segment['boundingBox']['ne']['longitude'] ];
+			$center       = array(
+				'lat' => $segment['center']['latitude'],
+				'lng' => $segment['center']['longitude'],
+			);
+			$sw           = array(
+				'lat' => $segment['boundingBox']['sw']['latitude'],
+				'lng' => $segment['boundingBox']['sw']['longitude'],
+			);
+			$ne           = array(
+				'lat' => $segment['boundingBox']['ne']['latitude'],
+				'lng' => $segment['boundingBox']['ne']['longitude'],
+			);
 			$bounding_box = $segment['boundingBox'];
-			// echo 'console.log("Segment: ", ' . json_encode( $segment ) . ' );';
+			// echo 'console.log("Segment: ", ' . wp_json_encode( $segment ) . ' );';
 			// $vertex_as_str = \Coco_Solar\Helper::calculate_bounding_box_tilted(
-			// 	$bounding_box['sw'],
-			// 	$bounding_box['ne'],
-			// 	$segment['center'],
-			// 	$segment['azimuthDegrees']
+			//  $bounding_box['sw'],
+			//  $bounding_box['ne'],
+			//  $segment['center'],
+			//  $segment['azimuthDegrees']
 			// );
 			$vertex_as_str = \Coco_Solar\Helper::get_vertex_by_bounding_box( $bounding_box );
-			echo 'console.log("Bounding box: ", ' . json_encode( $segment['azimuthDegrees'] ) . ' );';
+			echo 'console.log("Bounding box: ", ' . wp_json_encode( $segment['azimuthDegrees'] ) . ' );';
 			?>
 			// paint the square <?php echo esc_js( $i ); ?> of the area given by Sola API
 			window.paintAPoygonInMap( map, '<?php echo $vertex_as_str; ?>', { fillColor: '#00FF00', strokeOpacity: 0.9 });
@@ -289,12 +301,12 @@ class Hooks {
 					color: "#000000"
 				}
 			};
-			window.paintAMarker( map, <?php echo json_encode( $center ); ?>, '<?php echo esc_url( $sun_marker ); ?>', window.optionsMarker);
-			window.paintAMarker( map, <?php echo json_encode( $sw ); ?>, '<?php echo esc_url( $sw_marker ); ?>', { scaledSize: new window.google.maps.Size(10, 10), anchor: new google.maps.Point(0, 10) });
-			window.paintAMarker( map, <?php echo json_encode( $ne ); ?>, '<?php echo esc_url( $ne_marker ); ?>', { scaledSize: new window.google.maps.Size(10, 10), anchor: new google.maps.Point(10, 0) });
+			window.paintAMarker( map, <?php echo wp_json_encode( $center ); ?>, '<?php echo esc_url( $sun_marker ); ?>', window.optionsMarker);
+			window.paintAMarker( map, <?php echo wp_json_encode( $sw ); ?>, '<?php echo esc_url( $sw_marker ); ?>', { scaledSize: new window.google.maps.Size(10, 10), anchor: new google.maps.Point(0, 10) });
+			window.paintAMarker( map, <?php echo wp_json_encode( $ne ); ?>, '<?php echo esc_url( $ne_marker ); ?>', { scaledSize: new window.google.maps.Size(10, 10), anchor: new google.maps.Point(10, 0) });
 			<?php
 		} // end foreach every segment
-		$stats_str = json_encode( $stats );
+		$stats_str = wp_json_encode( $stats );
 
 		// access to the map with cocoMaps['<?php echo esc_js( $input_id ); ?\>'].map
 		echo '<!--' .
@@ -332,7 +344,7 @@ class Hooks {
 			return;
 		}
 		if ( ! isset( $building_data['results'] ) ) {
-			echo 'console.log("Error in PHP, no building outlines found", ' . json_encode($building_data) . ');';
+			echo 'console.log("Error in PHP, no building outlines found", ' . wp_json_encode( $building_data ) . ');';
 			return;
 		}
 		echo 'console.log("Executing building outlines for coco-map on the page 2 only");';
@@ -348,7 +360,6 @@ class Hooks {
 			<?php
 		}
 	}
-
 }
 
 Hooks::init();

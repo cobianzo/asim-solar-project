@@ -6,9 +6,14 @@ export interface CocoMapSetup {
 }
 
 // remember there is also a google.maps.LatLngLiteral which uses {lat: ... , lng: ... }
-export interface LatLngObject {
+export interface LatitudeLongitudeObject {
   latitude: number;
   longitude: number;
+}
+
+export interface boxBySWNE {
+  sw: LatitudeLongitudeObject;
+  ne: LatitudeLongitudeObject;
 }
 
 // response from Solar API schema
@@ -20,11 +25,8 @@ export interface RoofSegmentStats {
     sunshineQuantiles: number[];
     groundAreaMeters2: number;
   };
-  center: LatLngObject;
-  boundingBox: {
-    sw: LatLngObject;
-    ne: LatLngObject;
-  };
+  center: LatitudeLongitudeObject;
+  boundingBox: boxBySWNE;
   planeHeightAtCenterMeters: number;
 }
 
@@ -66,3 +68,5 @@ export interface CocoDrawingRectangleInfo {
   secondClickAxislineY?: google.maps.Polyline | null;
 
 }
+
+export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';

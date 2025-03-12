@@ -3,7 +3,7 @@
  * Plugin Name: Solar Project
  * Plugin URI: http://example.com/plugin
  * Description: Complementary code together with coco-gravity-form-map-field, to create the Solar Project experience
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Your Name
  * Author URI: http://example.com
  * License: GPL2

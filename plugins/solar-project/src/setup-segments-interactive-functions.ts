@@ -56,9 +56,7 @@ const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotat
   // reset the SEGMENTS polygons, deleting them if they exist
   if ( segments.length ) {
     segments.forEach( (segment: ExtendedSegment) => {
-      ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
-        google.maps.event.clearListeners(segment, eventName);
-      });
+      deactivateInteractivityOnSegment(segment);
       segment.setMap(null);
     } );
     cocoMapSetup.segments = [];
@@ -67,7 +65,7 @@ const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotat
   // If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
   removeRectangleInMap(theMap, true);
 
-  /** ========================================
+  /** ========================================  
    * PAINT THE SEGMENTS
    * ========================================*/
 
@@ -134,10 +132,8 @@ const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotat
 
       cocoMapSetup.segments.push( segment );
 
-      // Add Listeners to segments
-      segment.addListener('mouseover', handlerMouseOverHighlightSegment );
-      google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
-      google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
+      // Add Listeners to the segment
+      activateInteractivityOnSegment(segment);
     });
 
   } // end of painting the segments.
@@ -242,10 +238,24 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   });
 
   // this makes that the user starts painting the rectangle at the same time that he selects the segment
-  handlerFirstClickDrawRectangleOverSegment(e);
+  // handlerFirstClickDrawRectangleOverSegment(e);
   // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
-  // google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
+  google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
 }
+
+
+export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
+  segment.addListener('mouseover', handlerMouseOverHighlightSegment );
+  google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
+  google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
+}
+export const deactivateInteractivityOnSegment = (segm: ExtendedSegment) => {
+  ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
+    google.maps.event.clearListeners(segm, eventName);
+    google.maps.event.clearListeners(segm.map, eventName);
+  });
+}
+
 
 
 export default setupSegments;

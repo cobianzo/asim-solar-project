@@ -1,14 +1,14 @@
-import { LatLngObject } from './types';
+import { LatitudeLongitudeObject } from './types';
 
 /**
  * Converts a LatLng coordinate to a Point on the map's viewport.
  * @param m - The Google Map instance
- * @param latLngObject - An object containing latitude and longitude properties { latitude: number, longitude: number }
+ * @param LatitudeLongitudeObject - An object containing latitude and longitude properties { latitude: number, longitude: number }
  * @returns The pixel coordinates {x, y} on the map or null if bounds are not defined
  */
 export const latLngToPoint = function(
   m: google.maps.Map,
-  latLngObject: LatLngObject
+  latLngObject: LatitudeLongitudeObject
 ): google.maps.Point | null {
   const latLng = new google.maps.LatLng(latLngObject.latitude, latLngObject.longitude);
   const scale = Math.pow(2, m.getZoom() as number);
@@ -83,8 +83,8 @@ export const pointToLatLng = function(
    */
 export const orthopedicRegtanglePoints = (
   map: google.maps.Map,
-  sw: LatLngObject,
-  ne: LatLngObject
+  sw: LatitudeLongitudeObject,
+  ne: LatitudeLongitudeObject
 ): Array<google.maps.Point> | null  => {
   // get the latitude and logintude and convert into points in the map.
   const swPoint = latLngToPoint(map, sw);

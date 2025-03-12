@@ -2,20 +2,6 @@ import setupSegments from "./setup-segments-interactive-functions";
 import { ExtendedSegment } from "./types";
 
 
-export const debugSetup = () => {
-
-  const ratioParent = document.getElementsByClassName('segment-rotation');
-  const inputOptions = ratioParent[0]?.querySelectorAll('input');
-
-  inputOptions?.forEach((radio) => {
-    radio.addEventListener('change', (event) => {
-        // Obtener el valor del radio button seleccionado
-        const valorSeleccionado = (event.target as HTMLInputElement).value;
-        console.log(`Opción seleccionada: ${valorSeleccionado}`);
-        setupSegments( valorSeleccionado as 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all' );
-    });
-});
-}
 
 export const createPopup = function (elementContentToClone: Element) {
   const oldPopup = document.getElementById('popup-info');
