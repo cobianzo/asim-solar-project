@@ -54,6 +54,13 @@ export interface CocoDrawingRectangleInfo {
   firstClickAxislineX?: google.maps.Polyline | null;
   firstClickAxislineY?: google.maps.Polyline | null;
 
+  boundariesLinesAxisSecondClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
+  secondVertexCoord?: google.maps.LatLngLiteral;  // not in use i believe TODELETE:
+  secondVertexPoint?: google.maps.Point | null;   // not in use
+  secondClickAxislineX?: google.maps.Polyline | null;
+  secondClickAxislineY?: google.maps.Polyline | null;
+
+
   polygon?: google.maps.Polygon;
   polygonPoints?: Array<google.maps.Point>; // not used actually
   polygonCenterPoint?: google.maps.Point | null;
@@ -64,10 +71,6 @@ export interface CocoDrawingRectangleInfo {
   rotatingRectangleStartingVertexPoints: google.maps.Point[];
   tempRotatedPoints?: Array<google.maps.Point> | null;
   tempRotatedCoords?: string | null;
-
-  boundariesLinesAxisSecondClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
-  secondClickAxislineX?: google.maps.Polyline | null;
-  secondClickAxislineY?: google.maps.Polyline | null;
 
   // handlers to resize
   handlers: Array<AdvancedMarkerElement>; // Array gets keys 0 and 2.

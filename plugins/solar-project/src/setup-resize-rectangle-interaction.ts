@@ -1,3 +1,5 @@
+import { paintRectangleInMap } from "./drawing-helpers";
+import { calculatePathRectangleByOppositePointsAndInclination } from "./step3_functions";
 
 
 
@@ -77,7 +79,7 @@ const startDrag = function(e: MouseEvent) {
   const [initialX, initialY] = transformMatch ? [parseFloat(transformMatch[1]), parseFloat(transformMatch[2])] : [0, 0];
   element.dataset.initialTranslateX = initialX.toString() ?? '0' ;
   element.dataset.initialTranslateY = initialY.toString() ?? '0';
-  console.log('initial translate ', element.dataset);
+  console.log('initial translate and clic XY', element.dataset, e.clientX, e.clientY);
   element.style.border = "50px solid red";
 }
 
@@ -98,9 +100,42 @@ const moveDrag = function(e: MouseEvent) {
     parseFloat(element.dataset.initialTranslateY ?? '0') + offsetY
   ];
   element.style.transform = `translate(${translateX}px, ${translateY}px)`;
-  // -- circle handler moved  --
+  // -- end of circle handler, its now moved  --
+
+  // get the angle of the rectangle
+  const angle = getRectangleInclination(window.cocoDrawingRectangle.polygon);
 
   // -- repaint the rectangle --
+  // WIP - to delete, it doenst owrk ok. Try to reproduce the original render.
+  const theMap = window.cocoDrawingRectangle.selectedSegment?.map;
+  if ( ! theMap || ! window.cocoDrawingRectangle.firstVertexPoint ) return;
+  const success = calculatePathRectangleByOppositePointsAndInclination(
+    theMap,
+    window.cocoDrawingRectangle.firstVertexPoint!,
+    window.cocoDrawingRectangle.secondVertexPoint!!,
+    angle! + 90
+  );
+
+  if (window.cocoDrawingRectangle.selectedSegment
+    && success?.axisLinesDefinedByPointsFirst && success?.axisLinesDefinedByPointsSecond
+    && success?.rectanglePolygonCoords && success?.vertexPoints
+  ) {
+    const {
+      axisLinesDefinedByPointsFirst,
+      axisLinesDefinedByPointsSecond,
+      rectanglePolygonCoords,
+      vertexPoints
+    } = success;
+
+    // after the changes we update:
+    window.cocoDrawingRectangle.boundariesLinesAxisFirstClick = axisLinesDefinedByPointsFirst;
+    window.cocoDrawingRectangle.boundariesLinesAxisSecondClick = axisLinesDefinedByPointsSecond;
+
+    // if the polygon is drawn, we remove it and repaint it and update the params of the rectangle
+    paintRectangleInMap(theMap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords, vertexPoints);
+    console.log('Rectangle painted on resizing, ', success);
+  }
+  // -- end repaint the rectangle --
 
 
   console.log('offset', offsetX, offsetY, element.style.transform)

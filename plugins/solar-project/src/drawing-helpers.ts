@@ -1,6 +1,7 @@
 // types
 import { boxBySWNE, ExtendedSegment } from './types';
 import {
+  convertStringCoordinatesIntoGMapCoordinates,
   getPolygonCenterByVertexPoints,
   pointToLatLng,
   projectLineFromXY,
@@ -309,6 +310,13 @@ export const paintRectangleInMap = (
       window.cocoDrawingRectangle.polygonCenterPoint.y
     );
   }
+
+  // TODELETE: Paint a star in the Vertex 1 and 3
+  window.todel = window.todel || [];
+  window.todel.forEach(m=>m.map=null);
+  const coords = convertStringCoordinatesIntoGMapCoordinates(rectangleAsStringOfCoords);
+  window.paintAMarker( gmap, coords[0], window.cocoAssetsDir + 'vertex-sw.png', {} ).then( m => window.todel.push(m));
+  window.paintAMarker( gmap, coords[2], window.cocoAssetsDir + 'vertex-ne.png', {} ).then( m => window.todel.push(m));
 }
 
 /**

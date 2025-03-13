@@ -69,7 +69,7 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 
   // FIRST CLICK OF RECT DESIGN: Now we mark the first vertex of the rectangle
   const latLng = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-  setFirstVertexOfRectangle( segm.map, latLng, segm.realRotationAngle ?? 0 );
+  setFirstVertexOfRectangle( segm.map, latLng );
 
   segm.setOptions({ fillOpacity: 0.1 });
 
@@ -103,6 +103,11 @@ export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouse
   window.google.maps.event.clearListeners(segm.map, 'mousemove');
   window.google.maps.event.clearListeners(segm.map, 'click');
 
+  // save data of the second click (we don't use it) TODELETE: not needed to store these I believe
+  const latLng = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+  setSecondVertexOfRectangle( segm.map, latLng);
+
+  // Finsi setup and paint hte center
   window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
   paintCenterOfUsersRectangleInMap(segm.map);
 
@@ -111,7 +116,7 @@ export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouse
   paintResizeHandlersInPolygon(); // TODO: apply after rotation.
 }
 
-const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.LatLngLiteral, angle: number ) => {
+const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.LatLngLiteral ) => {
   window.cocoDrawingRectangle.firstVertexCoord = latLng;
   window.cocoDrawingRectangle.firstVertexPoint = latLngToPoint(gmap, { latitude: latLng.lat, longitude: latLng.lng });
 
@@ -120,6 +125,17 @@ const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.L
     return;
   }
 }
+
+// not needed to store these I believe TODELETE:
+const setSecondVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.LatLngLiteral ) => {
+  window.cocoDrawingRectangle.secondVertexCoord = latLng;
+  window.cocoDrawingRectangle.secondVertexPoint = latLngToPoint(gmap, { latitude: latLng.lat, longitude: latLng.lng });
+  if (! window.cocoDrawingRectangle.secondVertexPoint ) {
+    console.error('window.cocoDrawingRectangle.firstVertexPoint is null. This is a problem. Check the code.', window.cocoDrawingRectangle);
+    return;
+  }
+}
+
 
 const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
 
@@ -137,7 +153,7 @@ const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseE
   // angle
   if ( !pointB) return;
 
-  const success = drawRectangleByOppositePointsAndInclination(
+  const success = calculatePathRectangleByOppositePointsAndInclination(
     gmap,
     window.cocoDrawingRectangle.firstVertexPoint,
     pointB,
@@ -169,7 +185,13 @@ const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseE
 }
 
 
-function drawRectangleByOppositePointsAndInclination( gmap: google.maps.Map, pointA: google.maps.Point, pointC: google.maps.Point, angle: number ) {
+export const calculatePathRectangleByOppositePointsAndInclination = function(
+  gmap: google.maps.Map,
+  pointA:
+  google.maps.Point,
+  pointC: google.maps.Point,
+  angle: number
+) {
 
   const { axisLinesDefinedByPoints: axisLinesDefinedByPointsFirst } =
     getInclinedAxisAsLinesFromCoordenates( pointA, angle! );

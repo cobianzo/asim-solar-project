@@ -8,6 +8,7 @@ import { CoupleOfPoints, LatitudeLongitudeObject } from './types';
  */
 
 /**
+ * { latitude: ., longitude: . } ===> { x, y }}
  * Converts a LatLng coordinate to a Point on the map's viewport.
  * @param m - The Google Map instance
  * @param LatitudeLongitudeObject - An object containing latitude and longitude properties { latitude: number, longitude: number }
@@ -46,6 +47,7 @@ export const latLngToPoint = function(
 };
 
 /**
+ * x, y  ===> { lat{}, lng{} }
  * Converts a Point on the map's viewport to a LatLng coordinate.
  * @param map - The Google Map instance
  * @param x - The x-coordinate of the point in pixels
