@@ -28,7 +28,7 @@ class Hooks {
 
 		// JS to draw rectangles and polygons and markers: both work but I have deactivated, info not needed.
 		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_print_bounding_boxes_areas' ], 10, 3 );
-		add_action( 'coco_gravity_form_script_after_map_created', array( __CLASS__, 'js_script_to_paint_building_profile' ), 10, 3 );
+
 	}
 
 	public static function inject_js_script_step_2_and_3() {
@@ -36,26 +36,21 @@ class Hooks {
 
 		if ( $form_id ) {
 
+			// grab the already insterted values in the form and expose them to js globals
 			$form           = \GFAPI::get_form( $form_id );
 			$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
 			if ( $coco_map_entry ) {
-				$coco_mapfieldrectangle_instance = Helper::capture_coco_map_field_map_rectangle_step_2_instance( $form );
-				$coco_mapfieldpanelli_instance   = Helper::capture_coco_map_field_map_panelli_step_3_instance( $form );
+				$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
+				$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
+				$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
+				$coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
+				// ...
 			}
 
-			if ( ! $coco_mapfieldrectangle_instance ) {
+			// we need to be at least in step 2 to expose the js vars
+			if ( ! $coco_mapfieldoffset_instance ) {
 				return;
 			}
-
-			// wp_enqueue_script( 'geotiff-js',
-			//  'https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.min.js',
-			//  [], null, true );
-
-
-			// $current_page = \GFFormDisplay::get_current_page($form_id);
-			// if ( $current_page !== 2 ) {
-			//  return;
-			// }
 
 			// From here we continue in the ES6 script, loading build/index.js
 			$asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
@@ -71,9 +66,12 @@ class Hooks {
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url() . "'; \n" .
-				"window.step2PolygonInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
+				"window.step2CocoMapInputId = 'input_{$coco_mapfieldoffset_instance->formId}_{$coco_mapfieldoffset_instance->id}'; \n" .
+				"window.step2RotationInserted = " . wp_json_encode( $coco_segmentrotationtype_instance->value ) ." \n" .
+				"window.step2OffsetInserted = " . wp_json_encode( $coco_mapfieldoffset_instance->value ) ." \n" . // respect the center of the bounding box
+
+				"window.step3CocoMapInputId = 'input_{$coco_mapfieldpanelli_instance->formId}_{$coco_mapfieldpanelli_instance->id}'; \n" .
 				'window.step2RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
-				"window.step3PolygonInputId = 'input_{$coco_mapfieldpanelli_instance->formId}_{$coco_mapfieldpanelli_instance->id}'; \n" .
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
@@ -83,7 +81,8 @@ class Hooks {
 			if ( $stats ) {
 				wp_add_inline_script( 'coco-solar-functions',
 					'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
-					'window.cocoAllSegmentBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n"
+					'window.cocoAllSegmentBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
+					'window.cocoBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
 				);
 			}
 
@@ -107,22 +106,25 @@ class Hooks {
 			//  );
 			// }
 
-			$step_map_rectangle = $step_map_panelli = null;
+			$step_map_segments_offset = $step_map_rectangle = $step_map_panelli = null;
 
 			foreach ( $form['fields'] as $field ) {
-				if ( 'map-rectangle' === $field->adminLabel ) {
-					$step_map_rectangle = $field->pageNumber; // 2
-				} elseif ( 'map-panelli' === $field->adminLabel ) {
-					$step_map_panelli = $field->pageNumber; // 3
+				if ( 'map-segments-offset' === $field->adminLabel ) {
+					$step_map_segments_offset = $field->pageNumber; // 2
+				} elseif ( 'map-rectangle' === $field->adminLabel ) {
+					$step_map_rectangle = $field->pageNumber; // 3
 				}
+				// $step_map_panelli = $field->pageNumber; // 4
 			}
-			$current_page              = \GFFormDisplay::get_current_page( $form_id );
-			$current_page_is_rectangle = $current_page === $step_map_rectangle; // step 2
-			$current_page_is_panelli   = $current_page === $step_map_panelli; // step 3
+			$current_page                    = \GFFormDisplay::get_current_page( $form_id );
+			$current_page_is_segments_offset = $current_page === $step_map_segments_offset; // step 2
+			$current_page_is_rectangle       = $current_page === $step_map_rectangle; // step 2
+			$current_page_is_panelli         = $current_page === $step_map_panelli; // step 3
 
 			wp_add_inline_script( 'coco-solar-functions',
+				'window.cocoIsStepSelectOffset = ' . wp_json_encode( $current_page_is_segments_offset ) . "; \n" .
 				'window.cocoIsStepSelectRectangle = ' . wp_json_encode( $current_page_is_rectangle ) . "; \n" .
-					'window.cocoIsStepSelectPanelli = ' . wp_json_encode( $current_page_is_panelli ) . "; \n"
+				'window.cocoIsStepSelectPanelli = ' . wp_json_encode( $current_page_is_panelli ) . "; \n"
 			);
 			wp_enqueue_script( 'coco-solar-functions' );
 
@@ -312,53 +314,6 @@ class Hooks {
 		echo '<!--' .
 			$stats_str
 		. '-->';
-	}
-
-	/**
-	 * Add a js script to the page, to paint a polygon with the shape of the building
-	 * in the map, using the previously captured coordinates.
-	 * We call Google Maps API to get the shape of the building, then we paint it with js
-	 *
-	 * @param array  $instance The field instance.
-	 * @param object $form     The form object.
-	 * @param string $value    The field value.
-	 */
-	public static function js_script_to_paint_building_profile( $instance, $form, $value ) {
-
-		// get the lat and lng of the coco-map on form page 1.
-		$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
-		if ( ! $coco_map_entry ) {
-			return;
-		}
-
-		$coco_current_entry = Helper::capture_coco_map_field_map_rectangle_step_2_instance( $form );
-		if ( ! $coco_current_entry ) {
-			return;
-		}
-
-		$previous_marker_value = explode( ',', $coco_map_entry );
-
-		$building_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
-
-		if ( ! $building_data || is_wp_error( $building_data ) ) {
-			return;
-		}
-		if ( ! isset( $building_data['results'] ) ) {
-			echo 'console.log("Error in PHP, no building outlines found", ' . wp_json_encode( $building_data ) . ');';
-			return;
-		}
-		echo 'console.log("Executing building outlines for coco-map on the page 2 only");';
-		$buildings_coords = \Coco_Solar\Solar_API::extract_building_profile_from_map_geocode_response( $building_data );
-		foreach ( $buildings_coords as $i => $building_coords ) {
-			// The js var 'map' is already setup before this hook execution.
-			// We paint a polygon with the shape of the building
-			// echo 'console.log("Explanding shape of building: ", "'.$building_coords.'");';
-			// Helper::expand_polygon( $building_coords, 0.01 ); // not working at the moment
-			?>
-			// Paint the shape of the building
-			window.paintAPoygonInMap( map, '<?php echo $building_coords; ?>', { fillColor: '#00FFFF', fillOpacity:0, strokeOpacity: 1, strokeWeight: 5 });
-			<?php
-		}
 	}
 }
 

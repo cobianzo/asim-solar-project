@@ -30,6 +30,13 @@ export const paintASunForSegment = async(
     return Promise.reject(new Error('Segment does not have center coordinates'));
   }
 
+  // init: clear the marker if it existed already
+  if (seg.sunMarker){
+    seg.sunMarker.map = null;
+    google.maps.event.clearInstanceListeners(seg.sunMarker);
+    seg.sunMarker = null;
+  }
+
   // paintAMarker is a function defined by coco plugin
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -47,6 +54,22 @@ export const paintASunForSegment = async(
     }
   );
 };
+
+export const deleteAllSunMarkers = function() {
+  if (window.cocoAllSunMarkers?.length) {
+    window.cocoAllSunMarkers?.forEach( marker => {
+      if (marker) {
+        marker.map = null;
+        google.maps.event.clearInstanceListeners(marker);
+        marker = null;
+      }
+    });
+    window.cocoAllSunMarkers.length = 0;
+  }
+}
+window.dd = function() {
+  deleteAllSunMarkers();
+}
 
 /**
  * Draws a line in the map from an array of LatLng coordinates.
@@ -171,15 +194,21 @@ export const paintPolygonsByArrayOfStrings = (
   });
 }
 
+// it works, but not in use in favour of paintBoundingBoxAsRectangle
 export const paintBoundingBoxAsPolygon = (
   gmap: google.maps.Map,
   boundingBox: boxBySWNE,
   extraParams: google.maps.PolygonOptions = {}
 ) => {
-  const boundingBoxCoords = `${boundingBox.sw.latitude},${boundingBox.sw.longitude} ${boundingBox.sw.latitude},${boundingBox.ne.longitude} ${boundingBox.ne.latitude},${boundingBox.ne.longitude} ${boundingBox.ne.latitude},${boundingBox.sw.longitude}`;
+  const boundingBoxCoords = `${boundingBox.sw.latitude},${boundingBox.sw.longitude} ` +
+  `${boundingBox.sw.latitude},${boundingBox.ne.longitude} ` +
+  `${boundingBox.ne.latitude},${boundingBox.ne.longitude} ` +
+  `${boundingBox.ne.latitude},${boundingBox.sw.longitude}`;
+
   const initialParams: google.maps.PolygonOptions = {
-    strokeColor: 'black', fillColor: 'black', fillOpacity: 0.1, clickable: false
+    strokeColor: 'black', fillColor: 'black', fillOpacity: 0.5, clickable: false
   };
+
   window.paintAPoygonInMap(gmap, boundingBoxCoords, { ...initialParams, ...extraParams });
 }
 

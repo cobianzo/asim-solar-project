@@ -27,13 +27,6 @@ class Helper {
 		return null;
 	}
 
-	public static function capture_coco_map_field_map_rectangle_step_2_instance( $form ) {
-		return self::capture_coco_map_field_instance( $form, 'map-rectangle' );
-	}
-	public static function capture_coco_map_field_map_panelli_step_3_instance( $form ) {
-		return self::capture_coco_map_field_instance( $form, 'map-panelli' );
-	}
-
 	// not in use, not tested.
 	public static function capture_coco_map_field_instances_in_page( $form ) {
 		$page_number = \GFFormDisplay::get_current_page( $form['id'] );
@@ -54,8 +47,7 @@ class Helper {
 			// we detect the coco-form which is hidden now because we are not in the page 1.
 			foreach ( $form['fields'] as $field ) {
 				if (
-					! rgar( $field, 'isHidden' )
-					&& 'coco-map' === rgar( $field, 'type' ) && $adminLabel === $field->adminLabel
+					! rgar( $field, 'isHidden' ) && $adminLabel === $field->adminLabel
 				) {
 					$field->value = $entry[ $field->id ] ?? null;
 					return $field;

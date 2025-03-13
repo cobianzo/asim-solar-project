@@ -10,16 +10,18 @@
   - The first step of the form, the user selects a roof with a marker
   - The second step the user sees the shape of the roof he just selected, the interaction type of this coco-map is ´Developer´
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
-- The map in step 1 must have the adminLabel === 'map-roof'
-- The map in step 2 must have the adminLabel === 'map-rectangle'
+- The map in step 1 must have the adminLabel === 'map-roof'  >> We select the roof with a marker
+- The map in step 2 must have the adminLabel === 'map-segments-offset' >> We apply offset position of the segments and rotate them if needed
 - The map in step 3 must have the adminLabel === 'map-panelli'
-- The radio select for the orientation of the segments must have the class === 'segment-rotation'
+- The radio select in step 2, for the orientation of the segments 
+must have the class === 'segment-rotation' AND the adminLabel  === 'segment-rotation'
 
 # Develop
 
   in this folder
   `npm run start` for wp scripts compilation into /build
-  `npm run bs` for browser sync
+    - In my case I must call the global command with `wp-env start`
+  ~~`npm run bs`~~ for browser sync (not working)
 
 ## deploy of the work in a website
 

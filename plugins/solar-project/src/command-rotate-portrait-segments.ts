@@ -28,7 +28,7 @@ export const getRotationPortraitSelected = (): SelectRotationPortraitSegmentsOpt
   return 'no-extra-rotation';
 }
 
-const applyRotationPortraitSegmentsByRadioSelected = (): SelectRotationPortraitSegmentsOptions => {
+export const applyRotationPortraitSegmentsByRadioSelected = (): SelectRotationPortraitSegmentsOptions => {
   const valorSeleccionado = getRotationPortraitSelected();
   console.log(`Opción seleccionada: ${valorSeleccionado}`);
   setupSegments( valorSeleccionado as SelectRotationPortraitSegmentsOptions );

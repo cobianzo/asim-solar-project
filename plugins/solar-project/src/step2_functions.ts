@@ -1,7 +1,10 @@
+/**
+ * Origin of call to functions happening in step 2:
+ * Step 2 of the GF: setup of the position of the segments: the offset and the orientation.
+ */
 // types
-import { CocoMapSetup, ExtendedSegment } from './types';
+import { CocoMapSetup } from './types';
 
-import  setupSegments from './setup-segments-interactive-functions';
 import {
   latLngToPoint,
   convertPointsArrayToLatLngString,
@@ -13,23 +16,20 @@ import {
   paintPolygonsByArrayOfStrings,
   paintRectangleInMap,
   paintCenterOfUsersRectangleInMap,
-  paintBoundingBoxAsPolygon,
-  paintBoundingBoxAsRectangle,
  } from './drawing-helpers';
 
 import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
-import { getRotationPortraitSelected } from './command-rotate-portrait-segments';
-import { createDraggableBoundingBoxForMovingAllSegments } from './setup-drag-all-segments-interaction';
+import { setupSegmentsAndDraggableBoundingBox, updateValuesCoordsSegmentsWithOffset } from './setup-drag-all-segments-interaction';
 
 
 /**
  * Returns the CocoMapSetup object for the step2 map (the one with the input text element
- * identified by window.step2PolygonInputId). The default export of this script
+ * identified by window.step2CocoMapInputId). The default export of this script
  *
  * @returns {CocoMapSetup | null}
  */
 const getStep2CocoMapSetup = () : CocoMapSetup | null => {
-  const cocoMapSetup = window.cocoMaps[window.step2PolygonInputId];
+  const cocoMapSetup = window.cocoMaps[window.step2CocoMapInputId];
   return cocoMapSetup ?? null;
 }
 
@@ -40,7 +40,7 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   // setup and validations
   const customEvent = event as CustomEvent<CocoMapSetup>;
   const cocoMapSetup = getStep2CocoMapSetup();
-  if ( ! window.cocoIsStepSelectRectangle || ! cocoMapSetup
+  if ( ! window.cocoIsStepSelectOffset || ! cocoMapSetup
     || ( cocoMapSetup.inputElement.id !== customEvent.detail.inputElement.id )
   ) {
     return;
@@ -52,18 +52,22 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   /**  ================ ================ ================ ================
    *  PAINTS THE PROFILE OF THE BUILDING. The data has been exposed with PHP.
    *  ================ ================ ================ ================*/
-  // design polygon of the whole roof profile
+  // design polygon of the whole roof profile (todelete, it does not always work)
   if (window.cocoBuildingProfile?.length) {
     paintPolygonsByArrayOfStrings(theMap, window.cocoBuildingProfile, { strokeColor: 'black' });
   }
 
-  // design all segments, one by one, and applyes the inreactivity.
-  const rotationPortraitSegments = getRotationPortraitSelected();
-  setupSegments( rotationPortraitSegments );
-
-  if (cocoMapSetup.segments) {
-    createDraggableBoundingBoxForMovingAllSegments();
+  // If this is not the first time we load the step 2, we might have setup already a value for
+  // the offset (and it's in window.step2RotationInserted compared to window.cocoBoundingBoxCenter))
+  if (window.step2OffsetInserted?.length && window.cocoBoundingBoxCenter) {
+    const displacedLatLng = window.step2OffsetInserted.split(',');
+    const diffLat = window.cocoBoundingBoxCenter.latitude - parseFloat(displacedLatLng[0]);
+    const diffLng = window.cocoBoundingBoxCenter.longitude - parseFloat(displacedLatLng[1]);
+    updateValuesCoordsSegmentsWithOffset(-diffLat, -diffLng);
   }
+
+  // Create the segments and the bounding box to drag them
+  setupSegmentsAndDraggableBoundingBox();
 
 } );
 
@@ -105,7 +109,8 @@ export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouse
     return;
   }
 
-  const input = document.getElementById(window.step2PolygonInputId) as HTMLInputElement;
+  // TODO: this is now happening in step 3.
+  const input = document.getElementById(window.step2CocoMapInputId) as HTMLInputElement;
   if (input) {
     input.value = window.cocoDrawingRectangle.rectanglePolygonCoords || '';
   }

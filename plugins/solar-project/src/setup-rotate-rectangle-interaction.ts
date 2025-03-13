@@ -68,7 +68,8 @@ const rectangleRotationInteractionSetup = function() {
       window.cocoDrawingRectangle.rectanglePolygonCoords = window.cocoDrawingRectangle.tempRotatedCoords;
 
       // save the new value in the input
-      const input = document.getElementById(window.step2PolygonInputId) as HTMLInputElement;
+      // @TODO: this is now step 3!
+      const input = document.getElementById(window.step2CocoMapInputId) as HTMLInputElement;
       if (input) {
         input.value = window.cocoDrawingRectangle.rectanglePolygonCoords || '';
       }

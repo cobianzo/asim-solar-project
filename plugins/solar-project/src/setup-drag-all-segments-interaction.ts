@@ -8,10 +8,22 @@
  * We use that displacement to translate the rectangle into the Map view.
  */
 
+import { applyRotationPortraitSegmentsByRadioSelected } from "./command-rotate-portrait-segments";
 import { paintBoundingBoxAsRectangle } from "./drawing-helpers";
 import setupSegments, { deactivateInteractivityOnSegment } from "./setup-segments-interactive-functions";
 import getStep2CocoMapSetup from "./step2_functions";
 import { ExtendedSegment } from "./types";
+
+/**
+ * Setup draggable bounding box for moving all segments.
+ * Deactivate the interactivity of the segments, as the only interaction will be
+ * dragging the big bouniding box containing them all
+ */
+export const setupSegmentsAndDraggableBoundingBox = () => {
+  setupSegments(); // paint the segments (it also applies listeners to interact with them)
+  createDraggableBoundingBoxForMovingAllSegments(); // remothe segment's listeners and paint bounding box w/ dragabble listeners
+  applyRotationPortraitSegmentsByRadioSelected(); // rotate the segments as per the option selected
+}
 
 export const createDraggableBoundingBoxForMovingAllSegments = () => {
 
@@ -24,12 +36,20 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
     console.log(`Not found the coco-map of step 2 in page ${window.gf_current_page}. Early exit`, cocoMapSetup);
     return;
   }
+
   // reset things if needed
+  if (window.cocoRectangleBoundingBox) {
+    google.maps.event.clearListeners(window.cocoRectangleBoundingBox, 'mousedown');
+    google.maps.event.clearListeners(window.cocoRectangleBoundingBox, 'bounds_changed');
+    google.maps.event.clearListeners(window.cocoRectangleBoundingBox, 'mouseup');
+    window.cocoRectangleBoundingBox.setMap(null);
+    window.cocoRectangleBoundingBox = null;
+  }
 
   window.cocoRectangleBoundingBox = paintBoundingBoxAsRectangle(
     gmap,
     window.cocoAllSegmentBoundingBox,
-    {fillOpacity: 0, strokeOpacity: 0}
+    {fillOpacity: 0.1, strokeOpacity: 0.3, fillColor: 'black' }
   );
 
   if (!window.cocoRectangleBoundingBox) {
@@ -38,6 +58,7 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
   }
 
   if (segments.length) {
+    console.log('in creating bounding box, deactivate interaction segments');
     segments.forEach((segment: ExtendedSegment) => {
       deactivateInteractivityOnSegment(segment);
     });
@@ -65,6 +86,7 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
       })
     };
 
+    /** When the dragging is finsihed: we update the global parameters for segments and boundingbox  */
     const upHandler = () => {
       if (dragListener && upListener) {
         google.maps.event.removeListener(dragListener);
@@ -75,20 +97,20 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
       const latDiff = newNE.lat() - startNE.lat();
       const lngDiff = newNE.lng() - startNE.lng();
 
-      alert(`applying displacement in lat of ${latDiff}`);
-      // update the single source of truth for the position of the segments
-      segments.forEach( s => {
-        if (s.indexInMap == null) return;
-        window.cocoBuildingSegments[s.indexInMap].boundingBox.sw.latitude += latDiff;
-        window.cocoBuildingSegments[s.indexInMap].boundingBox.sw.longitude += lngDiff;
-        window.cocoBuildingSegments[s.indexInMap].boundingBox.ne.latitude += latDiff;
-        window.cocoBuildingSegments[s.indexInMap].boundingBox.ne.longitude += lngDiff;
-        window.cocoBuildingSegments[s.indexInMap].center.latitude += latDiff;
-        window.cocoBuildingSegments[s.indexInMap].center.longitude += lngDiff;
-      })
+      console.log(`applying displacement in lat of ${latDiff},${lngDiff}`);
 
-      setupSegments();
-      createDraggableBoundingBoxForMovingAllSegments();
+      // update the single source of truth for the position of the segments
+      updateValuesCoordsSegmentsWithOffset(latDiff, lngDiff);
+
+      // save the offset in the input
+      const cocoMapSetup = getStep2CocoMapSetup();
+      if ( cocoMapSetup?.inputElement ) {
+        const center = window.cocoBoundingBoxCenter;
+        cocoMapSetup.inputElement.value = `${center.latitude + latDiff},${center.longitude + lngDiff}`;
+      }
+
+      // restart everything, paiting from scratch the segments and boundg box with new values
+      setupSegmentsAndDraggableBoundingBox();
     };
 
     if (!window.cocoRectangleBoundingBox) {
@@ -111,4 +133,20 @@ function applyDisplacementToPolygon(polygon: ExtendedSegment, originalPath: Arra
     return new google.maps.LatLng(newLat, newLng);
   });
   polygon.setPath(newPath);
+}
+
+// updates the single source of truth for the position of the segments
+export const updateValuesCoordsSegmentsWithOffset = function( latOffset: number, lngOffset: number ) {
+  window.cocoBuildingSegments.forEach( s => {
+    s.boundingBox.sw.latitude += latOffset;
+    s.boundingBox.sw.longitude += lngOffset;
+    s.boundingBox.ne.latitude += latOffset;
+    s.boundingBox.ne.longitude += lngOffset;
+    s.center.latitude += latOffset;
+    s.center.longitude += lngOffset;
+  })
+  window.cocoAllSegmentBoundingBox.sw.latitude += latOffset;
+  window.cocoAllSegmentBoundingBox.sw.longitude += lngOffset;
+  window.cocoAllSegmentBoundingBox.ne.latitude += latOffset;
+  window.cocoAllSegmentBoundingBox.ne.longitude += lngOffset;
 }

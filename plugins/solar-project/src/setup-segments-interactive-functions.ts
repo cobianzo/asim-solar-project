@@ -5,7 +5,7 @@
  */
 
 // types
-import { ExtendedSegment, RoofSegmentStats } from './types';
+import { ExtendedSegment, RoofSegmentStats, SelectRotationPortraitSegmentsOptions } from './types';
 
 // internal dependencies, trigonometrical functions
 import {
@@ -23,6 +23,7 @@ import {
   fadeSegment,
   createUnselectSegmentButton,
   removeRectangleInMap,
+  deleteAllSunMarkers,
  } from './drawing-helpers';
 
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
@@ -36,7 +37,7 @@ import getStep2CocoMapSetup, { handlerFirstClickDrawRectangleOverSegment } from 
  *
  * This uses the exposed js vars set up in class-hooks.php
  */
-const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all' = 'no-extra-rotation' ) => {
+const setupSegments = ( rotationSegments: SelectRotationPortraitSegmentsOptions = 'no-extra-rotation' ) => {
 
   const cocoMapSetup = getStep2CocoMapSetup();
   if ( ! cocoMapSetup ) {
@@ -62,10 +63,13 @@ const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotat
     cocoMapSetup.segments = [];
   }
 
+  // delete all sun markers marking the center of the segments.
+  deleteAllSunMarkers();
+
   // If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
   removeRectangleInMap(theMap, true);
 
-  /** ========================================  
+  /** ========================================
    * PAINT THE SEGMENTS
    * ========================================*/
 
@@ -125,7 +129,9 @@ const setupSegments = ( rotationSegments: 'no-rotation-at-all' | 'no-extra-rotat
       segment.indexInMap = i;
       segment.pointsInMap = newRectPoints || undefined;
       paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
+        window.cocoAllSunMarkers = window.cocoAllSunMarkers || [];
         segment.sunMarker = sunMarker;
+        window.cocoAllSunMarkers.push(sunMarker);
       });
       segment.realRotationAngle = realAngleRotation;
       segment.isPortrait = isPortrait;
@@ -199,8 +205,8 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
     return;
   }
 
-  // unhighlight all segments
-  const allSegments = window.cocoMaps[window.step2PolygonInputId].segments;
+  // unhighlight all segments TODO: this is now step 3!
+  const allSegments = window.cocoMaps[window.step2CocoMapInputId].segments;
   allSegments?.forEach( (s: ExtendedSegment) => {
     if ( s.indexInMap !== segm.indexInMap ) {
       s.setVisible(false);

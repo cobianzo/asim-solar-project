@@ -34,7 +34,7 @@ export interface RoofSegmentStats {
 export interface ExtendedSegment extends google.maps.Polygon {
   data?: RoofSegmentStats;
   indexInMap?: number;
-  sunMarker?: AdvancedMarkerElement;
+  sunMarker?: AdvancedMarkerElement | null;
   pointsInMap?: google.maps.Point[];
   realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees
   map: google.maps.Map;
