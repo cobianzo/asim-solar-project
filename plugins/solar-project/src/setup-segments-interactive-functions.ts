@@ -27,7 +27,8 @@ import {
  } from './drawing-helpers';
 
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
-import getStep2CocoMapSetup, { handlerFirstClickDrawRectangleOverSegment } from './step2_functions';
+import { getCurrentStepCocoMap } from '.';
+import { getStep3CocoMapSetup, handlerFirstClickDrawRectangleOverSegment } from './step3_functions';
 
 /**
  * Initializes and sets up the roof segments for the map.
@@ -37,11 +38,14 @@ import getStep2CocoMapSetup, { handlerFirstClickDrawRectangleOverSegment } from 
  *
  * This uses the exposed js vars set up in class-hooks.php
  */
-const setupSegments = ( rotationSegments: SelectRotationPortraitSegmentsOptions = 'no-extra-rotation' ) => {
+const setupSegments = (
+  rotationSegments: SelectRotationPortraitSegmentsOptions = 'no-extra-rotation',
+  paintSunMarkers = true
+ ) => {
 
-  const cocoMapSetup = getStep2CocoMapSetup();
+  const cocoMapSetup = getCurrentStepCocoMap();
   if ( ! cocoMapSetup ) {
-    console.log(`Not found the coco-map of step 2 in page ${window.gf_current_page}. Early exit`, cocoMapSetup);
+    console.log(`:Not found the coco-map in page ${window.gf_current_page}. Early exit`, cocoMapSetup);
     return;
   }
 
@@ -128,11 +132,14 @@ const setupSegments = ( rotationSegments: SelectRotationPortraitSegmentsOptions 
       segment.data = element; // to access to the solar API data of the segment
       segment.indexInMap = i;
       segment.pointsInMap = newRectPoints || undefined;
-      paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
-        window.cocoAllSunMarkers = window.cocoAllSunMarkers || [];
-        segment.sunMarker = sunMarker;
-        window.cocoAllSunMarkers.push(sunMarker);
-      });
+      if (paintSunMarkers) {
+        paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
+          window.cocoAllSunMarkers = window.cocoAllSunMarkers || [];
+          segment.sunMarker = sunMarker;
+          // for some reason this is loaded twice
+          window.cocoAllSunMarkers.push(sunMarker); // we need this to delete effectively all markers when resettings things
+        });
+      }
       segment.realRotationAngle = realAngleRotation;
       segment.isPortrait = isPortrait;
 
@@ -149,9 +156,9 @@ const setupSegments = ( rotationSegments: SelectRotationPortraitSegmentsOptions 
 // handlers
 function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
   const segment: ExtendedSegment = this;
-  const cocoMapSetup = getStep2CocoMapSetup();
+  const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 2 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
+    console.error(`Not found the coco-map of step 3 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
     return;
   }
 
@@ -175,9 +182,9 @@ function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
 const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Event) {
   // init things
   const segment: ExtendedSegment  = this;
-  const cocoMapSetup = getStep2CocoMapSetup();
+  const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 2 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
+    console.error(`Not found the coco-map of step 3 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
     return;
   }
   // verifications
@@ -199,14 +206,14 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
 function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   // init vars
   const segm: ExtendedSegment = this;
-  const cocoMapSetup = getStep2CocoMapSetup();
+  const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 2 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
+    console.error(`Not found the coco-map of step 3 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
     return;
   }
 
-  // unhighlight all segments TODO: this is now step 3!
-  const allSegments = window.cocoMaps[window.step2CocoMapInputId].segments;
+  // unhighlight all segments
+  const allSegments = window.cocoMaps[window.step3CocoMapInputId].segments;
   allSegments?.forEach( (s: ExtendedSegment) => {
     if ( s.indexInMap !== segm.indexInMap ) {
       s.setVisible(false);
@@ -251,6 +258,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
 
 
 export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
+  if (!window.cocoIsStepSelectRectangle) return;
   segment.addListener('mouseover', handlerMouseOverHighlightSegment );
   google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
   google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);

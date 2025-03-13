@@ -1,20 +1,21 @@
-import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo, boxBySWNE, LatitudeLongitudeObject } from './types';
+import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo, boxBySWNE, LatitudeLongitudeObject, SelectRotationPortraitSegmentsOptions } from './types';
 
 
 declare global {
   interface Window {
 
     cocoDrawingRectangle: CocoDrawingRectangleInfo;
+
+    // data exposed in php, in class-hooks:
     cocoIsStepSelectOffset: Boolean;
     cocoIsStepSelectRectangle: Boolean;
     cocoIsStepSelectPanelli: Boolean;
 
-    // data exposed in php, in class-hooks:
     cocoAssetsDir: string;
     step2CocoMapInputId: string;
-    step2RotationInserted: string;
+    step2RotationInserted: SelectRotationPortraitSegmentsOptions;
     step2OffsetInserted: string;
-    step2RectangleCoords: string; // TODO:
+    step3RectangleCoords: string;
     step3CocoMapInputId: string; // TODO:
 
     cocoBuildingProfile: Array<string>;
@@ -26,9 +27,10 @@ declare global {
     // segments source of truth
     cocoBuildingSegments: Array<RoofSegmentStats>;
     cocoAllSunMarkers?: Array<AdvancedMarkerElement | null>;
-    cocoAllSegmentBoundingBox: boxBySWNE;
-    cocoBoundingBoxCenter: LatitudeLongitudeObject;
-    cocoRectangleBoundingBox: google.maps.Rectangle | null;
+    cocoOriginalBoundingBox: boxBySWNE; // the data
+    cocoMovingBoundingBoxPolygon: google.maps.Rectangle | null; // the painteed object from the data.
+    cocoMovingBoundingBoxCenterMarker: AdvancedMarkerElement[] | null;
+    cocoOriginalBoundingBoxCenter: LatitudeLongitudeObject; // to calculate the offset respect the painted polygon
 
     // this fn is exposed by the external plugin coco-map0-field
     paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;
@@ -36,6 +38,14 @@ declare global {
   }
 }
 
+
+export const getCurrentStepCocoMap = function(): CocoMapSetup | null {
+  if (window.cocoMaps) {
+    const firstKey = Object.keys(window.cocoMaps)[0];
+    return window.cocoMaps[firstKey];
+  }
+  return null;
+}
 
 // imports
 import './setup-segments-interactive-functions';

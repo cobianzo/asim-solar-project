@@ -237,7 +237,7 @@ export const paintBoundingBoxAsRectangle = (
     ...extraParams
   });
 
-  return rectangle?? null;
+  return rectangle ?? null;
 }
 
 export const createUnselectSegmentButton = ( gmap : google.maps.Map ) => {

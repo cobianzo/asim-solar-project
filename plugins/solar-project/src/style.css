@@ -30,4 +30,21 @@ body {
   .hidden {
     display: none;
   }
+
+  /* radio buttons*/
+  .gform_page_fields .segment-rotation {
+    margin-top: -250px;
+    z-index: 99;
+    margin-left: 9px;
+    background: #FFFFFFBB;
+    padding: 11px;
+    display: inline;
+    width: 440px;
+    min-width: 0;
+    height: min-content;
+
+    legend, .gfield_description {
+      display: none;;
+    }
+  }
 }

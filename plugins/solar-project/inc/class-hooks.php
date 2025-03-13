@@ -40,9 +40,12 @@ class Hooks {
 			$form           = \GFAPI::get_form( $form_id );
 			$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
 			if ( $coco_map_entry ) {
+				// step 2 fields
 				$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
 				$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
+				// step 3
 				$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
+				// step 4
 				$coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
 				// ...
 			}
@@ -70,8 +73,8 @@ class Hooks {
 				"window.step2RotationInserted = " . wp_json_encode( $coco_segmentrotationtype_instance->value ) ." \n" .
 				"window.step2OffsetInserted = " . wp_json_encode( $coco_mapfieldoffset_instance->value ) ." \n" . // respect the center of the bounding box
 
-				"window.step3CocoMapInputId = 'input_{$coco_mapfieldpanelli_instance->formId}_{$coco_mapfieldpanelli_instance->id}'; \n" .
-				'window.step2RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
+				"window.step3CocoMapInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
+				'window.step3RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
@@ -81,8 +84,8 @@ class Hooks {
 			if ( $stats ) {
 				wp_add_inline_script( 'coco-solar-functions',
 					'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
-					'window.cocoAllSegmentBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
-					'window.cocoBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
+					'window.cocoOriginalBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
+					'window.cocoOriginalBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
 				);
 			}
 

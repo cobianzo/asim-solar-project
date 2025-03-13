@@ -28,12 +28,13 @@ export const getRotationPortraitSelected = (): SelectRotationPortraitSegmentsOpt
   return 'no-extra-rotation';
 }
 
-export const applyRotationPortraitSegmentsByRadioSelected = (): SelectRotationPortraitSegmentsOptions => {
+export const applyRotationPortraitSegmentsByRadioSelected = ( createBoundingBoxAfterCreatingSegments: Boolean = true ): SelectRotationPortraitSegmentsOptions => {
   const valorSeleccionado = getRotationPortraitSelected();
-  console.log(`Opción seleccionada: ${valorSeleccionado}`);
-  setupSegments( valorSeleccionado as SelectRotationPortraitSegmentsOptions );
-
-  createDraggableBoundingBoxForMovingAllSegments();
-
+  console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
+  setupSegments( valorSeleccionado as SelectRotationPortraitSegmentsOptions, false );
+  if (createBoundingBoxAfterCreatingSegments) {
+    console.log(`and now the bouding box`);
+    createDraggableBoundingBoxForMovingAllSegments();
+  }
   return valorSeleccionado;
 }
