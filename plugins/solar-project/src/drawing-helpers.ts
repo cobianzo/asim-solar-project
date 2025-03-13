@@ -94,7 +94,7 @@ export const drawALine = (
   });
 };
 
-/**
+/** TODELETEE: moved to trigonometry
  * Calculates the 2 right lines that define the an inclined axis.
  * Every line is defined by two points in an array
  * @param gmap
@@ -274,7 +274,12 @@ export const fadeSegment =function(roofSegment: ExtendedSegment) {
  * @param rectangleAsStringOfCoords : string
  * @param vertexPoints
  */
-export const paintRectangleInMap = (gmap: google.maps.Map, segment: ExtendedSegment | null, rectangleAsStringOfCoords: string, vertexPoints?: Array<google.maps.Point>) => {
+export const paintRectangleInMap = (
+  gmap: google.maps.Map,
+  segment: ExtendedSegment | null,
+  rectangleAsStringOfCoords: string,
+  vertexPoints?: Array<google.maps.Point>
+) => {
 
   if (! segment ) {
     console.error('we cant paint the rectangle if no segment is selected');

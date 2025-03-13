@@ -31,20 +31,38 @@ body {
     display: none;
   }
 
-  /* radio buttons*/
-  .gform_page_fields .segment-rotation {
-    margin-top: -250px;
-    z-index: 99;
-    margin-left: 9px;
-    background: #FFFFFFBB;
-    padding: 11px;
-    display: inline;
-    width: 440px;
-    min-width: 0;
-    height: min-content;
+  /* radio buttons for rotation of portrait segments*/
+  @media (min-width: 1050px) {
+    .gform_page_fields .segment-rotation {
+      margin-top: -300px;
+      z-index: 99;
+      margin-left: 9px;
+      background: #FFFFFFBB;
+      padding: 11px;
+      display: inline;
+      width: 440px;
+      min-width: 0;
+      height: min-content;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 
-    legend, .gfield_description {
-      display: none;;
+      legend {
+        display: none;
+      }
     }
+  }
+  .gform_page_fields .segment-rotation.gfield_error {
+    border: 2px solid var(--gf-ctrl-desc-color-error);
+    transition: background-color 0.5s ease-in-out;
+    animation: colorChange 2s 5 alternate;
+    background-color: #ffffffee;
+  }
+}
+
+@keyframes colorChange {
+  0% {
+    background-color: #e38874ee;
+  }
+  100% {
+    background-color: white;
   }
 }

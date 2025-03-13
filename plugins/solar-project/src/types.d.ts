@@ -55,7 +55,7 @@ export interface CocoDrawingRectangleInfo {
   firstClickAxislineY?: google.maps.Polyline | null;
 
   polygon?: google.maps.Polygon;
-  polygonPoints?: Array<google.maps.Point>;
+  polygonPoints?: Array<google.maps.Point>; // not used actually
   polygonCenterPoint?: google.maps.Point | null;
   polygonCenterCoords?: google.maps.LatLng | null;
   polygonCenterMarker?: AdvancedMarkerElement | null;
@@ -70,7 +70,9 @@ export interface CocoDrawingRectangleInfo {
   secondClickAxislineY?: google.maps.Polyline | null;
 
   // handlers to resize
-  handlers: Array<HandlerAdvancedMarker>; // Array gets keys 0 and 2.
+  handlers: Array<AdvancedMarkerElement>; // Array gets keys 0 and 2.
 }
 
 export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';
+
+export type CoupleOfPoints = [google.maps.Point, google.maps.Point] | [];

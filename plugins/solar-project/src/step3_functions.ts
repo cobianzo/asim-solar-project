@@ -1,10 +1,10 @@
 // RENAME TO step 4 TODO:
-import { paintCenterOfUsersRectangleInMap, paintInclinedAxisAsLinesFromCoordenates, paintRectangleInMap } from './drawing-helpers';
+import { paintCenterOfUsersRectangleInMap, paintRectangleInMap } from './drawing-helpers';
 import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
 import { paintResizeHandlersInPolygon } from './setup-resize-rectangle-interaction';
 import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 import setupSegments from './setup-segments-interactive-functions';
-import { convertPointsArrayToLatLngString, getLineIntersection, latLngToPoint } from './trigonometry-helpers';
+import { convertPointsArrayToLatLngString, getInclinedAxisAsLinesFromCoordenates, getLineIntersection, latLngToPoint } from './trigonometry-helpers';
 import { CocoMapSetup } from './types';
 
 /**
@@ -119,13 +119,6 @@ const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.L
     console.error('window.cocoDrawingRectangle.firstVertexPoint is null. This is a problem. Check the code.', window.cocoDrawingRectangle);
     return;
   }
-  // paint the first 2 lines
-  const { axisLinesDefinedByPoints, line1, line2 } = paintInclinedAxisAsLinesFromCoordenates( gmap, window.cocoDrawingRectangle.firstVertexPoint, angle );
-  console.log(axisLinesDefinedByPoints); // object with {lineX, lineY}
-  window.cocoDrawingRectangle.boundariesLinesAxisFirstClick = axisLinesDefinedByPoints;
-  window.cocoDrawingRectangle.firstClickAxislineX = line1;
-  window.cocoDrawingRectangle.firstClickAxislineY = line2;
-  console.log('we saved the first vertex on ', window.cocoDrawingRectangle.firstVertexPoint);
 }
 
 const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
@@ -133,57 +126,103 @@ const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseE
   const gmap = window.cocoDrawingRectangle.selectedSegment?.map;
   const angle = window.cocoDrawingRectangle.selectedSegment?.realRotationAngle;
 
-  if (!gmap || angle === null) return;
-
-  // if the polygon is drawn, we remove it
-  window.cocoDrawingRectangle.polygon?.setMap(null);
-  window.cocoDrawingRectangle.secondClickAxislineX?.setMap(null);
-  window.cocoDrawingRectangle.secondClickAxislineY?.setMap(null);
-
-  // save the point where we clicked and project a line with the given angle
-  const secondVertexPoint = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
-  // this line causes problems. It inhibites the currnt click event on the segment
-  const { axisLinesDefinedByPoints, line1, line2 } = paintInclinedAxisAsLinesFromCoordenates( gmap, secondVertexPoint, angle );
-  if (!axisLinesDefinedByPoints ) return;
-  window.cocoDrawingRectangle.boundariesLinesAxisSecondClick = axisLinesDefinedByPoints;
-  window.cocoDrawingRectangle.secondClickAxislineX = line1;
-  window.cocoDrawingRectangle.secondClickAxislineY = line2;
+  if (!gmap || angle === null ||
+    !window.cocoDrawingRectangle.firstVertexPoint
+  ) return;
 
 
-  console.log('moving the mouse to build a rectangle: ', secondVertexPoint);
+  // Paint the polygon rectangle again with the params:
+  // window.cocoDrawingRectangle.firstVertexPoint
+  const pointB = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
+  // angle
+  if ( !pointB) return;
+
+  const success = drawRectangleByOppositePointsAndInclination(
+    gmap,
+    window.cocoDrawingRectangle.firstVertexPoint,
+    pointB,
+    angle!
+  );
+
+  if (window.cocoDrawingRectangle.selectedSegment
+    && success?.axisLinesDefinedByPointsFirst && success?.axisLinesDefinedByPointsSecond
+    && success?.rectanglePolygonCoords && success?.vertexPoints
+  ) {
+    const {
+      axisLinesDefinedByPointsFirst,
+      axisLinesDefinedByPointsSecond,
+      rectanglePolygonCoords,
+      vertexPoints
+    } = success;
+
+    // after the changes we update:
+    window.cocoDrawingRectangle.boundariesLinesAxisFirstClick = axisLinesDefinedByPointsFirst;
+    window.cocoDrawingRectangle.boundariesLinesAxisSecondClick = axisLinesDefinedByPointsSecond;
+
+    // if the polygon is drawn, we remove it and repaint it and update the params of the rectangle
+    paintRectangleInMap(gmap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords, vertexPoints);
+    console.log('Rectangle painted, ', success);
+  }
+
+  return success;
+
+}
+
+
+function drawRectangleByOppositePointsAndInclination( gmap: google.maps.Map, pointA: google.maps.Point, pointC: google.maps.Point, angle: number ) {
+
+  const { axisLinesDefinedByPoints: axisLinesDefinedByPointsFirst } =
+    getInclinedAxisAsLinesFromCoordenates( pointA, angle! );
+
+  if (!axisLinesDefinedByPointsFirst) {
+    return null;
+  }
+
+  console.log('we saved the first vertex on ', axisLinesDefinedByPointsFirst);
+
+  const { axisLinesDefinedByPoints: axisLinesDefinedByPointsSecond }
+    = getInclinedAxisAsLinesFromCoordenates( pointC, angle ?? 0 );
+
+  if (!axisLinesDefinedByPointsSecond ) {
+    return null;
+  }
+
+  console.log('moving the mouse to build a rectangle: ', pointC);
 
   // now get the 2 other points that we need
-  const axisFirstClick = window.cocoDrawingRectangle.boundariesLinesAxisFirstClick;
+
   const axisSecondClick = window.cocoDrawingRectangle.boundariesLinesAxisSecondClick;
   const intersectionPointB = getLineIntersection(
-    axisFirstClick.lineX[0].x, axisFirstClick.lineX[0].y,
-    axisFirstClick.lineX[1].x, axisFirstClick.lineX[1].y,
-    axisSecondClick.lineY[0].x, axisSecondClick.lineY[0].y,
-    axisSecondClick.lineY[1].x, axisSecondClick.lineY[1].y
+    axisLinesDefinedByPointsFirst.lineX[0]!.x, axisLinesDefinedByPointsFirst.lineX[0]!.y,
+    axisLinesDefinedByPointsFirst.lineX[1]!.x, axisLinesDefinedByPointsFirst.lineX[1]!.y,
+    axisLinesDefinedByPointsSecond.lineY[0]!.x, axisLinesDefinedByPointsSecond.lineY[0]!.y,
+    axisLinesDefinedByPointsSecond.lineY[1]!.x, axisLinesDefinedByPointsSecond.lineY[1]!.y
   );
   const intersectionPointD = getLineIntersection(
-    axisFirstClick.lineY[0].x, axisFirstClick.lineY[0].y,
-    axisFirstClick.lineY[1].x, axisFirstClick.lineY[1].y,
-    axisSecondClick.lineX[0].x, axisSecondClick.lineX[0].y,
-    axisSecondClick.lineX[1].x, axisSecondClick.lineX[1].y
+    axisLinesDefinedByPointsFirst.lineY[0]!.x, axisLinesDefinedByPointsFirst.lineY[0]!.y,
+    axisLinesDefinedByPointsFirst.lineY[1]!.x, axisLinesDefinedByPointsFirst.lineY[1]!.y,
+    axisLinesDefinedByPointsSecond.lineX[0]!.x, axisLinesDefinedByPointsSecond.lineX[0]!.y,
+    axisLinesDefinedByPointsSecond.lineX[1]!.x, axisLinesDefinedByPointsSecond.lineX[1]!.y
   );
 
   // with all the points, we draw the inclined rectangle created by the user
-  if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && secondVertexPoint && intersectionPointD ) {
+  if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && pointC && intersectionPointD ) {
     const vertexPoints = [
       window.cocoDrawingRectangle.firstVertexPoint,
       intersectionPointB,
-      secondVertexPoint,
+      pointC,
       intersectionPointD
     ]
     const rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, vertexPoints ) ?? '';;
 
-    // paint the rectangle created by the user!
-    paintRectangleInMap(gmap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords, vertexPoints);
-
-    return true;
+    return {
+      axisLinesDefinedByPointsFirst, // axis crossing point A
+      axisLinesDefinedByPointsSecond, // axis crossing point C
+      // the rectangle defined by lat lng coordenates, and by x,y points
+      rectanglePolygonCoords,
+      vertexPoints
+    };
   }
 
-  return false;
-
+  return null;
 }

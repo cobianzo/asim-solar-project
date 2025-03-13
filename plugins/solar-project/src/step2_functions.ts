@@ -6,16 +6,7 @@
 import { CocoMapSetup } from './types';
 
 import {
-  latLngToPoint,
-  convertPointsArrayToLatLngString,
-  getLineIntersection,
-} from './trigonometry-helpers';
-
-import {
-  paintInclinedAxisAsLinesFromCoordenates,
   paintPolygonsByArrayOfStrings,
-  paintRectangleInMap,
-  paintCenterOfUsersRectangleInMap,
  } from './drawing-helpers';
 
 import { setupSegmentsAndDraggableBoundingBox, updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion, updateValuesCoordsSegmentsWithOffset } from './setup-drag-all-segments-interaction';

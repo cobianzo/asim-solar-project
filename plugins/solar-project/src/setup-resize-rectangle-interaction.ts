@@ -87,7 +87,7 @@ const moveDrag = function(e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
 
-  // move the handler
+  // -- move the handler --
   const [offsetX, offsetY] = [
     e.clientX - parseFloat(element.dataset.startDragPointX!),
     e.clientY - parseFloat(element.dataset.startDragPointY!)
@@ -98,6 +98,10 @@ const moveDrag = function(e: MouseEvent) {
     parseFloat(element.dataset.initialTranslateY ?? '0') + offsetY
   ];
   element.style.transform = `translate(${translateX}px, ${translateY}px)`;
+  // -- circle handler moved  --
+
+  // -- repaint the rectangle --
+
 
   console.log('offset', offsetX, offsetY, element.style.transform)
 
@@ -123,3 +127,21 @@ const endDrag = function(e: MouseEvent) {
   element.style.border = element.dataset.initialBorderStyle ?? '';
   // element.style.transform = element.dataset.initialTransform ?? '';
 }
+
+
+
+export const getRectangleInclination = function( polygon: google.maps.Polygon | undefined ): number {
+  if ( ! polygon ) return 0;
+  const path = polygon.getPath().getArray();
+  const point1 = path[0];
+  const point2 = path[1];
+
+  const deltaX = point2.lng() - point1.lng();
+  const deltaY = point2.lat() - point1.lat();
+
+  const angleRadians = Math.atan2(deltaY, deltaX);
+  const angleDegrees = angleRadians * (180 / Math.PI);
+
+  return angleDegrees;
+}
+

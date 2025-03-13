@@ -1,4 +1,11 @@
-import { LatitudeLongitudeObject } from './types';
+import { CoupleOfPoints, LatitudeLongitudeObject } from './types';
+
+
+/**
+ * ========= ========= ========= =========
+ *    t r a n s f o r m   u n i t s
+ * ========= ========= ========= =========
+ */
 
 /**
  * Converts a LatLng coordinate to a Point on the map's viewport.
@@ -71,22 +78,74 @@ export const pointToLatLng = function(
   return null;
 }
 
+/**
+ * Given [ {x: 32.32, y: 55.1234 }, {..}, ... ] ===> '32.3414325,11.4324324 33.1113423,12.4324312 ...'
+ * Tranform array of points to a space-separated string of LatLng coordinates.
+ * @param map - The Google Map instance used for conversion
+ * @param points - An array of Points in pixel coordinates
+ * @returns A string of LatLng coordinates separated by spaces, or null if any
+ *          point cannot be converted
+ */
+export const convertPointsArrayToLatLngString = function(
+  map: google.maps.Map,
+  points: Array<google.maps.Point>
+): string | null {
+  // Convertir cada punto en píxeles a LatLng
+  const latLngPoints = points.map(point => {
+      const latLng = pointToLatLng(map, point.x, point.y);
+      return latLng? `${latLng.lat()},${latLng.lng()}` : null;
+  });
+
+  // Unir los puntos LatLng en una cadena separada por espacios
+  return latLngPoints.join(' ');
+}
+
+/**
+ * ========= ========= ========= =========
+ *    converters into structured data
+ * ========= ========= ========= =========
+ */
+
+/**
+ * polygon with getPath() which is [ { lat(), lng() }, {...}, ... ] ==> [ {x: 32.3, y: 55.1 }, {..}, .]
+ * @param polygon
+ * @returns
+ */
 export const polygonPathToPoints = function( polygon: google.maps.Polygon ) {
   const temp = polygon.getPath().getArray().map( latLng => {
     return latLngToPoint( polygon.getMap()!, { latitude: latLng.lat(), longitude: latLng.lng() } ) ;
   } );
   return temp.filter( p => p != null );
 }
-  /**
-   * Returns an array of Points representing the vertices of a rectangle
-   * whose bottom left and top right corners are given by the two LatLng
-   * objects. The order of the points in the array is:
-   *   [bottom left, top left, top right, bottom right]
-   * @param map The Google Map instance
-   * @param sw The LatLng of the bottom left corner of the rectangle
-   * @param ne The LatLng of the top right corner of the rectangle
-   * @returns An array of Points or null if the map bounds are not defined
-   */
+
+
+/**
+ * '32.3414325,11.4324324 33.1113423,12.4324312 ...' ===> [ { lat(), lng() }, {...}, ...]
+ * Converts a string of coordinates into an array of Google Maps LatLng objects.
+ *
+ * @param coordinatesAsString - A string containing coordinates separated by spaces.
+ * Each coordinate should be in the format "latitude,longitude".
+ * @returns An array of `google.maps.LatLng` objects representing the coordinates. {lat: number, lng: number}
+ */
+export const convertStringCoordinatesIntoGMapCoordinates = function (coordinatesAsString: string) {
+	const coordinatesArray = coordinatesAsString.split(' ');
+	const newPolygonCoords = coordinatesArray.map((coord) => {
+		const [lat, lng] = coord.split(',');
+		return new window.google.maps.LatLng({ lat: parseFloat(lat), lng: parseFloat(lng) });
+	});
+	return newPolygonCoords;
+};
+
+/**
+ * Given sw and ne coords,
+ * returns an array of Points for the whole rectangle
+ * The order of the points in the array is:
+ *   [bottom left, top left, top right, bottom right]
+ * @param map The Google Map instance
+ * @param sw The LatLng of the bottom left corner of the rectangle
+ * @param ne The LatLng of the top right corner of the rectangle
+ * @returns An array of Points or null if the map bounds are not defined
+ */
 export const orthopedicRegtanglePoints = (
   map: google.maps.Map,
   sw: LatitudeLongitudeObject,
@@ -107,6 +166,13 @@ export const orthopedicRegtanglePoints = (
     new google.maps.Point(nePoint.x, swPoint.y),
   ];
 };
+
+
+/**
+ * ========= ========= ========= =========
+ *    tranformers of geometry (rotate ... )
+ * ========= ========= ========= =========
+ */
 
 
 export const rotateRectangle = (
@@ -139,47 +205,14 @@ export const rotateRectangle = (
 
 
 /**
- * Converts an array of Points in pixel coordinates to a space-separated string
- * of LatLng coordinates.
- * @param map - The Google Map instance used for conversion
- * @param points - An array of Points in pixel coordinates
- * @returns A string of LatLng coordinates separated by spaces, or null if any
- *          point cannot be converted
+ * ========= ========= ========= =========
+ *    projections (calulation of a trigonometry param based on other parms)
+ * ========= ========= ========= =========
  */
 
-export const convertPointsArrayToLatLngString = function(
-  map: google.maps.Map,
-  points: Array<google.maps.Point>
-): string | null {
-  // Convertir cada punto en píxeles a LatLng
-  const latLngPoints = points.map(point => {
-      const latLng = pointToLatLng(map, point.x, point.y);
-      return latLng? `${latLng.lat()},${latLng.lng()}` : null;
-  });
-
-  // Unir los puntos LatLng en una cadena separada por espacios
-  return latLngPoints.join(' ');
-}
-
-
-
 /**
- * Converts a string of coordinates into an array of Google Maps LatLng objects.
+ * Given x,y Point, angle and length of line ==> point {x,y} of the extreme of the line
  *
- * @param coordinatesAsString - A string containing coordinates separated by spaces.
- * Each coordinate should be in the format "latitude,longitude".
- * @returns An array of `google.maps.LatLng` objects representing the coordinates. {lat: number, lng: number}
- */
-export const convertStringCoordinatesIntoGMapCoordinates = function (coordinatesAsString: string) {
-	const coordinatesArray = coordinatesAsString.split(' ');
-	const newPolygonCoords = coordinatesArray.map((coord) => {
-		const [lat, lng] = coord.split(',');
-		return new window.google.maps.LatLng({ lat: parseFloat(lat), lng: parseFloat(lng) });
-	});
-	return newPolygonCoords;
-};
-
-/**
  * Projects a line of a given length from a point (x, y) at a given angle
  * in degrees, and returns the end point of the line as a google.maps.Point.
  * @param x - The x-coordinate of the point
@@ -238,3 +271,61 @@ export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Arra
   return new google.maps.Point(sumX / polygonVertexPoints.length, sumY / polygonVertexPoints.length);
 
 }
+
+
+/**
+ * Calculates the 2 right lines that define the an inclined axis.
+ * Every line is defined by two points in an array
+ * @param crossPointInMap
+ * @param degrees
+ * @returns
+ */
+export const getInclinedAxisAsLinesFromCoordenates = (
+  crossPointInMap: google.maps.Point,
+  degrees: number
+): {
+  axisLinesDefinedByPoints: { lineX: CoupleOfPoints; lineY: CoupleOfPoints };
+} => {
+
+  const axisLinesDefinedByPoints: { lineX: CoupleOfPoints; lineY: CoupleOfPoints }
+    = { lineX: [], lineY: [] };
+
+  // draw line 1 (the X axis)
+  const angle90 = (degrees + 90) % 360;
+  let tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle90,
+    100
+  );
+  axisLinesDefinedByPoints.lineX[0] = tempPoint;
+
+  tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle90,
+    -100
+  );
+  axisLinesDefinedByPoints.lineX[1] = tempPoint;
+
+  // --- line 2 (the Y axis)
+  const angle0 = (degrees + 0) % 360;
+  tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle0,
+    100
+  );
+  axisLinesDefinedByPoints.lineY[0] = tempPoint;
+  tempPoint = projectLineFromXY(
+    crossPointInMap.x,
+    crossPointInMap.y,
+    angle0,
+    -100
+  );
+  axisLinesDefinedByPoints.lineY[1] = tempPoint;
+
+  return {
+    axisLinesDefinedByPoints
+  };
+};

@@ -1,3 +1,4 @@
+import { getRectangleInclination } from "./setup-resize-rectangle-interaction";
 import { convertPointsArrayToLatLngString, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
@@ -49,6 +50,9 @@ const rectangleRotationInteractionSetup = function() {
           window.cocoDrawingRectangle.polygon.setPath(latLngCoords);
         }
       }
+
+      const degreesToDelete = getRectangleInclination(window.cocoDrawingRectangle.polygon);
+      console.log('ANGULO DEL RECT: ', degreesToDelete);
     });
 
     // LISTENER mouseup. Stops rotation and save new data for the new polygon shape.
