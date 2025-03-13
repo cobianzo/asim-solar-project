@@ -39,6 +39,7 @@ export interface ExtendedSegment extends google.maps.Polygon {
   realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees
   map: google.maps.Map;
   isPortrait?: boolean;
+  panelsRectangle: google.maps.Polygon;
 }
 
 // object with many properties saving the info of the rectangle that the user is painting in step 2
@@ -60,13 +61,16 @@ export interface CocoDrawingRectangleInfo {
   polygonCenterMarker?: AdvancedMarkerElement | null;
 
   rotatingRectangleStartingPoint?: google.maps.Point | null;
-  tempRotatedPoints?: Array<google.maps.Point>;
+  rotatingRectangleStartingVertexPoints: google.maps.Point[];
+  tempRotatedPoints?: Array<google.maps.Point> | null;
   tempRotatedCoords?: string | null;
 
   boundariesLinesAxisSecondClick?: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
   secondClickAxislineX?: google.maps.Polyline | null;
   secondClickAxislineY?: google.maps.Polyline | null;
 
+  // handlers to resize
+  handlers: Array<HandlerAdvancedMarker>; // Array gets keys 0 and 2.
 }
 
 export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';

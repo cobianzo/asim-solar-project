@@ -268,8 +268,18 @@ export const fadeSegment =function(roofSegment: ExtendedSegment) {
 }
 
 // Rectangle painted by the user
-export const paintRectangleInMap = (gmap: google.maps.Map, rectangleAsStringOfCoords: string, vertexPoints?: Array<google.maps.Point>) => {
+/**
+ *
+ * @param gmap
+ * @param rectangleAsStringOfCoords : string
+ * @param vertexPoints
+ */
+export const paintRectangleInMap = (gmap: google.maps.Map, segment: ExtendedSegment | null, rectangleAsStringOfCoords: string, vertexPoints?: Array<google.maps.Point>) => {
 
+  if (! segment ) {
+    console.error('we cant paint the rectangle if no segment is selected');
+    return;
+  }
   if (window.cocoDrawingRectangle?.polygon) {
     removeRectangleInMap(gmap, false);
   }
@@ -280,6 +290,10 @@ export const paintRectangleInMap = (gmap: google.maps.Map, rectangleAsStringOfCo
     // { clickable: true }
   );
 
+  segment.panelsRectangle = window.cocoDrawingRectangle.polygon;
+
+  // Once painted as a polygon, now we save the data of the x,y points of the vertex,
+  // and the center (either as coordenates (lat,lng) and x,y points)
   window.cocoDrawingRectangle.polygonPoints = vertexPoints ?? [];
   window.cocoDrawingRectangle.polygonCenterPoint = vertexPoints? getPolygonCenterByVertexPoints(vertexPoints) : null;
 
@@ -292,10 +306,10 @@ export const paintRectangleInMap = (gmap: google.maps.Map, rectangleAsStringOfCo
   }
 }
 
-  /**
-   * Removes the drawn rectangle from the map
-   * @param gmap the google map object
-   */
+/**
+ * Removes the drawn rectangle from the map
+ * @param gmap the google map object
+ */
 export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = false) => {
   if (window.cocoDrawingRectangle?.polygon) {
     window.cocoDrawingRectangle.polygon.setMap(null);

@@ -18,7 +18,6 @@ import {
   paintCenterOfUsersRectangleInMap,
  } from './drawing-helpers';
 
-import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 import { setupSegmentsAndDraggableBoundingBox, updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion, updateValuesCoordsSegmentsWithOffset } from './setup-drag-all-segments-interaction';
 
 

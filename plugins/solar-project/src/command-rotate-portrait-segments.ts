@@ -10,6 +10,10 @@ import { createDraggableBoundingBoxForMovingAllSegments } from "./setup-drag-all
 import setupSegments from "./setup-segments-interactive-functions";
 import { SelectRotationPortraitSegmentsOptions } from "./types";
 
+/**
+ * The code flow of this feature: applying on page load
+ * the rotation or not for the segments which are portrait.
+ */
 document.addEventListener('DOMContentLoaded', () => {
   const inputOptions = document.querySelectorAll('.segment-rotation input');
   inputOptions?.forEach((radio) => {

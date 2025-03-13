@@ -1,4 +1,4 @@
-import { convertPointsArrayToLatLngString, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, rotateRectangle } from "./trigonometry-helpers";
+import { convertPointsArrayToLatLngString, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
 
@@ -20,7 +20,7 @@ const rectangleRotationInteractionSetup = function() {
     const point = latLngToPoint(map, { latitude: event.latLng.lat(), longitude: event.latLng.lng() });
     console.log('Pixel coordinates:', point);
     window.cocoDrawingRectangle.rotatingRectangleStartingPoint = point;
-
+    window.cocoDrawingRectangle.rotatingRectangleStartingVertexPoints = polygonPathToPoints( window.cocoDrawingRectangle.polygon );
 
     // LISTENER mouse MOVE. Apply rotation on mouse deflection
     map.addListener('mousemove', function(event: google.maps.MapMouseEvent) {
@@ -37,10 +37,18 @@ const rectangleRotationInteractionSetup = function() {
       // rotate the polygon
       const degreesFactor = 1; // Adjust this factor as needed
       const deltaDegrees = deltaX * degreesFactor;
-      window.cocoDrawingRectangle.tempRotatedPoints = rotateRectangle(window.cocoDrawingRectangle.polygonPoints, window.cocoDrawingRectangle.polygonCenterPoint, deltaDegrees);
-      window.cocoDrawingRectangle.tempRotatedCoords = convertPointsArrayToLatLngString(map, window.cocoDrawingRectangle.tempRotatedPoints);
-      const latLngCoords = convertStringCoordinatesIntoGMapCoordinates(window.cocoDrawingRectangle.tempRotatedCoords);
-      window.cocoDrawingRectangle.polygon.setPath(latLngCoords);
+
+      if (!window.cocoDrawingRectangle?.polygonCenterPoint){
+        return;
+      }
+      window.cocoDrawingRectangle.tempRotatedPoints = rotateRectangle(window.cocoDrawingRectangle.rotatingRectangleStartingVertexPoints, window.cocoDrawingRectangle?.polygonCenterPoint, deltaDegrees);
+      if (window.cocoDrawingRectangle.tempRotatedPoints) {
+        window.cocoDrawingRectangle.tempRotatedCoords = convertPointsArrayToLatLngString(map, window.cocoDrawingRectangle.tempRotatedPoints);
+        if (window.cocoDrawingRectangle.tempRotatedCoords) {
+          const latLngCoords = convertStringCoordinatesIntoGMapCoordinates(window.cocoDrawingRectangle.tempRotatedCoords);
+          window.cocoDrawingRectangle.polygon.setPath(latLngCoords);
+        }
+      }
     });
 
     // LISTENER mouseup. Stops rotation and save new data for the new polygon shape.

@@ -1,6 +1,7 @@
 // RENAME TO step 4 TODO:
 import { paintCenterOfUsersRectangleInMap, paintInclinedAxisAsLinesFromCoordenates, paintRectangleInMap } from './drawing-helpers';
 import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
+import { paintResizeHandlersInPolygon } from './setup-resize-rectangle-interaction';
 import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPointsArrayToLatLngString, getLineIntersection, latLngToPoint } from './trigonometry-helpers';
@@ -107,7 +108,7 @@ export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouse
 
   // assign the event listeners that allow the user to rotate the rectangle on the map
   rectangleRotationInteractionSetup();
-
+  paintResizeHandlersInPolygon(); // TODO: apply after rotation.
 }
 
 const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.LatLngLiteral, angle: number ) => {
@@ -178,7 +179,7 @@ const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseE
     const rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, vertexPoints ) ?? '';;
 
     // paint the rectangle created by the user!
-    paintRectangleInMap(gmap, rectanglePolygonCoords, vertexPoints);
+    paintRectangleInMap(gmap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords, vertexPoints);
 
     return true;
   }

@@ -71,6 +71,12 @@ export const pointToLatLng = function(
   return null;
 }
 
+export const polygonPathToPoints = function( polygon: google.maps.Polygon ) {
+  const temp = polygon.getPath().getArray().map( latLng => {
+    return latLngToPoint( polygon.getMap()!, { latitude: latLng.lat(), longitude: latLng.lng() } ) ;
+  } );
+  return temp.filter( p => p != null );
+}
   /**
    * Returns an array of Points representing the vertices of a rectangle
    * whose bottom left and top right corners are given by the two LatLng
