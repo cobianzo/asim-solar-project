@@ -1,10 +1,10 @@
 // RENAME TO step 4 TODO:
 import { paintCenterOfUsersRectangleInMap, paintRectangleInMap } from './drawing-helpers';
 import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
-import { paintResizeHandlersInPolygon } from './setup-resize-rectangle-interaction';
+import { getRectangleInclination, paintResizeHandlersInPolygon } from './setup-resize-rectangle-interaction';
 import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 import setupSegments from './setup-segments-interactive-functions';
-import { convertPointsArrayToLatLngString, getInclinedAxisAsLinesFromCoordenates, getLineIntersection, latLngToPoint } from './trigonometry-helpers';
+import { calculatePathRectangleByOppositePointsAndInclination, convertPointsArrayToLatLngString, getInclinedAxisAsLinesFromCoordenates, getLineIntersection, latLngToPoint } from './trigonometry-helpers';
 import { CocoMapSetup } from './types';
 
 /**
@@ -77,8 +77,13 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 
   console.log('The map where we apply mousemove: ', segm.map);
   segm.map.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
-  // we don't need to add the click because it already has it
-  segm.map.addListener('click', handlerSecondClickDrawRectangle);
+  segm.map.addListener('click', (e: google.maps.MapMouseEvent) => {
+    console.log('%cSECONDCLICK - we fix the rectangle', 'color: blue; font-weight: bold;');
+    handlerSecondClickDrawRectangle(e);
+    // the rectangle polygon has been created, we save the inclination, which can be modified with rotation tool.
+    window.cocoDrawingRectangle.inclinationWhenCreated = getRectangleInclination( window.cocoDrawingRectangle.polygon );
+    window.cocoDrawingRectangle.currentInclinationAfterRotation = window.cocoDrawingRectangle.inclinationWhenCreated;
+  });
   segm.setOptions({ clickable: false });
   segm.setVisible(false);
 
@@ -98,14 +103,9 @@ export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouse
   }
   console.log('window.cocoDrawingRectangle.rectanglePolygonCoords', window.cocoDrawingRectangle.rectanglePolygonCoords);
 
-  // Clear the mouseover listener
-  console.log('Clear mousemove listener');
-  window.google.maps.event.clearListeners(segm.map, 'mousemove');
-  window.google.maps.event.clearListeners(segm.map, 'click');
-
   // save data of the second click (we don't use it) TODELETE: not needed to store these I believe
-  const latLng = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-  setSecondVertexOfRectangle( segm.map, latLng);
+  // const latLng = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+  // setSecondVertexOfRectangle( segm.map, latLng);
 
   // Finsi setup and paint hte center
   window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
@@ -114,6 +114,12 @@ export const handlerSecondClickDrawRectangle = function (e: google.maps.MapMouse
   // assign the event listeners that allow the user to rotate the rectangle on the map
   rectangleRotationInteractionSetup();
   paintResizeHandlersInPolygon(); // TODO: apply after rotation.
+
+  // Clear the listeners for mousedown, click, and mousemove on segm.map
+  window.google.maps.event.clearListeners(segm.map, 'mousedown');
+  window.google.maps.event.clearListeners(segm.map, 'click');
+  window.google.maps.event.clearListeners(segm.map, 'mousemove');
+  window.google.maps.event.clearListeners(segm.map, 'mouseup');
 }
 
 const setFirstVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.LatLngLiteral ) => {
@@ -137,7 +143,7 @@ const setSecondVertexOfRectangle = ( gmap: google.maps.Map, latLng: google.maps.
 }
 
 
-const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
+export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
 
   const gmap = window.cocoDrawingRectangle.selectedSegment?.map;
   const angle = window.cocoDrawingRectangle.selectedSegment?.realRotationAngle;
@@ -149,15 +155,24 @@ const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseE
 
   // Paint the polygon rectangle again with the params:
   // window.cocoDrawingRectangle.firstVertexPoint
-  const pointB = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
+  const pointEnd = latLngToPoint(gmap, { latitude: clickEvent.latLng.lat(), longitude: clickEvent.latLng.lng() });
   // angle
-  if ( !pointB) return;
+  if ( !pointEnd) return;
+
+
+  // we consider the case of the rectangle has been rotated with the tool to rotate.
+  let degreesOffset = window.cocoDrawingRectangle.currentInclinationAfterRotation - window.cocoDrawingRectangle.inclinationWhenCreated;
+  if (isNaN(degreesOffset)) {
+    degreesOffset = 0;
+  }
+
+  console.log('degreesoffset', degreesOffset);
 
   const success = calculatePathRectangleByOppositePointsAndInclination(
     gmap,
     window.cocoDrawingRectangle.firstVertexPoint,
-    pointB,
-    angle!
+    pointEnd,
+    (angle! + degreesOffset)
   );
 
   if (window.cocoDrawingRectangle.selectedSegment
@@ -182,69 +197,4 @@ const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseE
 
   return success;
 
-}
-
-
-export const calculatePathRectangleByOppositePointsAndInclination = function(
-  gmap: google.maps.Map,
-  pointA:
-  google.maps.Point,
-  pointC: google.maps.Point,
-  angle: number
-) {
-
-  const { axisLinesDefinedByPoints: axisLinesDefinedByPointsFirst } =
-    getInclinedAxisAsLinesFromCoordenates( pointA, angle! );
-
-  if (!axisLinesDefinedByPointsFirst) {
-    return null;
-  }
-
-  console.log('we saved the first vertex on ', axisLinesDefinedByPointsFirst);
-
-  const { axisLinesDefinedByPoints: axisLinesDefinedByPointsSecond }
-    = getInclinedAxisAsLinesFromCoordenates( pointC, angle ?? 0 );
-
-  if (!axisLinesDefinedByPointsSecond ) {
-    return null;
-  }
-
-  console.log('moving the mouse to build a rectangle: ', pointC);
-
-  // now get the 2 other points that we need
-
-  const axisSecondClick = window.cocoDrawingRectangle.boundariesLinesAxisSecondClick;
-  const intersectionPointB = getLineIntersection(
-    axisLinesDefinedByPointsFirst.lineX[0]!.x, axisLinesDefinedByPointsFirst.lineX[0]!.y,
-    axisLinesDefinedByPointsFirst.lineX[1]!.x, axisLinesDefinedByPointsFirst.lineX[1]!.y,
-    axisLinesDefinedByPointsSecond.lineY[0]!.x, axisLinesDefinedByPointsSecond.lineY[0]!.y,
-    axisLinesDefinedByPointsSecond.lineY[1]!.x, axisLinesDefinedByPointsSecond.lineY[1]!.y
-  );
-  const intersectionPointD = getLineIntersection(
-    axisLinesDefinedByPointsFirst.lineY[0]!.x, axisLinesDefinedByPointsFirst.lineY[0]!.y,
-    axisLinesDefinedByPointsFirst.lineY[1]!.x, axisLinesDefinedByPointsFirst.lineY[1]!.y,
-    axisLinesDefinedByPointsSecond.lineX[0]!.x, axisLinesDefinedByPointsSecond.lineX[0]!.y,
-    axisLinesDefinedByPointsSecond.lineX[1]!.x, axisLinesDefinedByPointsSecond.lineX[1]!.y
-  );
-
-  // with all the points, we draw the inclined rectangle created by the user
-  if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && pointC && intersectionPointD ) {
-    const vertexPoints = [
-      window.cocoDrawingRectangle.firstVertexPoint,
-      intersectionPointB,
-      pointC,
-      intersectionPointD
-    ]
-    const rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, vertexPoints ) ?? '';;
-
-    return {
-      axisLinesDefinedByPointsFirst, // axis crossing point A
-      axisLinesDefinedByPointsSecond, // axis crossing point C
-      // the rectangle defined by lat lng coordenates, and by x,y points
-      rectanglePolygonCoords,
-      vertexPoints
-    };
-  }
-
-  return null;
 }

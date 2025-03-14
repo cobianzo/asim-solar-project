@@ -47,6 +47,7 @@ export interface CocoDrawingRectangleInfo {
   hoveredSegment?: ExtendedSegment;
   selectedSegment?: ExtendedSegment;
 
+  // the creation of the polygon
   rectanglePolygonCoords?: string | null;
   firstVertexCoord?: google.maps.LatLngLiteral;
   firstVertexPoint?: google.maps.Point | null;
@@ -60,20 +61,26 @@ export interface CocoDrawingRectangleInfo {
   secondClickAxislineX?: google.maps.Polyline | null;
   secondClickAxislineY?: google.maps.Polyline | null;
 
+  inclinationWhenCreated: number;
+  currentInclinationAfterRotation: number;
 
+  // the polygon (the inclined rectangle).
   polygon?: google.maps.Polygon;
   polygonPoints?: Array<google.maps.Point>; // not used actually
   polygonCenterPoint?: google.maps.Point | null;
   polygonCenterCoords?: google.maps.LatLng | null;
   polygonCenterMarker?: AdvancedMarkerElement | null;
 
+  // when rotating the rectangle
   rotatingRectangleStartingPoint?: google.maps.Point | null;
   rotatingRectangleStartingVertexPoints: google.maps.Point[];
   tempRotatedPoints?: Array<google.maps.Point> | null;
   tempRotatedCoords?: string | null;
+  extraRotationDegreesRespectSegment: number;
 
   // handlers to resize
   handlers: Array<AdvancedMarkerElement>; // Array gets keys 0 and 2.
+  draggingHandler?: AdvancedMarkerElement;
 }
 
 export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';

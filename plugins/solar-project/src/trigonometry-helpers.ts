@@ -331,3 +331,73 @@ export const getInclinedAxisAsLinesFromCoordenates = (
     axisLinesDefinedByPoints
   };
 };
+
+/**
+ * For the creation of the inclined rectangle by the user
+ * @param gmap
+ * @param pointA
+ * @param pointC
+ * @param angle
+ * @returns
+ */
+export const calculatePathRectangleByOppositePointsAndInclination = function(
+  gmap: google.maps.Map,
+  pointA:
+  google.maps.Point,
+  pointC: google.maps.Point,
+  angle: number
+) {
+
+  const { axisLinesDefinedByPoints: axisLinesDefinedByPointsFirst } =
+    getInclinedAxisAsLinesFromCoordenates( pointA, angle! );
+
+  if (!axisLinesDefinedByPointsFirst) {
+    return null;
+  }
+
+  console.log('we saved the first vertex on ', axisLinesDefinedByPointsFirst);
+
+  const { axisLinesDefinedByPoints: axisLinesDefinedByPointsSecond }
+    = getInclinedAxisAsLinesFromCoordenates( pointC, angle ?? 0 );
+
+  if (!axisLinesDefinedByPointsSecond ) {
+    return null;
+  }
+
+  console.log('moving the mouse to build a rectangle: ', pointC);
+
+  // now get the 2 other points that we need
+  const intersectionPointB = getLineIntersection(
+    axisLinesDefinedByPointsFirst.lineX[0]!.x, axisLinesDefinedByPointsFirst.lineX[0]!.y,
+    axisLinesDefinedByPointsFirst.lineX[1]!.x, axisLinesDefinedByPointsFirst.lineX[1]!.y,
+    axisLinesDefinedByPointsSecond.lineY[0]!.x, axisLinesDefinedByPointsSecond.lineY[0]!.y,
+    axisLinesDefinedByPointsSecond.lineY[1]!.x, axisLinesDefinedByPointsSecond.lineY[1]!.y
+  );
+  const intersectionPointD = getLineIntersection(
+    axisLinesDefinedByPointsFirst.lineY[0]!.x, axisLinesDefinedByPointsFirst.lineY[0]!.y,
+    axisLinesDefinedByPointsFirst.lineY[1]!.x, axisLinesDefinedByPointsFirst.lineY[1]!.y,
+    axisLinesDefinedByPointsSecond.lineX[0]!.x, axisLinesDefinedByPointsSecond.lineX[0]!.y,
+    axisLinesDefinedByPointsSecond.lineX[1]!.x, axisLinesDefinedByPointsSecond.lineX[1]!.y
+  );
+
+  // with all the points, we draw the inclined rectangle created by the user
+  if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && pointC && intersectionPointD ) {
+    const vertexPoints = [
+      window.cocoDrawingRectangle.firstVertexPoint,
+      intersectionPointB,
+      pointC,
+      intersectionPointD
+    ]
+    const rectanglePolygonCoords = convertPointsArrayToLatLngString( gmap, vertexPoints ) ?? '';;
+
+    return {
+      axisLinesDefinedByPointsFirst, // axis crossing point A
+      axisLinesDefinedByPointsSecond, // axis crossing point C
+      // the rectangle defined by lat lng coordenates, and by x,y points
+      rectanglePolygonCoords,
+      vertexPoints
+    };
+  }
+
+  return null;
+}

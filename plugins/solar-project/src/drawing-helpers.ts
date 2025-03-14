@@ -95,84 +95,6 @@ export const drawALine = (
   });
 };
 
-/** TODELETEE: moved to trigonometry
- * Calculates the 2 right lines that define the an inclined axis.
- * Every line is defined by two points in an array
- * @param gmap
- * @param crossPointInMap
- * @param degrees
- * @returns
- */
-export const paintInclinedAxisAsLinesFromCoordenates = (
-  gmap: google.maps.Map,
-  crossPointInMap: google.maps.Point,
-  degrees: number
-): {
-  axisLinesDefinedByPoints: { lineX: google.maps.Point[]; lineY: google.maps.Point[] };
-  line1: null;
-  line2: null;
-} => {
-
-  const axisLinesDefinedByPoints
-    : { lineX: google.maps.Point[]; lineY: google.maps.Point[] }
-    = { lineX: [], lineY: [] };
-
-  // draw line 1
-  const angle90 = (degrees + 90) % 360;
-  let tempPoint = projectLineFromXY(
-    crossPointInMap.x,
-    crossPointInMap.y,
-    angle90,
-    100
-  );
-  axisLinesDefinedByPoints.lineX.push(tempPoint);
-
-  tempPoint = projectLineFromXY(
-    crossPointInMap.x,
-    crossPointInMap.y,
-    angle90,
-    -100
-  );
-  axisLinesDefinedByPoints.lineX.push(tempPoint);
-
-  // drawing a line in Gmaps - it works, painting the axis but it stops listening to click event, so I remove it
-  // let temp1 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
-  // const coordPointALine1 = temp1 ? { lat: temp1.lat(), lng: temp1.lng() } : null;
-  // temp1 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
-  // const coordPointBLine1 = temp1 ? { lat: temp1.lat(), lng: temp1.lng() } : null;
-  // const line1 = drawALine( Gmap, [ coordPointALine1, coordPointBLine1 ]);
-
-  // --- line 2 (Y)
-  const angle0 = (degrees + 0) % 360;
-  tempPoint = projectLineFromXY(
-    crossPointInMap.x,
-    crossPointInMap.y,
-    angle0,
-    100
-  );
-  axisLinesDefinedByPoints.lineY.push(tempPoint);
-  tempPoint = projectLineFromXY(
-    crossPointInMap.x,
-    crossPointInMap.y,
-    angle0,
-    -100
-  );
-  axisLinesDefinedByPoints.lineY.push(tempPoint);
-
-  // drawing a line in Gmaps: same as above
-  // let temp2 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
-  // const coordPointALine2 = temp2? { lat: temp2.lat(), lng: temp2.lng() } : null;
-  // temp2 = pointToLatLng(gmap, tempPoint.x, tempPoint.y);
-  // const coordPointBLine2 = temp2? { lat: temp2.lat(), lng: temp2.lng() } : null;
-  // const line2 = drawALine( Gmap, [ coordPointALine2, coordPointBLine2 ]);
-
-  return {
-    axisLinesDefinedByPoints,
-    line1: null,
-    line2: null,
-  };
-};
-
 /**
  * Paints a polygon in the map from a string of coordinates.
  * @param gmap
@@ -315,7 +237,7 @@ export const paintRectangleInMap = (
   window.todel = window.todel || [];
   window.todel.forEach(m=>m.map=null);
   const coords = convertStringCoordinatesIntoGMapCoordinates(rectangleAsStringOfCoords);
-  window.paintAMarker( gmap, coords[0], window.cocoAssetsDir + 'vertex-sw.png', {} ).then( m => window.todel.push(m));
+  window.paintAMarker( gmap, coords[0], window.cocoAssetsDir + 'sun-marker-hover.png', {} ).then( m => window.todel.push(m));
   window.paintAMarker( gmap, coords[2], window.cocoAssetsDir + 'vertex-ne.png', {} ).then( m => window.todel.push(m));
 }
 

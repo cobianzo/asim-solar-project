@@ -1,4 +1,4 @@
-import { getRectangleInclination } from "./setup-resize-rectangle-interaction";
+import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import { convertPointsArrayToLatLngString, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
@@ -7,6 +7,8 @@ const rectangleRotationInteractionSetup = function() {
   if (!window.cocoDrawingRectangle.polygon)  {
     return;
   }
+
+  window.cocoDrawingRectangle.extraRotationDegreesRespectSegment = window.cocoDrawingRectangle.extraRotationDegreesRespectSegment || 0;
 
   // LISTENER mousedown. Clicking starts the rotation
   window.cocoDrawingRectangle.polygon.addListener('mousedown', function(this: google.maps.Polygon, event: google.maps.MapMouseEvent) {
@@ -51,6 +53,7 @@ const rectangleRotationInteractionSetup = function() {
         }
       }
 
+      // todelete: not in use and not working ok.
       const degreesToDelete = getRectangleInclination(window.cocoDrawingRectangle.polygon);
       console.log('ANGULO DEL RECT: ', degreesToDelete);
     });
@@ -78,6 +81,10 @@ const rectangleRotationInteractionSetup = function() {
       // update data saved in global vars about the rect.
       window.cocoDrawingRectangle.polygonPoints = window.cocoDrawingRectangle.tempRotatedPoints;
       window.cocoDrawingRectangle.rectanglePolygonCoords = window.cocoDrawingRectangle.tempRotatedCoords;
+      window.cocoDrawingRectangle.currentInclinationAfterRotation = getRectangleInclination( window.cocoDrawingRectangle.polygon );
+
+      // update the handler of the rectangle
+      paintResizeHandlersInPolygon();
 
       // save the new value in the input
       // @TODO: this is now step 3!
