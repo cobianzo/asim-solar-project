@@ -56,21 +56,9 @@ const startDrag = function(e: MouseEvent) {
   e.stopPropagation();
 
   const element = e.currentTarget as HTMLDivElement;
-  const { x, y } = element.getBoundingClientRect()
-  element.dataset.isDragging = 'yes';
-  element.dataset.startDragPointX = e.clientX.toString();
-  element.dataset.startDragPointY = e.clientY.toString();
-  element.dataset.startMarkerX = x.toString();
-  element.dataset.startMarkerY = y.toString();
-  element.dataset.initialBorderStyle = element.style.border;
-
-  const initialTransform = element.style.transform ?? '';
-  const transformMatch = initialTransform.match(/translate\(([^px]+)px, ([^px]+)px\)/);
-  const [initialX, initialY] = transformMatch ? [parseFloat(transformMatch[1]), parseFloat(transformMatch[2])] : [0, 0];
-  element.dataset.initialTranslateX = initialX.toString() ?? '0' ;
-  element.dataset.initialTranslateY = initialY.toString() ?? '0';
-  console.log('initial translate and clic XY', element.dataset, e.clientX, e.clientY);
   element.style.border = "2px solid red";
+
+  window.cocoDrawingRectangle.polygon?.setOptions({clickable: false});
 
   // now we keep on listeneing the movement of the mouse
   window.cocoDrawingRectangle.draggingHandler?.map?.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
@@ -110,7 +98,6 @@ export const getRectangleInclination = function( polygon: google.maps.Polygon | 
 
   return angleInDegrees; // Devuelve el ángulo en grados
 }
-window.dd = getRectangleInclination; // TODELETE
 
 export const destroyHandlersInPolygon = function() {
 

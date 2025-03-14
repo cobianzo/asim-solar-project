@@ -1,14 +1,16 @@
 import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
-import { convertPointsArrayToLatLngString, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
+import { convertPointsArrayToLatLngString, convertPolygonPathIntoStringCoords, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
+
+  // temporarily deactivated
+  return;
 
   // validations
   if (!window.cocoDrawingRectangle.polygon)  {
     return;
   }
 
-  window.cocoDrawingRectangle.extraRotationDegreesRespectSegment = window.cocoDrawingRectangle.extraRotationDegreesRespectSegment || 0;
 
   // LISTENER mousedown. Clicking starts the rotation
   window.cocoDrawingRectangle.polygon.addListener('mousedown', function(this: google.maps.Polygon, event: google.maps.MapMouseEvent) {
@@ -41,6 +43,7 @@ const rectangleRotationInteractionSetup = function() {
       const degreesFactor = 1; // Adjust this factor as needed
       const deltaDegrees = deltaX * degreesFactor;
 
+      // TODO: we need to calculate it now.
       if (!window.cocoDrawingRectangle?.polygonCenterPoint){
         return;
       }
@@ -79,8 +82,6 @@ const rectangleRotationInteractionSetup = function() {
       polygon.setOptions({ clickable: true });
 
       // update data saved in global vars about the rect.
-      window.cocoDrawingRectangle.polygonPoints = window.cocoDrawingRectangle.tempRotatedPoints;
-      window.cocoDrawingRectangle.rectanglePolygonCoords = window.cocoDrawingRectangle.tempRotatedCoords;
       window.cocoDrawingRectangle.currentInclinationAfterRotation = getRectangleInclination( window.cocoDrawingRectangle.polygon );
 
       // update the handler of the rectangle
@@ -90,7 +91,8 @@ const rectangleRotationInteractionSetup = function() {
       // @TODO: this is now step 3!
       const input = document.getElementById(window.step2CocoMapInputId) as HTMLInputElement;
       if (input) {
-        input.value = window.cocoDrawingRectangle.rectanglePolygonCoords || '';
+        const pathInString = window.cocoDrawingRectangle.polygon? (convertPolygonPathIntoStringCoords( window.cocoDrawingRectangle.polygon ) ?? '') : '';
+        input.value = pathInString ?? '';
       }
     });
   });

@@ -21,7 +21,6 @@ import {
   highlightSegment,
   resetSegmentVisibility,
   fadeSegment,
-  createUnselectSegmentButton,
   removeRectangleInMap,
   deleteAllSunMarkers,
  } from './drawing-helpers';
@@ -29,6 +28,7 @@ import {
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup, handlerFirstClickDrawRectangleOverSegment } from './step3_functions';
+import { createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
 
 /**
  * Initializes and sets up the roof segments for the map.
@@ -228,18 +228,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
     createPopup(popoverInfo);
   }
 
-  const unselectButton = createUnselectSegmentButton(segm.map);
-  unselectButton.onclick = () => {
-
-    // rebuild all the segments
-    setupSegments();
-
-    unselectButton.remove();
-
-    // debug action, remove the info of the segment
-    const popupInfoDebug = document.getElementById('popup-info');
-    if (popupInfoDebug) popupInfoDebug.remove();
-  };
+  createUnselectSegmentButton(segm.map);
 
   window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
   window.cocoDrawingRectangle.selectedSegment = segm;

@@ -1,12 +1,13 @@
 {
   "name": "solar-functions",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
     "bs": "browser-sync start --config bs-config.js",
-    "plugin-zip": "node bin/build-plugin.js"
+    "plugin-zip": "node bin/build-plugin.js",
+    "version": "node bin/version-increment.js"
   },
   "keywords": [],
   "author": "cobianzo",

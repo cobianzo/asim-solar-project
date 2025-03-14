@@ -3,11 +3,13 @@ import { boxBySWNE, ExtendedSegment } from './types';
 import {
   convertStringCoordinatesIntoGMapCoordinates,
   getPolygonCenterByVertexPoints,
+  getPolygonCenterLatLngByVertexPlygonPath,
   pointToLatLng,
   projectLineFromXY,
 } from './trigonometry-helpers';
 import { Draggable } from '@wordpress/components';
 import { BorderControl } from '@wordpress/components/build-types/border-control';
+import { destroyHandlersInPolygon } from './setup-resize-rectangle-interaction';
 
 /**
  * Paints a sun marker in the map at the center of a segment.
@@ -163,16 +165,6 @@ export const paintBoundingBoxAsRectangle = (
   return rectangle ?? null;
 }
 
-export const createUnselectSegmentButton = ( gmap : google.maps.Map ) => {
-  const unselectButton = document.createElement('button');
-  unselectButton.textContent = 'Unselect';
-  unselectButton.style.position = 'absolute';
-  unselectButton.style.top = '10px';
-  unselectButton.style.right = '10px';
-  gmap.controls[google.maps.ControlPosition.TOP_RIGHT].push(unselectButton);
-  return unselectButton;
-}
-
 export const highlightSegment = function(roofSegment: ExtendedSegment, extraParams = {}) {
   roofSegment.setOptions({ fillOpacity: 0.7, strokeOpacity: 1, ...extraParams });
   if (roofSegment.sunMarker?.content) {
@@ -218,27 +210,22 @@ export const paintRectangleInMap = (
     // { clickable: true }
   );
 
-  segment.panelsRectangle = window.cocoDrawingRectangle.polygon;
+  segment.segmentRectangle = window.cocoDrawingRectangle.polygon;
 
   // Once painted as a polygon, now we save the data of the x,y points of the vertex,
   // and the center (either as coordenates (lat,lng) and x,y points)
-  window.cocoDrawingRectangle.polygonPoints = vertexPoints ?? [];
-  window.cocoDrawingRectangle.polygonCenterPoint = vertexPoints? getPolygonCenterByVertexPoints(vertexPoints) : null;
+  const polygonCenterPoint = vertexPoints? getPolygonCenterByVertexPoints(vertexPoints) : null;
 
-  if (window.cocoDrawingRectangle.polygonCenterPoint) {
-    window.cocoDrawingRectangle.polygonCenterCoords = pointToLatLng(
+  if (polygonCenterPoint) {
+    const polygonCenterCoords = pointToLatLng(
       gmap,
-      window.cocoDrawingRectangle.polygonCenterPoint.x,
-      window.cocoDrawingRectangle.polygonCenterPoint.y
+      polygonCenterPoint.x,
+      polygonCenterPoint.y
     );
   }
 
   // TODELETE: Paint a star in the Vertex 1 and 3
-  window.todel = window.todel || [];
-  window.todel.forEach(m=>m.map=null);
   const coords = convertStringCoordinatesIntoGMapCoordinates(rectangleAsStringOfCoords);
-  window.paintAMarker( gmap, coords[0], window.cocoAssetsDir + 'sun-marker-hover.png', {} ).then( m => window.todel.push(m));
-  window.paintAMarker( gmap, coords[2], window.cocoAssetsDir + 'vertex-ne.png', {} ).then( m => window.todel.push(m));
 }
 
 /**
@@ -251,6 +238,9 @@ export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = f
     if (window.cocoDrawingRectangle.polygonCenterMarker) {
       window.cocoDrawingRectangle.polygonCenterMarker.map = null;
     }
+    // delete all handlers
+    destroyHandlersInPolygon();
+
     if (clearDrawingInfo)
       window.cocoDrawingRectangle = {};
   }
@@ -263,14 +253,22 @@ export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = f
  * @returns void
  */
 export const paintCenterOfUsersRectangleInMap = (gmap: google.maps.Map) => {
-  // paint hte center of the polygon
+  if (!window.cocoDrawingRectangle.polygon) {
+    return;
+  }
+
+  // reset if needed
   if (window.cocoDrawingRectangle.polygonCenterMarker)
     window.cocoDrawingRectangle.polygonCenterMarker.map = null;
-  console.log('center polygon is ', window.cocoDrawingRectangle.polygonCenterCoords?.lat(), window.cocoDrawingRectangle.polygonCenterCoords?.lng());
-  if (window.cocoDrawingRectangle.polygonCenterCoords) {
+
+  // calculate center coords:
+  const polygonCenterCoords = getPolygonCenterLatLngByVertexPlygonPath(window.cocoDrawingRectangle.polygon);
+
+  console.log('center polygon is ', polygonCenterCoords?.lat(), polygonCenterCoords?.lng());
+  if (polygonCenterCoords) {
     window.paintAMarker(
       gmap,
-      window.cocoDrawingRectangle.polygonCenterCoords,
+      polygonCenterCoords,
       `${(window as any).cocoAssetsDir}${'target.png'}`,
       {
         style: {

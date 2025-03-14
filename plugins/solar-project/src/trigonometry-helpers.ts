@@ -138,6 +138,14 @@ export const convertStringCoordinatesIntoGMapCoordinates = function (coordinates
 	return newPolygonCoords;
 };
 
+export const convertPolygonPathIntoStringCoords = function (polygon: google.maps.Polygon) {
+  let stringCoords = '';
+  const path = polygon.getPath().getArray();
+  const stringCoordsArray = path.map(latLng => `${latLng.lat()},${latLng.lng()}`);
+  stringCoords = stringCoordsArray.join(' ');
+  return stringCoords;
+}
+
 /**
  * Given sw and ne coords,
  * returns an array of Points for the whole rectangle
@@ -265,6 +273,11 @@ export const getLineIntersection = function(
   return new google.maps.Point(px, py);
 }
 
+/**
+ * Returns {x,y} of the polygon by an array of the {x,y} points
+ * @param polygonVertexPoints
+ * @returns
+ */
 export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Array<google.maps.Point>) {
 
   const sumX = polygonVertexPoints.reduce((acc, point) => acc + point.x, 0);
@@ -272,6 +285,19 @@ export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Arra
 
   return new google.maps.Point(sumX / polygonVertexPoints.length, sumY / polygonVertexPoints.length);
 
+}
+
+/**
+ * Given the polygon, returns the center (getCenter() only works for rectangles)
+ * @param polygon
+ * @returns
+ */
+export const getPolygonCenterLatLngByVertexPlygonPath = function(polygon: google.maps.Polygon) {
+  const path = polygon.getPath().getArray();
+  const sumLat = path.reduce((acc, latLng) => acc + latLng.lat(), 0);
+  const sumLng = path.reduce((acc, latLng) => acc + latLng.lng(), 0);
+
+  return new google.maps.LatLng(sumLat / path.length, sumLng / path.length);
 }
 
 
@@ -342,8 +368,7 @@ export const getInclinedAxisAsLinesFromCoordenates = (
  */
 export const calculatePathRectangleByOppositePointsAndInclination = function(
   gmap: google.maps.Map,
-  pointA:
-  google.maps.Point,
+  pointA: google.maps.Point,
   pointC: google.maps.Point,
   angle: number
 ) {
@@ -352,6 +377,7 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
     getInclinedAxisAsLinesFromCoordenates( pointA, angle! );
 
   if (!axisLinesDefinedByPointsFirst) {
+    console.error('not calculated axisLinesDefinedByPointsFirst', axisLinesDefinedByPointsFirst);
     return null;
   }
 
@@ -361,6 +387,7 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
     = getInclinedAxisAsLinesFromCoordenates( pointC, angle ?? 0 );
 
   if (!axisLinesDefinedByPointsSecond ) {
+    console.error('not calculated axisLinesDefinedByPointsSecond', axisLinesDefinedByPointsSecond);
     return null;
   }
 
@@ -381,9 +408,9 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
   );
 
   // with all the points, we draw the inclined rectangle created by the user
-  if ( window.cocoDrawingRectangle.firstVertexPoint && intersectionPointB && pointC && intersectionPointD ) {
+  if ( pointA && intersectionPointB && pointC && intersectionPointD ) {
     const vertexPoints = [
-      window.cocoDrawingRectangle.firstVertexPoint,
+      pointA,
       intersectionPointB,
       pointC,
       intersectionPointD
