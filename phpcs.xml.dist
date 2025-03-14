@@ -34,6 +34,7 @@
     <exclude-pattern>*/plugins/solar-project/node_modules/*</exclude-pattern>
     <exclude-pattern>*/plugins/solar-project/vendor/*</exclude-pattern>
     <exclude-pattern>*/plugins/solar-project/tests/*</exclude-pattern>
+    <exclude-pattern>*/plugins/coco-gravity-form-map-field/**/*</exclude-pattern>
     <exclude-pattern>*/plugins/solar-project/bin/*</exclude-pattern>
     <exclude-pattern>*/build/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>

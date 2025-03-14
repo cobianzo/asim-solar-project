@@ -10,6 +10,7 @@
     "browser-sync": "browser-sync start --config bs-config.js",
     "dev": "concurrently \"npm run start --prefix plugins/coco-gravity-form-map-field\" \"npm run start --prefix plugins/solar-project\"",
     "test": "wp-env run tests-cli wp plugin list",
+    "test:e2e": "playwright test",
     "plugins-zip": "sh ./bin/plugins-build.sh"
   },
   "keywords": [],
@@ -17,8 +18,10 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@playwright/test": "^1.51.0",
     "@wordpress/env": "^7.0.0",
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "playwright": "^1.51.0"
   },
   "dependencies": {
     "browser-sync": "^3.0.3"
