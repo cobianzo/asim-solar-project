@@ -9,7 +9,7 @@ import {
 } from './trigonometry-helpers';
 import { Draggable } from '@wordpress/components';
 import { BorderControl } from '@wordpress/components/build-types/border-control';
-import { destroyHandlersInPolygon } from './setup-resize-rectangle-interaction';
+import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
 
 /**
  * Paints a sun marker in the map at the center of a segment.
@@ -239,7 +239,7 @@ export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = f
       window.cocoDrawingRectangle.polygonCenterMarker.map = null;
     }
     // delete all handlers
-    destroyHandlersInPolygon();
+    destroyHandlersInRectanglePolygon();
 
     if (clearDrawingInfo)
       window.cocoDrawingRectangle = {};

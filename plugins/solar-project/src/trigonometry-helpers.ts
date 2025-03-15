@@ -288,11 +288,12 @@ export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Arra
 }
 
 /**
+ * polygon => { lat(), lng() }
  * Given the polygon, returns the center (getCenter() only works for rectangles)
  * @param polygon
  * @returns
  */
-export const getPolygonCenterLatLngByVertexPlygonPath = function(polygon: google.maps.Polygon) {
+export const getPolygonCenterLatLngByVertexPlygonPath = function(polygon: google.maps.Polygon) : google.maps.LatLng{
   const path = polygon.getPath().getArray();
   const sumLat = path.reduce((acc, latLng) => acc + latLng.lat(), 0);
   const sumLng = path.reduce((acc, latLng) => acc + latLng.lng(), 0);

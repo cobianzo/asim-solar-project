@@ -1,10 +1,11 @@
-import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo, boxBySWNE, LatitudeLongitudeObject, SelectRotationPortraitSegmentsOptions } from './types';
+import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleInfo, boxBySWNE, LatitudeLongitudeObject, SelectRotationPortraitSegmentsOptions, SavedRectangles } from './types';
 
 
 declare global {
   interface Window {
 
     cocoDrawingRectangle: CocoDrawingRectangleInfo;
+    cocoSavedRectangles: SavedRectangles;
 
     // data exposed in php, in class-hooks:
     cocoIsStepSelectOffset: Boolean;

@@ -49,7 +49,7 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   }
 
   // If this is not the first time we load the step 2, we might have setup already a value for
-  // the offset (and it's in window.step2RotationInserted compared to window.cocoOriginalBoundingBoxCenter))
+  // the offset
   updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
 
   // Create the segments and the bounding box to drag them

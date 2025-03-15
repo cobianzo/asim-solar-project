@@ -181,7 +181,6 @@ export const updateValuesCoordsSegmentsWithOffset = function( latOffset: number,
 }
 
 // For the page load, we might need to apply the offset inserted in the step 2 in the form.
-// the offset is calculated from window.step2RotationInserted compared to window.cocoOriginalBoundingBoxCenter.
 // window.cocoOriginalBoundingBoxCenter is the center of the boundingBox without modifying it from the Solar API response
 export const updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion = () => {
   if (window.step2OffsetInserted?.length && window.cocoOriginalBoundingBoxCenter) {

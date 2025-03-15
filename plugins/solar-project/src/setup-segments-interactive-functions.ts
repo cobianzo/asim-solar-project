@@ -28,7 +28,8 @@ import {
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup, handlerFirstClickDrawRectangleOverSegment } from './step3_functions';
-import { createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
+import { createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
+import setupRectangles, { highlightSavedRectangle, unhighlightSavedRectangle } from './setup-rectangles-interactive';
 
 /**
  * Initializes and sets up the roof segments for the map.
@@ -149,6 +150,10 @@ const setupSegments = (
       activateInteractivityOnSegment(segment);
     });
 
+
+    // if there are rectangles designed by the user, paint them
+    setupRectangles();
+
   } // end of painting the segments.
 }
 
@@ -164,6 +169,7 @@ function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
 
   console.log('hover on roof segment', segment);
   highlightSegment(segment);
+  highlightSavedRectangle(segment);
   highlightSegmentInfo(segment); // debug info highlighted.
   // eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -197,6 +203,7 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
   // the action
   window.cocoDrawingRectangle.hoveredSegment = undefined;
   resetSegmentVisibility(segment);
+  unhighlightSavedRectangle(segment);
   resetSegmentsInfo(); // debug purposes
   // hide all other segments .
   if (cocoMapSetup?.segments?.length)
@@ -229,6 +236,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   }
 
   createUnselectSegmentButton(segm.map);
+  createSaveSegmentButton(segm.map);
 
   window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
   window.cocoDrawingRectangle.selectedSegment = segm;

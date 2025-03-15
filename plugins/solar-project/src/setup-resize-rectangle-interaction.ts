@@ -7,7 +7,7 @@ export const paintResizeHandlersInPolygon = function() {
   if (!window.cocoDrawingRectangle.polygon)  {
     return;
   }
-  destroyHandlersInPolygon();
+  destroyHandlersInRectanglePolygon();
   // paintResizeHandlerInPolygon( window.cocoDrawingRectangle.polygon.getMap(), window.cocoDrawingRectangle.polygon, 0 );
   paintResizeHandlerInPolygon( window.cocoDrawingRectangle.polygon.getMap(), window.cocoDrawingRectangle.polygon, 2 );
 }
@@ -17,7 +17,7 @@ export const paintResizeHandlerInPolygon = function( gmap: google.maps.Map | nul
   if (! gmap ) return;
 
   // reset the handler if created before
-  // make sure destroyHandlersInPolygon has been called before this function
+  // make sure destroyHandlersInRectanglePolygon has been called before this function
 
 
   const vertexCoords = polygon.getPath().getArray();
@@ -99,7 +99,7 @@ export const getRectangleInclination = function( polygon: google.maps.Polygon | 
   return angleInDegrees; // Devuelve el ángulo en grados
 }
 
-export const destroyHandlersInPolygon = function() {
+export const destroyHandlersInRectanglePolygon = function() {
 
   delete window.cocoDrawingRectangle.draggingHandler;
 

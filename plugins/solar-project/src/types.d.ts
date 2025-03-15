@@ -69,6 +69,13 @@ export interface CocoDrawingRectangleInfo {
   draggingHandler?: AdvancedMarkerElement;
 }
 
+export type SavedRectangles = Array<{
+  polygon: google.maps.Polygon | null,
+  tempPathAsString: string; // we use it to repaint the polygon after it's saved.
+  segmentIndex?: number;
+}>
+
 export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';
 
 export type CoupleOfPoints = [google.maps.Point, google.maps.Point] | [];
+
