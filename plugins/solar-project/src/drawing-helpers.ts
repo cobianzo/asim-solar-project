@@ -10,6 +10,8 @@ import {
 import { Draggable } from '@wordpress/components';
 import { BorderControl } from '@wordpress/components/build-types/border-control';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
+import { SEGMENT_DEFAULT, SEGMENT_HOVER, SEGMENT_HOVER_WHEN_RECTANGLE, SEGMENT_WHEN_RECTANGLE } from './setup-segments-interactive-functions';
+import { getRectangleBySegment } from './setup-rectangle-interactive';
 
 /**
  * Paints a sun marker in the map at the center of a segment.
@@ -165,15 +167,27 @@ export const paintBoundingBoxAsRectangle = (
   return rectangle ?? null;
 }
 
+export const paintSegment = function( gmap: google.maps.Map, stringCoords: string, options: google.maps.PolygonOptions = {} ) {
+  console.log('>>>> Painting segment ');
+  return window.paintAPoygonInMap( gmap, stringCoords, { ...SEGMENT_DEFAULT, ...options} )
+}
+
 export const highlightSegment = function(roofSegment: ExtendedSegment, extraParams = {}) {
-  roofSegment.setOptions({ fillOpacity: 0.7, strokeOpacity: 1, ...extraParams });
+  const options = getRectangleBySegment(roofSegment) ? SEGMENT_HOVER_WHEN_RECTANGLE : SEGMENT_HOVER;
+  roofSegment.setOptions(options);
   if (roofSegment.sunMarker?.content) {
     roofSegment.sunMarker.content.style.border = '1px solid orange';
     roofSegment.sunMarker.content.style.borderRadius = '50%';
   }
 }
 export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
-  roofSegment.setOptions({ fillOpacity: 0.35, fillColor: '#FF0000', clickable: true });
+  // check if the segment has a rectangle. The style is different thena
+  if ( getRectangleBySegment(roofSegment) ) {
+    console.log('has todelete');
+    roofSegment.setOptions(SEGMENT_WHEN_RECTANGLE);
+  } else {
+    roofSegment.setOptions(SEGMENT_DEFAULT);
+  }
   if (roofSegment.sunMarker?.content) {
     roofSegment.sunMarker.content.style.border = 'none'
   }
@@ -210,22 +224,6 @@ export const paintRectangleInMap = (
     // { clickable: true }
   );
 
-  segment.segmentRectangle = window.cocoDrawingRectangle.polygon;
-
-  // Once painted as a polygon, now we save the data of the x,y points of the vertex,
-  // and the center (either as coordenates (lat,lng) and x,y points)
-  const polygonCenterPoint = vertexPoints? getPolygonCenterByVertexPoints(vertexPoints) : null;
-
-  if (polygonCenterPoint) {
-    const polygonCenterCoords = pointToLatLng(
-      gmap,
-      polygonCenterPoint.x,
-      polygonCenterPoint.y
-    );
-  }
-
-  // TODELETE: Paint a star in the Vertex 1 and 3
-  const coords = convertStringCoordinatesIntoGMapCoordinates(rectangleAsStringOfCoords);
 }
 
 /**

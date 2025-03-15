@@ -1,5 +1,8 @@
+import { contextConnect } from '@wordpress/components/build-types/context';
+import { resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathIntoStringCoords } from './trigonometry-helpers';
+import { RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
 
 function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: MouseEvent) => void, attrs: Record<string, any> = {}) {
   if (attrs.id) {
@@ -12,6 +15,7 @@ function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: M
   button.style.top = '10px';
   button.style.right = '10px';
   button.style.margin = '10px';
+  button.classList.add('rectangle-edit-button');
   for (const [key, value] of Object.entries(attrs)) {
     (button as any)[key] = value;
   }
@@ -21,40 +25,55 @@ function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: M
   return button;
 }
 
-export const createUnselectSegmentButton = ( gmap : google.maps.Map ) => {
-  return createBtn( gmap, 'Delete', handlerClickUnselectButton, {id: 'delete-rectangle-btn'} );
+export const createUnselectSegmentButton = ( gmap : google.maps.Map, text: string = 'Unselect' ) => {
+  return createBtn( gmap, text, handlerClickUnselectButton, {id: 'delete-rectangle-btn'} );
+}
+
+export const convertUnselectButtonIntoDelete = () => {
+  const btn = document.getElementById('delete-rectangle-btn');
+  if (btn) btn.textContent = 'Delete';
 }
 
 export const createSaveSegmentButton = ( gmap : google.maps.Map ) => {
+  convertUnselectButtonIntoDelete();
   return createBtn( gmap, 'Save', handlerClickSaveRectangleButton, {id: 'save-rectangle-btn'} );
 }
 
+const exitFromEditRectangle = function() {
+  // rebuild all the segments
+  setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );
+
+  // make all rectangles visible again
+  (window.cocoSavedRectangles || []).forEach( r => r.polygon?.setOptions(RECTANGLE_OPTIONS) );
+
+  const btns = document.querySelectorAll('.rectangle-edit-button');
+  (btns || []).forEach(btn => btn.remove());
+}
 
 const handlerClickUnselectButton = function(e: MouseEvent) {
-    // rebuild all the segments
-    setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );
-    const unselectButton = e.currentTarget as HTMLElement;
 
-    if (!unselectButton) return;
-    unselectButton.remove();
+    e.preventDefault();
+
+    exitFromEditRectangle();
 
     // debug action, remove the info of the segment
     const popupInfoDebug = document.getElementById('popup-info');
     if (popupInfoDebug) popupInfoDebug.remove();
+
 
 }
 
 
 const handlerClickSaveRectangleButton = function(e :MouseEvent) {
 
+  e.preventDefault();
+
   if ( !window.cocoDrawingRectangle?.polygon) {
     console.error('There is no rectangle to save');
     return;
   }
-  const saveBtn = e.currentTarget as HTMLElement;
-  if (!saveBtn) return;
-  saveBtn.remove();
 
+  // cleanup - delete the rectangle if it existed already.
 
   const pathAsString = convertPolygonPathIntoStringCoords(window.cocoDrawingRectangle.polygon);
   const savedRectangle = {
@@ -67,6 +86,11 @@ const handlerClickSaveRectangleButton = function(e :MouseEvent) {
   window.cocoSavedRectangles = window.cocoSavedRectangles || [];
   window.cocoSavedRectangles.push(savedRectangle);
 
+  // change the look of the segment now that it has a rectangle
+  if (window.cocoDrawingRectangle.selectedSegment) {
+    resetSegmentVisibility(window.cocoDrawingRectangle.selectedSegment);
+  }
+
   // delete the selected rectangle and its painted polygon
-  handlerClickUnselectButton(e);
+  exitFromEditRectangle();
 }

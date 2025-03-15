@@ -23,13 +23,47 @@ import {
   fadeSegment,
   removeRectangleInMap,
   deleteAllSunMarkers,
+  paintSegment,
  } from './drawing-helpers';
 
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
-import { getStep3CocoMapSetup, handlerFirstClickDrawRectangleOverSegment } from './step3_functions';
+import { getStep3CocoMapSetup } from './step3_functions';
 import { createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
-import setupRectangles, { highlightSavedRectangle, unhighlightSavedRectangle } from './setup-rectangles-interactive';
+import setupRectangles, { highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive'
+
+// colours of the polygons
+export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
+  fillColor: 'red',
+  fillOpacity: 0.4,
+  strokeColor: 'black',
+  strokeWeight: 0,
+  strokeOpacity: 1,
+  clickable: true
+}
+
+export const SEGMENT_WHEN_RECTANGLE: google.maps.PolygonOptions = {
+  fillColor: 'red',
+  fillOpacity: 0.1,
+  strokeColor: 'black',
+  strokeWeight: 1,
+  strokeOpacity: 0.5,
+  clickable: true
+}
+
+export const SEGMENT_HOVER: google.maps.PolygonOptions = {
+  fillOpacity: 0.8,
+}
+export const SEGMENT_HOVER_WHEN_RECTANGLE: google.maps.PolygonOptions = {
+  strokeWeight: 5
+}
+export const SEGMENT_SELECTED: google.maps.PolygonOptions = {
+
+}
+export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {
+
+}
+
 
 /**
  * Initializes and sets up the roof segments for the map.
@@ -89,7 +123,8 @@ const setupSegments = (
 
       const {center, azimuthDegrees, boundingBox: {sw, ne}} = element;
 
-      // calculations of coord of the new rotated rect
+      // based on sw and ne, get the full rectangle
+      // aligned with North
       const rectPoints = orthopedicRegtanglePoints(theMap, sw, ne);
 
       if ( ! rectPoints ) {
@@ -116,7 +151,10 @@ const setupSegments = (
       const centerPoint = latLngToPoint(theMap, center);
       const newRectPoints = centerPoint? rotateRectangle(rectPoints, centerPoint, realAngleRotation) : null;
       const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
-      console.log('rectangleToPaint', rectangleToPaint);
+      if (!rectangleToPaint) {
+        console.error('we coudlnt calculate the coords to paint the segment', rectangleToPaint);
+        return;
+      }
 
       // Finally paint the inclined rectangle, adding some properties for easy access
       if (cocoMapSetup) {
@@ -129,10 +167,11 @@ const setupSegments = (
       // add extra data to the segment so we can manipulate it better.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const segment = window.paintAPoygonInMap(theMap, rectangleToPaint, { clickable: true, fillOpacity: 0.35, fillColor: '#FF0000' });
+      const segment = paintSegment(theMap, rectangleToPaint);
+
       segment.data = element; // to access to the solar API data of the segment
       segment.indexInMap = i;
-      segment.pointsInMap = newRectPoints || undefined;
+
       if (paintSunMarkers) {
         paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
           window.cocoAllSunMarkers = window.cocoAllSunMarkers || [];
@@ -145,6 +184,8 @@ const setupSegments = (
       segment.isPortrait = isPortrait;
 
       cocoMapSetup.segments.push( segment );
+
+      resetSegmentVisibility(segment); // if the segment has rectangle the visibility needs update.
 
       // Add Listeners to the segment
       activateInteractivityOnSegment(segment);
@@ -235,8 +276,10 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
     createPopup(popoverInfo);
   }
 
-  createUnselectSegmentButton(segm.map);
-  createSaveSegmentButton(segm.map);
+  createUnselectSegmentButton(segm.map, 'Unselect');
+  if ( getRectangleBySegment(segm) ) {
+    createSaveSegmentButton(segm.map);
+  }
 
   window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
   window.cocoDrawingRectangle.selectedSegment = segm;
@@ -247,13 +290,41 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
     google.maps.event.clearListeners(segm.map, eventName);
   });
 
-  // this makes that the user starts painting the rectangle at the same time that he selects the segment
-  // handlerFirstClickDrawRectangleOverSegment(e);
-  // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
-  google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
+
+  const rectangleInfo = getRectangleBySegment(segm);
+
+  // hide all other rectangles, they are not being edited
+  window.cocoSavedRectangles?.forEach( r => {
+    if (rectangleInfo?.segmentIndex !== r.segmentIndex) {
+      console.log( ' >>> hiding: ', rectangleInfo, rectangleInfo?.segmentIndex)
+      r.polygon?.setOptions(FADED_RECTANGLE_OPTIONS);
+    }
+  } );
+
+  // If the segment has already a saved rectangle associated, we select that rectangle
+  // NOTE: we could allow having more than one rectangle per segment. For that we would not
+  // select the rectangle just yet, but add a click event for the rectangles of this segment first.
+  if (rectangleInfo?.polygon) {
+
+    // remove the edited rectangleInfo from the saved rectangles, if we need to recreate it, we will on save.
+    window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segm.indexInMap)
+
+    // we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
+    window.cocoDrawingRectangle.polygon = rectangleInfo.polygon;
+    handlerSecondClickDrawRectangle();
+
+  } else {
+
+    // this makes that the user starts painting the rectangle at the same time that he selects the segment
+    // handlerFirstClickDrawRectangleOverSegment(e);
+    // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
+    google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
+
+  }
+
 }
 
-
+/** Add the three handlers to the segment  */
 export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
   if (!window.cocoIsStepSelectRectangle) return;
   segment.addListener('mouseover', handlerMouseOverHighlightSegment );

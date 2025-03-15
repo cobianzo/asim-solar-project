@@ -35,11 +35,9 @@ export interface ExtendedSegment extends google.maps.Polygon {
   data?: RoofSegmentStats;
   indexInMap?: number;
   sunMarker?: AdvancedMarkerElement | null;
-  pointsInMap?: google.maps.Point[];
   realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees
   map: google.maps.Map;
   isPortrait?: boolean;
-  segmentRectangle: google.maps.Polygon;
 }
 
 // object with many properties saving the info of the rectangle that the user is painting in step 2
@@ -47,7 +45,7 @@ export interface CocoDrawingRectangleInfo {
   hoveredSegment?: ExtendedSegment;
   selectedSegment?: ExtendedSegment;
 
-  // the creation of the polygon (and the resizing)
+  // the creation of the rectangle polygon (and the resizing)
   tempFirstClickPoint?: google.maps.Point | null;  // to save the first click while creating the rect
 
   // not in use until we reactivate the rotation tool TODO:
@@ -69,11 +67,13 @@ export interface CocoDrawingRectangleInfo {
   draggingHandler?: AdvancedMarkerElement;
 }
 
-export type SavedRectangles = Array<{
+export type SavedRectangle = {
   polygon: google.maps.Polygon | null,
   tempPathAsString: string; // we use it to repaint the polygon after it's saved.
   segmentIndex?: number;
-}>
+};
+
+export type SavedRectangles = Array<SavedRectangle>
 
 export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';
 

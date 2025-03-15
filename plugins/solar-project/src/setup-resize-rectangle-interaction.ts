@@ -1,4 +1,4 @@
-import { handlerMouseMoveSecondVertexRectangle, handlerSecondClickDrawRectangle } from "./step3_functions";
+import { handlerMouseMoveSecondVertexRectangle, handlerSecondClickDrawRectangle } from "./setup-rectangle-interactive";
 import { latLngToPoint, polygonPathToPoints } from "./trigonometry-helpers";
 
 
