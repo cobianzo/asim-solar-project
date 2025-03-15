@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-export const getRotationPortraitSelected = (): SelectRotationPortraitSegmentsOptions => {
+export const getRotationTypePortraitSelected = (): SelectRotationPortraitSegmentsOptions => {
   const radioParent = document.querySelector('.segment-rotation');
   const selected = radioParent?.querySelector('input:checked');
   if (selected) {
@@ -33,7 +33,7 @@ export const getRotationPortraitSelected = (): SelectRotationPortraitSegmentsOpt
 }
 
 export const applyRotationPortraitSegmentsByRadioSelected = ( createBoundingBoxAfterCreatingSegments: Boolean = true ): SelectRotationPortraitSegmentsOptions => {
-  const valorSeleccionado = getRotationPortraitSelected();
+  const valorSeleccionado = getRotationTypePortraitSelected();
   console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
   setupSegments( valorSeleccionado as SelectRotationPortraitSegmentsOptions, false );
   if (createBoundingBoxAfterCreatingSegments) {

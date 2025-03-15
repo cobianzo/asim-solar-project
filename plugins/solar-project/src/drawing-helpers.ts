@@ -72,9 +72,6 @@ export const deleteAllSunMarkers = function() {
     window.cocoAllSunMarkers.length = 0;
   }
 }
-window.dd = function() {
-  deleteAllSunMarkers();
-}
 
 /**
  * Draws a line in the map from an array of LatLng coordinates.

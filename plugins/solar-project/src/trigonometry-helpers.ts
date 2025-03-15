@@ -102,6 +102,7 @@ export const convertPointsArrayToLatLngString = function(
   return latLngPoints.join(' ');
 }
 
+
 /**
  * ========= ========= ========= =========
  *    converters into structured data
@@ -213,6 +214,27 @@ export const rotateRectangle = (
   });
 };
 
+/** Not in use but it works like charm  */
+export const rotateRectanglePolygon = function( polygon: google.maps.Polygon, angle: number ) {
+  if (!polygon) {
+    console.error('no polygon');
+    return;
+  }
+  const map = polygon.getMap();
+  if (!map) {
+    console.error('no map');
+    return;
+  }
+  const points = polygonPathToPoints(polygon);
+  const center = getPolygonCenterByVertexPoints(points);
+  const rotatedPoints = rotateRectangle(points, center, angle);
+  const newPathString = convertPointsArrayToLatLngString(map, rotatedPoints);
+  console.log('new coordinates', newPathString);
+  const newPath = convertStringCoordinatesIntoGMapCoordinates(newPathString!);
+  console.log('new coordinates', newPath);
+  polygon.setPath(newPath);
+}
+window.dd = rotateRectanglePolygon; // TODELETE
 
 /**
  * ========= ========= ========= =========

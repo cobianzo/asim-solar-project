@@ -1,3 +1,5 @@
+// We can refactor by using `rotateRectanglePolygon`, currently not in use.
+
 import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import { convertPointsArrayToLatLngString, convertPolygonPathIntoStringCoords, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
 
