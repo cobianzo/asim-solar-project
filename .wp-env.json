@@ -2,17 +2,27 @@
   "$schema": "./schemas/wp-env.json",
   "core": null,
   "plugins": [
+    ".",
     "./plugins/coco-gravity-form-map-field",
     "./plugins/solar-project",
-    "./plugins/gravityforms"
+    "./plugins/gravityforms",
+    "https://downloads.wordpress.org/plugin/wordpress-importer.latest-stable.zip"
   ],
+  "mappings": {
+    "/wordpress-tests-lib": "./tests/phpunit/wordpress-tests-lib"
+  },
   "config": {
-		"WP_DEBUG_DISPLAY": true,
-		"WP_DEBUG": true
-	},
-	"env": {
+    "WP_DEBUG": true,
+    "WP_ENVIRONMENT_TYPE": "local"
+  },
+  "env": {
+		"development": {
+			"phpVersion": "8.2",
+			"port": 8777
+		},
 		"tests": {
-			"phpVersion": "8.1"
+			"phpVersion": "8.2",
+			"port": 8889
 		}
 	}
 }

@@ -9,9 +9,16 @@
     "restart": "wp-env stop && wp-env start",
     "browser-sync": "browser-sync start --config bs-config.js",
     "dev": "concurrently \"npm run start --prefix plugins/coco-gravity-form-map-field\" \"npm run start --prefix plugins/solar-project\"",
-    "test": "wp-env run tests-cli wp plugin list",
     "test:e2e": "playwright test",
-    "plugins-zip": "sh ./bin/plugins-build.sh"
+    "test:php": "npm run test:php:setup && wp-env run tests-wordpress --env-cwd='wp-content/plugins/solar'  ",
+    "test:php:setup": "wp-env start",
+    "plugins-zip": "sh ./bin/plugins-build.sh",
+    "//comment": "--CLI commands in dev and tests environments--",
+    "//comment2": "e.g: `npm run cli bash`, `npm run cli wp get option siteurl`, `npm run cli wp db cli` ",
+    "cli": "wp-env run cli",
+    "tests-cli": "wp-env run tests-cli",
+    "db-cli": "npm run cli wp db cli",
+    "tests-db-cli": "npm run tests-cli wp db cli"
   },
   "keywords": [],
   "author": "",
@@ -19,11 +26,11 @@
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.51.0",
-    "@wordpress/env": "^7.0.0",
     "concurrently": "^9.1.2",
     "playwright": "^1.51.0"
   },
   "dependencies": {
+    "@wordpress/env": "^4.9.0",
     "browser-sync": "^3.0.3"
   }
 }

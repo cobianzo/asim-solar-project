@@ -15,11 +15,16 @@
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "^3.11",
-		"automattic/vipwpcs": "^3.0"
+		"automattic/vipwpcs": "^3.0",
+		"phpunit/phpunit": "^9.5",
+		"brain/monkey": "^2.6",
+		"yoast/phpunit-polyfills": "^4.0"
 	},
 	"scripts": {
 		"lint": "./vendor/bin/phpcs -s --standard=phpcs.xml.dist --extensions=php",
-		"format": "./vendor/bin/phpcbf -p --standard=phpcs.xml.dist --extensions=php"
+		"format": "./vendor/bin/phpcbf -p --standard=phpcs.xml.dist --extensions=php",
+
+		"test": "wp-env run tests-cli \"/var/www/html/wp-content/plugins/$(basename $PWD)/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/$(basename $PWD)/phpunit.xml.dist\""
 	},
 	"config": {
 		"allow-plugins": {

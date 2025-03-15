@@ -33,6 +33,21 @@ Export both plugins in the zip into `./dist`
 // California
 37.4449739,-122.13914659999998
 
+# Testing playwright
+
+npx wp-env run tests-cli wp db reset --yes
+npx wp-env run tests-cli wp core install --url="http://localhost:8889" --title="Mi Test Site WP" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
+npx wp-env run tests-cli -- wp plugin activate coco-gravity-form-map-field gravityforms solar-project solar
+
+# Testing PHPUnit
+
+Still in WIP - I'm having problems the required files for phpunit to work are not installed with wp-env.
+We need to have `/tmp/wordpress-tests-lib` installed, and it's not. I want to install it with the command `./bin/install-wp-tests.sh` but we require `svn` and it's not in the docker's container. It shouldnt be that difficult.
+
+The DB inside the container of tests is 
+`tests-wordpress`
+user: 
+
 # PHPCS
 
 composer run-script lint plugins/solar-project/solar-project.php

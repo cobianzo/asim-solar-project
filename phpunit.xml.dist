@@ -1,0 +1,27 @@
+<phpunit
+    bootstrap="tests/phpunit/bootstrap.php"
+    colors="true"
+    beStrictAboutOutputDuringTests="true"
+    beStrictAboutTodoAnnotatedTests="true"
+    verbose="true"
+>
+    <testsuites>
+        <testsuite name="plugin-tests">
+            <directory prefix="test-" suffix=".php">./tests/phpunit/</directory>
+        </testsuite>
+    </testsuites>
+
+     <php>
+        <env name="WP_ENV_CWD" value="wp-content/plugins/solar"/>
+
+        <!-- Useful for wp-env but not for a regular wp installation -->
+        <env name="WP_TESTS_PHPUNIT_POLYFILLS_PATH" value="./vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php"/>
+        <env name="WP_TESTS_DIR" value="/var/www/html/wordpress-tests-lib"/>
+        <env name="WP_PLUGIN_DIR" value="/var/www/html/wp-content/plugins"/>
+        <env name="WP_DEFAULT_THEME" value="twentytwentyone"/>
+        <env name="WP_TESTS_DOMAIN" value="example.org"/>
+        <env name="WP_TESTS_EMAIL" value="admin@example.org"/>
+        <env name="WP_TESTS_TITLE" value="Test Blog"/>
+        <env name="WP_PHP_BINARY" value="/usr/local/bin/php"/>
+    </php>
+</phpunit>

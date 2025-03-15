@@ -1,6 +1,6 @@
 // playwright.config.js
 module.exports = {
-    testDir: './tests', // Directorio donde estarán tus tests
+    testDir: './tests/e2e', // Directorio donde estarán tus tests
     use: {
         headless: true, // Ejecutar en modo sin cabeza (headless)
         viewport: { width: 1280, height: 720 }, // Tamaño de la ventana del navegador
