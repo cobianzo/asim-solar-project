@@ -1,5 +1,6 @@
 import { ExtendedSegment } from "./types";
 import * as trigo from './trigonometry-helpers';
+import * as trigoPanels from './trigonometry-solar-panels';
 import { getCurrentStepCocoMap } from ".";
 
 /** ====== ====== ====== ====== ======
@@ -8,12 +9,12 @@ import { getCurrentStepCocoMap } from ".";
 window.debug = window.debug || {};
 
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
-window.debug = { ...window.debug, ...trigo};
+window.debug = { ...window.debug, ...trigo, ...trigoPanels};
 // quick access to data of our page
 window.debug.getSegmentAsPoints = (index: number) => {
   /** Usage:
    s0 = window.debug.getSegmentAsPoints(0);
-   window.debug.createPolygonPopup(s0);
+   window.debug.previewPolygonPoints(s0);
    */
   const c = getCurrentStepCocoMap();
   const seg = c?.segments ? c.segments[index] : null;
@@ -26,7 +27,7 @@ window.debug.getSegmentAsPoints = (index: number) => {
 window.debug.getRectangleAsPoints = (index: number) => {
   /** Usage:
    r = window.debug.getRectangleAsPoints();
-   window.debug.createPolygonPopup(r);
+   window.debug.previewPolygonPoints(r);
    */
   const pol = window.cocoDrawingRectangle.polygon;
   if (pol) {
@@ -79,7 +80,7 @@ export const resetSegmentsInfo = function() {
 /** ====== ====== ====== ====== ======
  *   DEBUG SHOWING POLIGONS IN x y COORDENATES
  * ====== ====== ====== ====== ====== */
-export function createPolygonPopup(points: google.maps.Point[]) {
+export function previewPolygonPoints(points: google.maps.Point[]) {
   // Crear el canvas
   const canvas = document.createElement("canvas");
   canvas.width = 1200;  // Ajusta el tamaño según necesites
@@ -130,6 +131,6 @@ const polygon = [
   new window.google.maps.Point(150, 200),
   new window.google.maps.Point(50, 150),
 ];
-window.debug.createPolygonPopup(polygon);
+window.debug.previewPolygonPoints(polygon);
 */
-window.debug.createPolygonPopup = createPolygonPopup;
+window.debug.previewPolygonPoints = previewPolygonPoints;

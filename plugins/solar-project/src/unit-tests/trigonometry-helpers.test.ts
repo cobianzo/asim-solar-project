@@ -1,4 +1,4 @@
-import { convertPointsArrayToLatLngString, getCenterByVertexPoints, getRectangleInclinationByPoints, rotateRectangle, scaleRectangleByPoints } from "../trigonometry-helpers";
+import { convertPointsArrayToLatLngString, getCenterByVertexPoints, getInclinationByRectanglePoints, rotateRectangle, scaleRectangleByPoints } from "../trigonometry-helpers";
 // import { otraFuncionTrigonometrica } from "../../src/otraFuncion";
 
 describe("Testing an inclined rectangle", () => {
@@ -84,20 +84,20 @@ describe("Testing an inclined rectangle", () => {
     });
   });
 
-  describe("GET ANGLE: getRectangleInclinationByPoints", () => {
+  describe("GET ANGLE: getInclinationByRectanglePoints", () => {
     test("Angle of not inclined, should be 0", () => {
-      const deg = getRectangleInclinationByPoints(rightRect);
+      const deg = getInclinationByRectanglePoints(rightRect);
       expect(deg).toEqual(0);
     });
     test("Angle of inclined rectangle", () => {
       const degrees = 10;
       // const rotatedPoints66 = rightRect;
       const rotatedPoints66 = rotateRectangle(rightRect, degrees);
-      let deg = getRectangleInclinationByPoints(rotatedPoints66);
+      let deg = getInclinationByRectanglePoints(rotatedPoints66);
       console.log('deg', deg);
 
       const rotatedPointsback = rotateRectangle(rightRect, - degrees);
-      deg = getRectangleInclinationByPoints(rotatedPointsback);
+      deg = getInclinationByRectanglePoints(rotatedPointsback);
       console.log('degback', deg);
     });
   });

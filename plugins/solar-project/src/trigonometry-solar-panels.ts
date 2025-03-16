@@ -30,7 +30,6 @@ export const resizeRectanglePolygon = function( polygon: google.maps.Polygon ) {
 
   polygon.setPath(newPath);
 }
-window.ee = resizeRectanglePolygon;
 
 
 // TODO: move this into trigonometry maybe?
@@ -46,7 +45,7 @@ function scaleVector(p1: google.maps.Point, p2: google.maps.Point, newLength: nu
   return new google.maps.Point(p1.x + (dx / length) * newLength, p1.y + (dy / length) * newLength);
 }
 
-function resizeRectangle(vertices: Array<google.maps.Point>, newSide1: number, newSide2: number): Array<google.maps.Point> {
+export function resizeRectangle(vertices: Array<google.maps.Point>, newSide1: number, newSide2: number): Array<google.maps.Point> {
   if (vertices.length !== 4) throw new Error("El rectángulo debe tener 4 vértices");
 
   // Determinar las longitudes de los lados originales

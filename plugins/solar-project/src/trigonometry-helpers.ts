@@ -485,7 +485,7 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
   return null;
 }
 
-export const getRectangleInclinationByPoints = function( points: Array<google.maps.Point>) : number {
+export const getInclinationByRectanglePoints = function( points: Array<google.maps.Point>) : number {
   if (!points || points.length !== 4) {
     return 0; // Valor predeterminado si no hay 4 puntos
   }
@@ -498,7 +498,7 @@ export const getRectangleInclinationByPoints = function( points: Array<google.ma
   const alfaGrados = (alfa * 180) / Math.PI; // Grados
 
   // 3. Calcular el ángulo con respecto al eje Y (beta)
-  const betaGrados = 90 - alfaGrados;
+  const betaGrados = (alfaGrados + 270) % 360;
 
   return betaGrados;
 
