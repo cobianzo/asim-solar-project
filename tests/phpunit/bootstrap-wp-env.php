@@ -3,7 +3,17 @@
  * PHPUnit bootstrap file.
  *
  * @package Create_Block_Theme
+ *
+ * Having problems with it... WIP.
+ * I can follow this
+ * https://matty.blog/adding-unit-tests-to-your-wordpress-plugin-using-wp-env/
+ * which uses
+ * wp-env run tests-cli --env-cwd=wp-content/plugins/starter-plugin ./vendor/bin/phpunit.
+ * but i think i tried already.
  */
+
+
+
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 

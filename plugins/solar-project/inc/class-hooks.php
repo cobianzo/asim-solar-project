@@ -22,6 +22,7 @@ class Hooks {
 		// Hooks who applied in the page 2 of the form, on the coco-map field with polygon interaction
 		add_action( 'coco_gravity_form_map_field_previous_to_field', array( __CLASS__, 'form_top_message' ), 10, 3 );
 
+		// add_filter( 'coco_gravity_form_map_field_value', array( __CLASS__, 'set_default_inputvalue' ), 10, 3);
 		add_filter( 'coco_gravity_form_map_field_default_zoom', array( __CLASS__, 'set_default_zoom' ), 10, 2 );
 		add_filter( 'coco_gravity_form_map_field_default_lat', array( __CLASS__, 'set_default_lat' ), 10, 2 );
 		add_filter( 'coco_gravity_form_map_field_default_lng', array( __CLASS__, 'set_default_lng' ), 10, 2 );
@@ -203,6 +204,30 @@ class Hooks {
 		<?php
 	}
 
+
+	public static function set_default_inputvalue( $value, $field, $form ) {
+		if ( ! empty( $value ) && strlen( $value ) < 3 ) {
+			return '';
+		}
+		if ( 'map-segments-offset' !== $field->adminLabel ) {
+			return $value;
+		}
+		if ( ! empty( $value ) && strlen( $value ) > 3 ) {
+			return $value;
+		}
+
+		// important: the default value must be the center given by solar API to make calculations work ok.
+		$coco_map_entry        = Helper::capture_coco_map_field_value_in_step_1( $form );
+		$previous_marker_value = explode( ',', $coco_map_entry );
+		$building_data         = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+		$latlng                = $building_data['center']['latitude'] . ',' . $building_data['center']['longitude'];
+
+		if ( ! empty( $latlng ) ) {
+			return $latlng;
+		}
+		return $value;
+	}
+
 	public static function set_default_zoom( $zoom, $form ) {
 		$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
 		if ( $coco_map_entry ) {
@@ -210,7 +235,7 @@ class Hooks {
 		}
 		return $zoom;
 	}
-	public static function set_default_lat( $lat, $form ) {
+	public static function set_default_lat( $lat, $form ) { // not in use, set_default_inputvalue is enough
 		$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
 		if ( $coco_map_entry ) {
 			$previous_marker_value = explode( ',', $coco_map_entry );

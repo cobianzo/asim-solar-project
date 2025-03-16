@@ -170,6 +170,10 @@ function applyDisplacementToPolygon(polygon: ExtendedSegment, originalPath: Arra
 // updates the single source of truth for the position of the segments
 export const updateValuesCoordsSegmentsWithOffset = function( latOffset: number, lngOffset: number ) {
   // alert(`Applying offset ${latOffset*100000}, ${lngOffset*100000}`);
+  if (isNaN(latOffset) || isNaN(lngOffset)) {
+    console.error('Error. offsets are not numbers. Check out why with the developer. updateValuesCoordsSegmentsWithOffset');
+    return;
+  }
   window.cocoBuildingSegments.forEach( s => {
     s.boundingBox.sw.latitude += latOffset;
     s.boundingBox.sw.longitude += lngOffset;

@@ -7,7 +7,8 @@
     "start": "wp-scripts start",
     "bs": "browser-sync start --config bs-config.js",
     "plugin-zip": "node bin/build-plugin.js",
-    "version": "node bin/version-increment.js"
+    "version": "node bin/version-increment.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "cobianzo",
@@ -15,6 +16,7 @@
   "description": "",
   "devDependencies": {
     "@types/google.maps": "^3.58.1",
+    "@types/jest": "^29.5.14",
     "@types/wordpress__blocks": "^12.5.17",
     "@types/wordpress__components": "^23.8.0",
     "@types/wordpress__element": "^2.14.1",
@@ -23,6 +25,9 @@
     "archiver": "^7.0.1",
     "browser-sync": "^3.0.3",
     "gulp": "^5.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.2.6",
     "typescript": "^5.8.2"
   },
   "dependencies": {

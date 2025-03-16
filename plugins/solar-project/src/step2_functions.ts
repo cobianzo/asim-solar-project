@@ -55,6 +55,10 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   // Create the segments and the bounding box to drag them
   setupSegmentsAndDraggableBoundingBox();
 
+  // Once everything's drawn, we initialize the value for the input
+  if (cocoMapSetup.inputElement && !cocoMapSetup.inputElement.value) {
+    cocoMapSetup.inputElement.value = `${window.cocoOriginalBoundingBoxCenter.latitude},${window.cocoOriginalBoundingBoxCenter.longitude}`;
+  }
 } );
 
 

@@ -4,7 +4,7 @@ import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup
 import { getRectangleInclination, paintResizeHandlersInPolygon } from './setup-resize-rectangle-interaction';
 import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 import setupSegments from './setup-segments-interactive-functions';
-import { calculatePathRectangleByOppositePointsAndInclination, convertPointsArrayToLatLngString, convertPolygonPathIntoStringCoords, getInclinedAxisAsLinesFromCoordenates, getLineIntersection, latLngToPoint, polygonPathToPoints } from './trigonometry-helpers';
+import { calculatePathRectangleByOppositePointsAndInclination, convertPointsArrayToLatLngString, convertPolygonPathToStringLatLng, getInclinedAxisAsLinesFromCoordenates, getLineIntersection, latLngToPoint, convertPolygonPathToPoints } from './trigonometry-helpers';
 import { CocoMapSetup } from './types';
 
 /**

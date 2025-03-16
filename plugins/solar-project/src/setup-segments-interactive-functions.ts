@@ -114,7 +114,7 @@ const setupSegments = (
 
   // get the info of the segments and paint them, one by one
   const roofSegments = window.cocoBuildingSegments;
-
+  console.log('todelee', cocoBuildingSegments[0].center);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-ignore
   if ( roofSegments.length ) {
@@ -122,6 +122,13 @@ const setupSegments = (
       console.log( 'Calculos par segment ', i, element);
 
       const {center, azimuthDegrees, boundingBox: {sw, ne}} = element;
+
+      // Early exit if any required property is undefined
+      if (!center || azimuthDegrees === undefined || !sw || !ne) {
+        console.error('Missing required segment data. Skipping segment:', { center, azimuthDegrees, sw, ne });
+        return;
+      }
+
 
       // based on sw and ne, get the full rectangle
       // aligned with North
@@ -147,12 +154,12 @@ const setupSegments = (
         case 'rotate-all':
           realAngleRotation += 90; break;
       }
-
+      console.log('calculation ', center);
       const centerPoint = latLngToPoint(theMap, center);
       const newRectPoints = centerPoint? rotateRectangle(rectPoints, centerPoint, realAngleRotation) : null;
       const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
-      if (!rectangleToPaint) {
-        console.error('we coudlnt calculate the coords to paint the segment', rectangleToPaint);
+      if (!rectangleToPaint || rectangleToPaint.includes('NaN')) {
+        console.error('we coudlnt calculate the coords to paint the segment', rectangleToPaint, centerPoint, newRectPoints);
         return;
       }
 

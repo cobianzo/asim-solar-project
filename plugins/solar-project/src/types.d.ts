@@ -54,7 +54,7 @@ export interface CocoDrawingRectangleInfo {
 
   // the polygon (the inclined rectangle).
   polygon?: google.maps.Polygon;
-  polygonCenterMarker?: AdvancedMarkerElement | null;
+  associatedMarkers?: Array<AdvancedMarkerElement>; // store markers to delete when we clean the rectangle
 
   // when rotating the rectangle, currently deactivated TODELETE
   rotatingRectangleStartingPoint?: google.maps.Point | null;

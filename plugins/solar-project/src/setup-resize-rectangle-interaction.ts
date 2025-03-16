@@ -1,5 +1,5 @@
 import { handlerMouseMoveSecondVertexRectangle, handlerSecondClickDrawRectangle } from "./setup-rectangle-interactive";
-import { latLngToPoint, polygonPathToPoints } from "./trigonometry-helpers";
+import { latLngToPoint, convertPolygonPathToPoints } from "./trigonometry-helpers";
 
 
 
@@ -82,7 +82,7 @@ const endDrag = function(e: google.maps.MapMouseEvent) {
 // MOVE to trigonometry TODELETE: i think it doesnt work ok
 export const getRectangleInclination = function( polygon: google.maps.Polygon | undefined ): number {
   if ( ! polygon ) return 0;
-  const pointsPath = polygonPathToPoints( polygon );
+  const pointsPath = convertPolygonPathToPoints( polygon );
   const pointA = pointsPath[0];
   const pointB = pointsPath[1];
 

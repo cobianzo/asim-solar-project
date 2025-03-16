@@ -103,24 +103,19 @@ export const convertPointsArrayToLatLngString = function(
 }
 
 
-/**
- * ========= ========= ========= =========
- *    converters into structured data
- * ========= ========= ========= =========
- */
+/** ========= converters into structured data ========= */
 
 /**
  * polygon with getPath() which is [ { lat(), lng() }, {...}, ... ] ==> [ {x: 32.3, y: 55.1 }, {..}, .]
  * @param polygon
  * @returns
  */
-export const polygonPathToPoints = function( polygon: google.maps.Polygon ) {
+export const convertPolygonPathToPoints = function( polygon: google.maps.Polygon ) {
   const temp = polygon.getPath().getArray().map( latLng => {
     return latLngToPoint( polygon.getMap()!, { latitude: latLng.lat(), longitude: latLng.lng() } ) ;
   } );
   return temp.filter( p => p != null );
 }
-
 
 /**
  * '32.3414325,11.4324324 33.1113423,12.4324312 ...' ===> [ { lat(), lng() }, {...}, ...]
@@ -130,7 +125,7 @@ export const polygonPathToPoints = function( polygon: google.maps.Polygon ) {
  * Each coordinate should be in the format "latitude,longitude".
  * @returns An array of `google.maps.LatLng` objects representing the coordinates. {lat: number, lng: number}
  */
-export const convertStringCoordinatesIntoGMapCoordinates = function (coordinatesAsString: string) {
+export const convertStringLatLngToArrayLatLng = function (coordinatesAsString: string) {
 	const coordinatesArray = coordinatesAsString.split(' ');
 	const newPolygonCoords = coordinatesArray.map((coord) => {
 		const [lat, lng] = coord.split(',');
@@ -139,7 +134,7 @@ export const convertStringCoordinatesIntoGMapCoordinates = function (coordinates
 	return newPolygonCoords;
 };
 
-export const convertPolygonPathIntoStringCoords = function (polygon: google.maps.Polygon) {
+export const convertPolygonPathToStringLatLng = function (polygon: google.maps.Polygon) {
   let stringCoords = '';
   const path = polygon.getPath().getArray();
   const stringCoordsArray = path.map(latLng => `${latLng.lat()},${latLng.lng()}`);
@@ -147,36 +142,6 @@ export const convertPolygonPathIntoStringCoords = function (polygon: google.maps
   return stringCoords;
 }
 
-/**
- * Given sw and ne coords,
- * returns an array of Points for the whole rectangle
- * The order of the points in the array is:
- *   [bottom left, top left, top right, bottom right]
- * @param map The Google Map instance
- * @param sw The LatLng of the bottom left corner of the rectangle
- * @param ne The LatLng of the top right corner of the rectangle
- * @returns An array of Points or null if the map bounds are not defined
- */
-export const orthopedicRegtanglePoints = (
-  map: google.maps.Map,
-  sw: LatitudeLongitudeObject,
-  ne: LatitudeLongitudeObject
-): Array<google.maps.Point> | null  => {
-  // get the latitude and logintude and convert into points in the map.
-  const swPoint = latLngToPoint(map, sw);
-  const nePoint = latLngToPoint(map, ne);
-  if (! swPoint || ! nePoint) {
-    return null;
-  }
-
-  return [
-    // vertex from bottom left, top left, top right, bottom right
-    new google.maps.Point(swPoint.x, swPoint.y),
-    new google.maps.Point(swPoint.x, nePoint.y),
-    new google.maps.Point(nePoint.x, nePoint.y),
-    new google.maps.Point(nePoint.x, swPoint.y),
-  ];
-};
 
 
 /**
@@ -185,7 +150,14 @@ export const orthopedicRegtanglePoints = (
  * ========= ========= ========= =========
  */
 
-
+/**
+ * Given a polygon defined by Array<google.maps.Point>, y returns the
+ * Array<google.maps.Point> after rotating the polygon `angleDegrees`
+ * @param vertices
+ * @param center
+ * @param angleDegrees
+ * @returns
+ */
 export const rotateRectangle = (
   vertices: Array<google.maps.Point>,
   center: google.maps.Point,
@@ -225,22 +197,71 @@ export const rotateRectanglePolygon = function( polygon: google.maps.Polygon, an
     console.error('no map');
     return;
   }
-  const points = polygonPathToPoints(polygon);
-  const center = getPolygonCenterByVertexPoints(points);
+  const points = convertPolygonPathToPoints(polygon);
+  console.log('posints', points); // todelete
+  const center = getCenterByVertexPoints(points);
   const rotatedPoints = rotateRectangle(points, center, angle);
+  console.log('rotates points', points); // todelete
   const newPathString = convertPointsArrayToLatLngString(map, rotatedPoints);
   console.log('new coordinates', newPathString);
-  const newPath = convertStringCoordinatesIntoGMapCoordinates(newPathString!);
+  const newPath = convertStringLatLngToArrayLatLng(newPathString!);
   console.log('new coordinates', newPath);
   polygon.setPath(newPath);
 }
-window.dd = rotateRectanglePolygon; // TODELETE
+
+export const scaleRectangleByPoints = function(arrayPoints: Array<google.maps.Point>, scale: number) {
+  // get the center of the rect
+  const center = getCenterByVertexPoints(arrayPoints);
+  return arrayPoints.map((point) => {
+    const deltaX = point.x - center.x;
+    const deltaY = point.y - center.y;
+
+    const scaledDeltaX = deltaX * scale;
+    const scaledDeltaY = deltaY * scale;
+
+    const newX = center.x + scaledDeltaX;
+    const newY = center.y + scaledDeltaY;
+
+    return new google.maps.Point(newX, newY);
+  });
+}
 
 /**
  * ========= ========= ========= =========
  *    projections (calulation of a trigonometry param based on other parms)
  * ========= ========= ========= =========
  */
+
+/**
+ * Given sw and ne coords,
+ * returns an array of Points for the whole rectangle
+ * The order of the points in the array is:
+ *   [bottom left, top left, top right, bottom right]
+ * @param map The Google Map instance
+ * @param sw The LatLng of the bottom left corner of the rectangle
+ * @param ne The LatLng of the top right corner of the rectangle
+ * @returns An array of Points or null if the map bounds are not defined
+ */
+export const orthopedicRegtanglePoints = (
+  map: google.maps.Map,
+  sw: LatitudeLongitudeObject,
+  ne: LatitudeLongitudeObject
+): Array<google.maps.Point> | null  => {
+  // get the latitude and logintude and convert into points in the map.
+  const swPoint = latLngToPoint(map, sw);
+  const nePoint = latLngToPoint(map, ne);
+  if (! swPoint || ! nePoint) {
+    return null;
+  }
+
+  return [
+    // vertex from bottom left, top left, top right, bottom right
+    new google.maps.Point(swPoint.x, swPoint.y),
+    new google.maps.Point(swPoint.x, nePoint.y),
+    new google.maps.Point(nePoint.x, nePoint.y),
+    new google.maps.Point(nePoint.x, swPoint.y),
+  ];
+};
 
 /**
  * Given x,y Point, angle and length of line ==> point {x,y} of the extreme of the line
@@ -300,7 +321,7 @@ export const getLineIntersection = function(
  * @param polygonVertexPoints
  * @returns
  */
-export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Array<google.maps.Point>) {
+export const getCenterByVertexPoints = function(polygonVertexPoints: Array<google.maps.Point>) {
 
   const sumX = polygonVertexPoints.reduce((acc, point) => acc + point.x, 0);
   const sumY = polygonVertexPoints.reduce((acc, point) => acc + point.y, 0);
@@ -315,7 +336,7 @@ export const getPolygonCenterByVertexPoints = function(polygonVertexPoints: Arra
  * @param polygon
  * @returns
  */
-export const getPolygonCenterLatLngByVertexPlygonPath = function(polygon: google.maps.Polygon) : google.maps.LatLng{
+export const getPolygonCenterCoords = function(polygon: google.maps.Polygon) : google.maps.LatLng{
   const path = polygon.getPath().getArray();
   const sumLat = path.reduce((acc, latLng) => acc + latLng.lat(), 0);
   const sumLng = path.reduce((acc, latLng) => acc + latLng.lng(), 0);
@@ -450,4 +471,23 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
   }
 
   return null;
+}
+
+export const getRectangleInclinationByPoints = function( points: Array<google.maps.Point>) : number {
+  if (!points || points.length !== 4) {
+    return 0; // Valor predeterminado si no hay 4 puntos
+  }
+
+  // 1. Calcular la pendiente (m)
+  const m = (points[1].y - points[0].y) / (points[1].x - points[0].x);
+
+  // 2. Calcular el ángulo con respecto al eje X (alfa)
+  const alfa = Math.atan(m); // Radiantes
+  const alfaGrados = (alfa * 180) / Math.PI; // Grados
+
+  // 3. Calcular el ángulo con respecto al eje Y (beta)
+  const betaGrados = 90 - alfaGrados;
+
+  return betaGrados;
+
 }

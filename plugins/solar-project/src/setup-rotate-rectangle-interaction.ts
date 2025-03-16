@@ -1,7 +1,7 @@
 // We can refactor by using `rotateRectanglePolygon`, currently not in use.
 
 import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
-import { convertPointsArrayToLatLngString, convertPolygonPathIntoStringCoords, convertStringCoordinatesIntoGMapCoordinates, latLngToPoint, polygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
+import { convertPointsArrayToLatLngString, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, latLngToPoint, convertPolygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
 
@@ -27,7 +27,7 @@ const rectangleRotationInteractionSetup = function() {
     const point = latLngToPoint(map, { latitude: event.latLng.lat(), longitude: event.latLng.lng() });
     console.log('Pixel coordinates:', point);
     window.cocoDrawingRectangle.rotatingRectangleStartingPoint = point;
-    window.cocoDrawingRectangle.rotatingRectangleStartingVertexPoints = polygonPathToPoints( window.cocoDrawingRectangle.polygon );
+    window.cocoDrawingRectangle.rotatingRectangleStartingVertexPoints = convertPolygonPathToPoints( window.cocoDrawingRectangle.polygon );
 
     // LISTENER mouse MOVE. Apply rotation on mouse deflection
     map.addListener('mousemove', function(event: google.maps.MapMouseEvent) {
@@ -53,7 +53,7 @@ const rectangleRotationInteractionSetup = function() {
       if (window.cocoDrawingRectangle.tempRotatedPoints) {
         window.cocoDrawingRectangle.tempRotatedCoords = convertPointsArrayToLatLngString(map, window.cocoDrawingRectangle.tempRotatedPoints);
         if (window.cocoDrawingRectangle.tempRotatedCoords) {
-          const latLngCoords = convertStringCoordinatesIntoGMapCoordinates(window.cocoDrawingRectangle.tempRotatedCoords);
+          const latLngCoords = convertStringLatLngToArrayLatLng(window.cocoDrawingRectangle.tempRotatedCoords);
           window.cocoDrawingRectangle.polygon.setPath(latLngCoords);
         }
       }
@@ -93,7 +93,7 @@ const rectangleRotationInteractionSetup = function() {
       // @TODO: this is now step 3!
       const input = document.getElementById(window.step2CocoMapInputId) as HTMLInputElement;
       if (input) {
-        const pathInString = window.cocoDrawingRectangle.polygon? (convertPolygonPathIntoStringCoords( window.cocoDrawingRectangle.polygon ) ?? '') : '';
+        const pathInString = window.cocoDrawingRectangle.polygon? (convertPolygonPathToStringLatLng( window.cocoDrawingRectangle.polygon ) ?? '') : '';
         input.value = pathInString ?? '';
       }
     });

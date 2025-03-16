@@ -6,7 +6,7 @@
 // usage:
 // const newRectangle = resizeRectangle(originalVertices, 3, 2) : google.maps.Point[];
 
-import { convertPointsArrayToLatLngString, convertStringCoordinatesIntoGMapCoordinates, polygonPathToPoints } from "./trigonometry-helpers";
+import { convertPointsArrayToLatLngString, convertStringLatLngToArrayLatLng, convertPolygonPathToPoints } from "./trigonometry-helpers";
 
 
 
@@ -21,12 +21,12 @@ export const resizeRectanglePolygon = function( polygon: google.maps.Polygon ) {
     console.error('no map');
     return;
   }
-  const points = polygonPathToPoints(polygon);
+  const points = convertPolygonPathToPoints(polygon);
   const newRectanglePoints = resizeRectangle(points, 30, 22);
 
   const newPathString = convertPointsArrayToLatLngString(map, newRectanglePoints);
   console.log('new coordinates', newPathString);
-  const newPath = convertStringCoordinatesIntoGMapCoordinates(newPathString!);
+  const newPath = convertStringLatLngToArrayLatLng(newPathString!);
 
   polygon.setPath(newPath);
 }

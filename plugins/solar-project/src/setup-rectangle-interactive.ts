@@ -10,11 +10,11 @@
  */
 
 import { SlotFillProvider } from "@wordpress/components";
-import { paintCenterOfUsersRectangleInMap, paintRectangleInMap } from "./drawing-helpers";
+import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsersRectangleInMap, paintRectangleInMap } from "./drawing-helpers";
 import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
-import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathIntoStringCoords, latLngToPoint } from "./trigonometry-helpers";
+import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToStringLatLng, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, SavedRectangle } from "./types";
 import { createSaveSegmentButton } from "./buttons-unselect-save-rectangle";
 
@@ -120,22 +120,33 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
   window.cocoDrawingRectangle.tempFirstClickPoint = latLngToPoint(segm.map, { latitude: latLng.lat, longitude: latLng.lng });
 
   segm.setOptions({ fillOpacity: 0.1 });
+  segm.setOptions({ clickable: false });
+  segm.setVisible(false);
 
+  // paint the arrow marking the first vertex
+  window.cocoDrawingRectangle.associatedMarkers = window.cocoDrawingRectangle.associatedMarkers || [];
+  window.paintAMarker(segm.map, e.latLng!, `${window.cocoAssetsDir}vertex-sw-white.png`, MARKER_LEFT_BOTTOM_OPTIONS)
+    .then(m => window.cocoDrawingRectangle.associatedMarkers!.push(m))
+
+
+
+  // Now setup the listeners
   google.maps.event.clearListeners(segm, 'click');
-
-  console.log('The map where we apply mousemove: ', segm.map);
   segm.map.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
   segm.map.addListener('click', (e: google.maps.MapMouseEvent) => {
-    console.log('%cSECONDCLICK - we fix the rectangle', 'color: blue; font-weight: bold;');
-    handlerSecondClickDrawRectangle();
+
+    console.log('%cSECONDCLICK when we create a new rectangle', 'color: blue; font-weight: bold;');
+
+    handlerSecondClickDrawRectangle(); // this is also used when we edit an existing rectangle
+
+    createSaveSegmentButton(segm.map);
+
+    // WIP - currently not in use
     // the rectangle polygon has been created, we save the inclination, which can be modified with rotation tool.
     window.cocoDrawingRectangle.inclinationWhenCreated = getRectangleInclination( window.cocoDrawingRectangle.polygon );
     window.cocoDrawingRectangle.currentInclinationAfterRotation = window.cocoDrawingRectangle.inclinationWhenCreated;
 
-    createSaveSegmentButton(segm.map);
   });
-  segm.setOptions({ clickable: false });
-  segm.setVisible(false);
 
 }
 

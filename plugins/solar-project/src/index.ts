@@ -36,6 +36,9 @@ declare global {
     // this fn is exposed by the external plugin coco-map0-field
     paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;
     paintAMarker: (gMap: google.maps.Map, position: google.maps.LatLng, markerIcon: string, extraOptions?: object) => Promise<AdvancedMarkerElement>;
+
+
+    debug: Record<string, any>; // /TODELETE, for debugging testing in console, use it wit window.debug
   }
 }
 

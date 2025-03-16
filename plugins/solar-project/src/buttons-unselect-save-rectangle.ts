@@ -1,7 +1,7 @@
 import { contextConnect } from '@wordpress/components/build-types/context';
 import { resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
-import { convertPolygonPathIntoStringCoords } from './trigonometry-helpers';
+import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
 
 function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: MouseEvent) => void, attrs: Record<string, any> = {}) {
@@ -75,7 +75,7 @@ const handlerClickSaveRectangleButton = function(e :MouseEvent) {
 
   // cleanup - delete the rectangle if it existed already.
 
-  const pathAsString = convertPolygonPathIntoStringCoords(window.cocoDrawingRectangle.polygon);
+  const pathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon);
   const savedRectangle = {
     polygon: null,
     tempPathAsString: pathAsString,
