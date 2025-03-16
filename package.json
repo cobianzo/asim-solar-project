@@ -12,7 +12,7 @@
     "test:e2e": "playwright test",
     "test:php": "npm run test:php:setup && wp-env run tests-wordpress --env-cwd='wp-content/plugins/solar'  ",
     "test:php:setup": "wp-env start",
-    "test:jest": "npm run jest --prefix plugins/solar-project",
+    "test:jest": "cd plugins/solar-project && npm run test",
     "plugins-zip": "sh ./bin/plugins-build.sh",
     "//comment": "--CLI commands in dev and tests environments--",
     "//comment2": "e.g: `npm run cli bash`, `npm run cli wp get option siteurl`, `npm run cli wp db cli` ",

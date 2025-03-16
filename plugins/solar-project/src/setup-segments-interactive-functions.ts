@@ -7,6 +7,7 @@
 // types
 import { ExtendedSegment, RoofSegmentStats, SelectRotationPortraitSegmentsOptions } from './types';
 
+
 // internal dependencies, trigonometrical functions
 import {
   orthopedicRegtanglePoints,
@@ -22,8 +23,9 @@ import {
   resetSegmentVisibility,
   fadeSegment,
   removeRectangleInMap,
-  deleteAllSunMarkers,
   paintSegment,
+  MARKER_DOT,
+  deleteMarkersCompletely,
  } from './drawing-helpers';
 
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
@@ -97,13 +99,12 @@ const setupSegments = (
   if ( segments.length ) {
     segments.forEach( (segment: ExtendedSegment) => {
       deactivateInteractivityOnSegment(segment);
+      cleanupAssociatedMarkers( segment as unknown as AssociatedMarkersParent );
       segment.setMap(null);
     } );
     cocoMapSetup.segments = [];
   }
 
-  // delete all sun markers marking the center of the segments.
-  deleteAllSunMarkers();
 
   // If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
   removeRectangleInMap(theMap, true);
@@ -114,7 +115,7 @@ const setupSegments = (
 
   // get the info of the segments and paint them, one by one
   const roofSegments = window.cocoBuildingSegments;
-  console.log('todelee', cocoBuildingSegments[0].center);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-ignore
   if ( roofSegments.length ) {
@@ -154,12 +155,10 @@ const setupSegments = (
         case 'rotate-all':
           realAngleRotation += 90; break;
       }
-      console.log('calculation ', center);
-      const centerPoint = latLngToPoint(theMap, center);
-      const newRectPoints = centerPoint? rotateRectangle(rectPoints, centerPoint, realAngleRotation) : null;
+      const newRectPoints = rotateRectangle(rectPoints, realAngleRotation);
       const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
       if (!rectangleToPaint || rectangleToPaint.includes('NaN')) {
-        console.error('we coudlnt calculate the coords to paint the segment', rectangleToPaint, centerPoint, newRectPoints);
+        console.error('we coudlnt calculate the coords to paint the segment', rectangleToPaint, newRectPoints);
         return;
       }
 
@@ -181,12 +180,12 @@ const setupSegments = (
 
       if (paintSunMarkers) {
         paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
-          window.cocoAllSunMarkers = window.cocoAllSunMarkers || [];
-          segment.sunMarker = sunMarker;
-          // for some reason this is loaded twice
-          window.cocoAllSunMarkers.push(sunMarker); // we need this to delete effectively all markers when resettings things
+          addAssociatedMarker(sunMarker, segment as unknown as AssociatedMarkersParent);
         });
       }
+      window.paintAMarker( theMap, segment.getPath().getArray()[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
+        .then(m => addAssociatedMarker(m, segment as unknown as AssociatedMarkersParent))
+
       segment.realRotationAngle = realAngleRotation;
       segment.isPortrait = isPortrait;
 
@@ -345,6 +344,16 @@ export const deactivateInteractivityOnSegment = (segm: ExtendedSegment) => {
   });
 }
 
+export const addAssociatedMarker = (marker: AdvancedMarkerElement, parent: AssociatedMarkersParent) => {
+  parent.associatedMarkers ||= [];
+  parent.associatedMarkers.push(marker);
+};
+
+export const cleanupAssociatedMarkers = ( parent: AssociatedMarkersParent) => {
+  parent.associatedMarkers ||= [];
+  deleteMarkersCompletely(parent.associatedMarkers);
+  parent.associatedMarkers = [];
+};
 
 
 export default setupSegments;

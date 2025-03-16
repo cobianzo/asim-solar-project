@@ -59,6 +59,7 @@ const startDrag = function(e: MouseEvent) {
   element.style.border = "2px solid red";
 
   window.cocoDrawingRectangle.polygon?.setOptions({clickable: false});
+  window.cocoDrawingRectangle.selectedSegment?.setOptions({clickable: false});
 
   // now we keep on listeneing the movement of the mouse
   window.cocoDrawingRectangle.draggingHandler?.map?.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);

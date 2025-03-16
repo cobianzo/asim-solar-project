@@ -160,12 +160,16 @@ export const convertPolygonPathToStringLatLng = function (polygon: google.maps.P
  */
 export const rotateRectangle = (
   vertices: Array<google.maps.Point>,
-  center: google.maps.Point,
-  angleDegrees: number
+  angleDegrees: number,
+  center: google.maps.Point|null = null,
 ): Array<google.maps.Point> => {
   const angleRadians = (angleDegrees * Math.PI) / 180;
 
-  return vertices.map(vertex => {
+  if (! center) {
+    center = getCenterByVertexPoints(vertices);
+  }
+
+  const newVertex = vertices.map(vertex => {
     // Trasladar el vértice al origen
     const translatedX = vertex.x - center.x;
     const translatedY = vertex.y - center.y;
@@ -184,6 +188,13 @@ export const rotateRectangle = (
 
     return new google.maps.Point(newX, newY);
   });
+
+  // show for debuggint in a human reading stuff
+  console.log('rotateRectangle from the center', center.x, center.y);
+  console.log('From', vertices.map(point => `${point.x.toFixed()},${point.y.toFixed()}` ).join('  ') );
+  console.log('To   ', newVertex.map(point => `${point.x.toFixed()},${point.y.toFixed()}` ).join('  ') );
+
+  return newVertex;
 };
 
 /** Not in use but it works like charm  */
@@ -199,8 +210,7 @@ export const rotateRectanglePolygon = function( polygon: google.maps.Polygon, an
   }
   const points = convertPolygonPathToPoints(polygon);
   console.log('posints', points); // todelete
-  const center = getCenterByVertexPoints(points);
-  const rotatedPoints = rotateRectangle(points, center, angle);
+  const rotatedPoints = rotateRectangle(points, angle);
   console.log('rotates points', points); // todelete
   const newPathString = convertPointsArrayToLatLngString(map, rotatedPoints);
   console.log('new coordinates', newPathString);
@@ -403,7 +413,9 @@ export const getInclinedAxisAsLinesFromCoordenates = (
 };
 
 /**
- * For the creation of the inclined rectangle by the user
+ * For the creation of the inclined rectangle by the user (he clicks on v0 and then drags to set v2)
+ * Quite complex process. Given the angle I calculate the lines y and x in the clicked point.
+ * Then calculate the lines y and x for the v2 as the user drags the mouse, and finds the interections.
  * @param gmap
  * @param pointA
  * @param pointC

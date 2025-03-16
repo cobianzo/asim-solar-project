@@ -16,3 +16,7 @@ interface AdvancedMarkerElement {
   setPosition(position: google.maps.LatLng | google.maps.LatLngLiteral): void;
   setMap(map: google.maps.Map | null): void; // Alternativa a la propiedad `map`
 }
+
+interface AssociatedMarkersParent extends Record<string, any> {
+  associatedMarkers: AdvancedMarkerElement[];
+}

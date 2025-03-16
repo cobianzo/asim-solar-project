@@ -4,7 +4,7 @@ import {
   getPolygonCenterCoords,
 } from './trigonometry-helpers';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
-import { SEGMENT_DEFAULT, SEGMENT_HOVER, SEGMENT_HOVER_WHEN_RECTANGLE, SEGMENT_WHEN_RECTANGLE } from './setup-segments-interactive-functions';
+import { addAssociatedMarker, cleanupAssociatedMarkers, SEGMENT_DEFAULT, SEGMENT_HOVER, SEGMENT_HOVER_WHEN_RECTANGLE, SEGMENT_WHEN_RECTANGLE } from './setup-segments-interactive-functions';
 import { getRectangleBySegment } from './setup-rectangle-interactive';
 import { rawHandler } from '@wordpress/blocks';
 
@@ -26,10 +26,23 @@ export const MARKER_DOT = {
   style: {
     width: '1px',
     height: '1px',
-    transform: 'translate(0px, 0.5px)',
+    transform: 'translate(0px, 3.5px)',
     border: '3px solid white',
     'border-radius': '50%',
   },
+}
+
+export const deleteMarkersCompletely = function(m: AdvancedMarkerElement[] | AdvancedMarkerElement | null) {
+  if (!m) return;
+  if (Array.isArray(m)) {
+    m.forEach(marker => {
+      google.maps.event.clearInstanceListeners(marker);
+      marker.map = null;
+    });
+  } else {
+    google.maps.event.clearInstanceListeners(m);
+    m.map = null;
+  }
 }
 
 /**
@@ -55,9 +68,8 @@ export const paintASunForSegment = async(
   }
 
   // init: clear the marker if it existed already
-  if (seg.sunMarker){
-    seg.sunMarker.map = null;
-    google.maps.event.clearInstanceListeners(seg.sunMarker);
+  if (seg.sunMarker) {
+    deleteMarkersCompletely(seg.sunMarker);
     seg.sunMarker = null;
   }
 
@@ -73,18 +85,6 @@ export const paintASunForSegment = async(
   );
 };
 
-export const deleteAllSunMarkers = function() {
-  if (window.cocoAllSunMarkers?.length) {
-    window.cocoAllSunMarkers?.forEach( marker => {
-      if (marker) {
-        marker.map = null;
-        google.maps.event.clearInstanceListeners(marker);
-        marker = null;
-      }
-    });
-    window.cocoAllSunMarkers.length = 0;
-  }
-}
 
 /**
  * Draws a line in the map from an array of LatLng coordinates.
@@ -243,10 +243,7 @@ export const paintRectangleInMap = (
 export const removeRectangleInMap = (gmap: google.maps.Map, clearDrawingInfo = false) => {
   if (window.cocoDrawingRectangle?.polygon) {
     window.cocoDrawingRectangle.polygon.setMap(null);
-    window.cocoDrawingRectangle.associatedMarkers?.forEach(m => {
-      google.maps.event.clearInstanceListeners(m);
-      m.map = null;
-    });
+    cleanupAssociatedMarkers(window.cocoDrawingRectangle as AssociatedMarkersParent);
 
     // delete all handlers
     destroyHandlersInRectanglePolygon();
@@ -268,26 +265,20 @@ export const paintCenterOfUsersRectangleInMap = (gmap: google.maps.Map) => {
   }
 
   // reset if needed
-  window.cocoDrawingRectangle.associatedMarkers?.forEach(m => {
-    google.maps.event.clearInstanceListeners(m);
-    m.map = null;
-  });
+  cleanupAssociatedMarkers(window.cocoDrawingRectangle as AssociatedMarkersParent);
 
   // calculate center coords:
   const polygonCenterCoords = getPolygonCenterCoords(window.cocoDrawingRectangle.polygon);
 
   console.log('center polygon is ', polygonCenterCoords?.lat(), polygonCenterCoords?.lng());
   const markerOptions = { ...MARKER_DOT, style: { ...MARKER_DOT.style, 'border-color': 'darkturquoise'} };
-  window.cocoDrawingRectangle.associatedMarkers = window.cocoDrawingRectangle.associatedMarkers || [];
   if (polygonCenterCoords) {
     window.paintAMarker( gmap, polygonCenterCoords, `${window.cocoAssetsDir}${'pixel.png'}`, markerOptions)
-      .then(marker => { // we save the marker for future access.
-        window.cocoDrawingRectangle.associatedMarkers!.push(marker);
-    });
+      .then(marker => addAssociatedMarker(marker, window.cocoDrawingRectangle as AssociatedMarkersParent));
   }
 
   // Not important also we paint the first vertex as a reference.
   const vertex = window.cocoDrawingRectangle.polygon.getPath().getArray();
   window.paintAMarker( gmap, vertex[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
-      .then(marker => window.cocoDrawingRectangle.associatedMarkers!.push(marker) );
+      .then(marker => addAssociatedMarker(marker, window.cocoDrawingRectangle as AssociatedMarkersParent) );
 }

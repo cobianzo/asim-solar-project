@@ -17,6 +17,7 @@ import { getStep3CocoMapSetup } from "./step3_functions";
 import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToStringLatLng, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, SavedRectangle } from "./types";
 import { createSaveSegmentButton } from "./buttons-unselect-save-rectangle";
+import { addAssociatedMarker } from "./setup-segments-interactive-functions";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
@@ -124,9 +125,8 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
   segm.setVisible(false);
 
   // paint the arrow marking the first vertex
-  window.cocoDrawingRectangle.associatedMarkers = window.cocoDrawingRectangle.associatedMarkers || [];
   window.paintAMarker(segm.map, e.latLng!, `${window.cocoAssetsDir}vertex-sw-white.png`, MARKER_LEFT_BOTTOM_OPTIONS)
-    .then(m => window.cocoDrawingRectangle.associatedMarkers!.push(m))
+    .then(m => addAssociatedMarker(m, window.cocoDrawingRectangle as AssociatedMarkersParent))
 
 
 

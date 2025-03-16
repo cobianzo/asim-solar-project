@@ -39,9 +39,9 @@ describe("Testing an inclined rectangle", () => {
     });
     test("Confirma que un rectangulo girado dos veces mantiene el mismo centro", () => {
       const center = getCenterByVertexPoints(rightRect);
-      const rotatedPoints66 = rotateRectangle(rightRect, center, 66);
+      const rotatedPoints66 = rotateRectangle(rightRect, 66, center);
       const center2 = getCenterByVertexPoints(rotatedPoints66);
-      const enderezadoPoints = rotateRectangle( rotatedPoints66, center, 24);
+      const enderezadoPoints = rotateRectangle( rotatedPoints66, 24, center);
       const center3 = getCenterByVertexPoints(enderezadoPoints);
       expect(center).toEqual(center2)
       expect(center).toEqual(center3);
@@ -51,14 +51,12 @@ describe("Testing an inclined rectangle", () => {
   describe("rotateRectangle", () => {
 
     test("rota un rectángulo recto unos 66 grados", () => {
-      const center = getCenterByVertexPoints(rightRect);
-      const rotatedPoints = rotateRectangle(rightRect, center, 66);
+      const rotatedPoints = rotateRectangle(rightRect, 66);
     });
     test("Endereza el rectangulo, tras dos giros complementarios de 66 + 24 = 90 grados", () => {
 
-      const center = getCenterByVertexPoints(rightRect);
-      const rotatedPoints66 = rotateRectangle(rightRect, center, 66);
-      const enderezadoPoints = rotateRectangle( rotatedPoints66, center, 24);
+      const rotatedPoints66 = rotateRectangle(rightRect, 66);
+      const enderezadoPoints = rotateRectangle( rotatedPoints66, 24);
 
       const { x: firstVertexX, y: firstVertexY } = enderezadoPoints[0];
       // Verify that at least one element of enderezadoPoints has an .x value equal to firstVertexX
@@ -93,13 +91,12 @@ describe("Testing an inclined rectangle", () => {
     });
     test("Angle of inclined rectangle", () => {
       const degrees = 10;
-      const center = getCenterByVertexPoints(rightRect);
       // const rotatedPoints66 = rightRect;
-      const rotatedPoints66 = rotateRectangle(rightRect, center, degrees);
+      const rotatedPoints66 = rotateRectangle(rightRect, degrees);
       let deg = getRectangleInclinationByPoints(rotatedPoints66);
       console.log('deg', deg);
 
-      const rotatedPointsback = rotateRectangle(rightRect, center, - degrees);
+      const rotatedPointsback = rotateRectangle(rightRect, - degrees);
       deg = getRectangleInclinationByPoints(rotatedPointsback);
       console.log('degback', deg);
     });

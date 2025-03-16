@@ -27,7 +27,6 @@ declare global {
 
     // segments source of truth
     cocoBuildingSegments: Array<RoofSegmentStats>;
-    cocoAllSunMarkers?: Array<AdvancedMarkerElement | null>;
     cocoOriginalBoundingBox: boxBySWNE; // the data
     cocoMovingBoundingBoxPolygon: google.maps.Rectangle | null; // the painteed object from the data.
     cocoMovingBoundingBoxCenterMarker: AdvancedMarkerElement[] | null;
