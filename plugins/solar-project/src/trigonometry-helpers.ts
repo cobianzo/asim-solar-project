@@ -142,8 +142,6 @@ export const convertPolygonPathToStringLatLng = function (polygon: google.maps.P
   return stringCoords;
 }
 
-
-
 /**
  * ========= ========= ========= =========
  *    tranformers of geometry (rotate ... )
@@ -497,8 +495,14 @@ export const getInclinationByRectanglePoints = function( points: Array<google.ma
   const alfa = Math.atan(m); // Radiantes
   const alfaGrados = (alfa * 180) / Math.PI; // Grados
 
+  let orientation = 'north';
+
   // 3. Calcular el ángulo con respecto al eje Y (beta)
-  const betaGrados = (alfaGrados + 270) % 360;
+  // Depending on the quadrant we need to substract 180.
+  let betaGrados = (alfaGrados + 270 );
+  // if the first side of the rect is facing East we need to do this.
+  if (points[1].x > points[0].x)
+    betaGrados -= 180;
 
   return betaGrados;
 

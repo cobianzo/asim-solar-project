@@ -66,3 +66,30 @@ body {
     background-color: white;
   }
 }
+
+
+/* handlers to resize over */
+gmp-advanced-marker .handler-resize {
+  border: 4px solid white;
+  border-radius: 50%;
+  background-color: #FFFFFFAA;
+  transition: border-color 0.1s ease-in-out;
+  &:hover {
+    border-color: #ffcccc;
+    background-color: #FFFFFFFF;
+  }
+
+  &.dragging {
+    animation: flickerBorder 0.1s linear 3;
+    background-color: red;
+  }
+}
+
+@keyframes flickerBorder {
+  0%, 100% {
+    border-color: red;
+  }
+  50% {
+    border-color: white;
+  }
+}

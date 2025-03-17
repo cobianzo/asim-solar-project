@@ -45,24 +45,29 @@ function scaleVector(p1: google.maps.Point, p2: google.maps.Point, newLength: nu
   return new google.maps.Point(p1.x + (dx / length) * newLength, p1.y + (dy / length) * newLength);
 }
 
-export function resizeRectangle(vertices: Array<google.maps.Point>, newSide1: number, newSide2: number): Array<google.maps.Point> {
-  if (vertices.length !== 4) throw new Error("El rectángulo debe tener 4 vértices");
+export const resizePolygon = function(points: google.maps.Point[], scaleFactor: number): google.maps.Point[] {
 
-  // Determinar las longitudes de los lados originales
-  const d1 = distance(vertices[0], vertices[1]);
-  const d2 = distance(vertices[1], vertices[2]);
+  /*
+  // Ejemplo de uso
+    points = [
+      { x: 50, y: 250 },
+      { x: 50, y: 100 },
+      { x: 150, y: 100 },
+      { x: 150, y: 250 }
+    ];
 
-  console.log('lado 1 en px: ', d1);
-  console.log('lado 2 en px: ', d2);
+    window.debug.previewPolygonPoints(points);
+    points = debug.resizePolygon(points, 1.5); // Escala al 150%
+    window.debug.previewPolygonPoints(points);
+  */
+  if (points.length === 0) return [];
 
-  // Identificar qué lado es más largo
-  const [longerSide, shorterSide] = d1 > d2 ? [vertices[0], vertices[1], vertices[2]] : [vertices[1], vertices[2], vertices[3]];
+  // Calcular el centro del polígono
+  const centerX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+  const centerY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
 
-  // Redimensionar los lados usando la misma inclinación
-  const newP1 = longerSide;  // Primer punto permanece igual
-  const newP2 = scaleVector(newP1, shorterSide, newSide1);
-  const newP3 = scaleVector(newP2, vertices[2], newSide2);
-  const newP4 = scaleVector(newP1, vertices[3], newSide2);
-
-  return [newP1, newP2, newP3, newP4];
+  // Escalar cada punto respecto al centro
+  const scaledPoints = points.map(p => new google.maps.Point( centerX + (p.x - centerX) * scaleFactor, centerY + (p.y - centerY) * scaleFactor ));
+  return scaledPoints;
 }
+

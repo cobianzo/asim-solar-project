@@ -14,7 +14,7 @@ import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsers
 import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
-import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToStringLatLng, latLngToPoint } from "./trigonometry-helpers";
+import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, SavedRectangle } from "./types";
 import { createSaveSegmentButton } from "./buttons-unselect-save-rectangle";
 import { addAssociatedMarker } from "./setup-segments-interactive-functions";
@@ -206,7 +206,16 @@ export const handlerSecondClickDrawRectangle = function () {
 export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
 
   const gmap = window.cocoDrawingRectangle.selectedSegment?.map;
-  const angle = window.cocoDrawingRectangle.selectedSegment?.realRotationAngle;
+  let polygonAsPoints;
+  if (window.cocoDrawingRectangle.polygon) {
+    polygonAsPoints = convertPolygonPathToPoints(window.cocoDrawingRectangle.polygon);
+  } else {
+    // this is exectuted the first pixel when we move the mouse, as the rectangle polygon doesnt exist,
+    // then we take the inclination of the parent segment.
+    polygonAsPoints = convertPolygonPathToPoints(window.cocoDrawingRectangle.selectedSegment!);
+  }
+  const angle = getInclinationByRectanglePoints(polygonAsPoints)
+  // const angle = window.cocoDrawingRectangle.selectedSegment?.realRotationAngle; // this works but I think I've improved it
 
   if (!gmap || angle === null) return;
 

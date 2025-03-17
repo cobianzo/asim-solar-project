@@ -10,6 +10,18 @@ window.debug = window.debug || {};
 
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
 window.debug = { ...window.debug, ...trigo, ...trigoPanels};
+
+// when rotating, paint it straight away
+window.debug.rotateRectangle = function(points: google.maps.Point[], angle: number) {
+  previewPolygonPoints(points);
+  const angleBefore = trigo.getInclinationByRectanglePoints(points);
+  console.log('▷▷angle Before',angleBefore);
+  const newpoints = trigo.rotateRectangle(points, angle);
+  const angleAfter = trigo.getInclinationByRectanglePoints(newpoints);
+  console.log('▷▷angle After rotation of '+angle, angleAfter);
+  previewPolygonPoints(newpoints);
+  return newpoints;
+}
 // quick access to data of our page
 window.debug.getSegmentAsPoints = (index: number) => {
   /** Usage:

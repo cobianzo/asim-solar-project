@@ -1,3 +1,4 @@
+import { MARKER_CENTERED_OPTIONS } from "./drawing-helpers";
 import { handlerMouseMoveSecondVertexRectangle, handlerSecondClickDrawRectangle } from "./setup-rectangle-interactive";
 import { latLngToPoint, convertPolygonPathToPoints } from "./trigonometry-helpers";
 
@@ -22,23 +23,12 @@ export const paintResizeHandlerInPolygon = function( gmap: google.maps.Map | nul
 
   const vertexCoords = polygon.getPath().getArray();
   const coords = vertexCoords[indexVertex];
-  window.paintAMarker(
-    gmap,
-    coords,
-    `${(window as any).cocoAssetsDir}${'target.png'}`,
-    {
-      style: {
-        width: '20px',
-        height: '20px',
-        transform: 'translate(0px, 10px)',
-        border:'2px solid white',
-        borderRadius:'50%',
-      },
-    }
-  ).then(marker => {
+  window.paintAMarker(gmap, coords, `${(window as any).cocoAssetsDir}${'target.png'}`, MARKER_CENTERED_OPTIONS)
+    .then(marker => {
     // we save the marker for future access.
     if (marker.content) {
       marker.content.title = "Resize";
+      marker.content.classList.add(`handler-resize`);
       marker.content.dataset.handlerVertexIndex = indexVertex.toString();
     }
     window.cocoDrawingRectangle.handlers = window.cocoDrawingRectangle.handlers || [];
@@ -56,7 +46,7 @@ const startDrag = function(e: MouseEvent) {
   e.stopPropagation();
 
   const element = e.currentTarget as HTMLDivElement;
-  element.style.border = "2px solid red";
+  element.classList.add('dragging');
 
   window.cocoDrawingRectangle.polygon?.setOptions({clickable: false});
   window.cocoDrawingRectangle.selectedSegment?.setOptions({clickable: false});
@@ -65,7 +55,7 @@ const startDrag = function(e: MouseEvent) {
   window.cocoDrawingRectangle.draggingHandler?.map?.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
   window.cocoDrawingRectangle.draggingHandler?.map?.addListener('mouseup', (e: google.maps.MapMouseEvent) => {
     console.log('%cMOUSEUP - we fix the rectangle', 'color: green; font-weight: bold;');
-    handlerSecondClickDrawRectangle(e);
+    handlerSecondClickDrawRectangle();
   });
 }
 
