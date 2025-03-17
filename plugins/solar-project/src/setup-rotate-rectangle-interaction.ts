@@ -1,7 +1,7 @@
 // We can refactor by using `rotateRectanglePolygon`, currently not in use.
 
-import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
-import { convertPointsArrayToLatLngString, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, latLngToPoint, convertPolygonPathToPoints, rotateRectangle } from "./trigonometry-helpers";
+import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
+import { convertPointsArrayToLatLngString, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, latLngToPoint, convertPolygonPathToPoints, rotateRectangle, getInclinationByPolygonPath } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
 
@@ -59,7 +59,7 @@ const rectangleRotationInteractionSetup = function() {
       }
 
       // todelete: not in use and not working ok.
-      const degreesToDelete = getRectangleInclination(window.cocoDrawingRectangle.polygon);
+      const degreesToDelete = getInclinationByPolygonPath(window.cocoDrawingRectangle.polygon);
       console.log('ANGULO DEL RECT: ', degreesToDelete);
     });
 
@@ -84,7 +84,7 @@ const rectangleRotationInteractionSetup = function() {
       polygon.setOptions({ clickable: true });
 
       // update data saved in global vars about the rect.
-      window.cocoDrawingRectangle.currentInclinationAfterRotation = getRectangleInclination( window.cocoDrawingRectangle.polygon );
+      window.cocoDrawingRectangle.currentInclinationAfterRotation = getInclinationByPolygonPath( window.cocoDrawingRectangle.polygon );
 
       // update the handler of the rectangle
       paintResizeHandlersInPolygon();

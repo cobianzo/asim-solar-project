@@ -11,13 +11,14 @@
 
 import { SlotFillProvider } from "@wordpress/components";
 import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsersRectangleInMap, paintRectangleInMap } from "./drawing-helpers";
-import { getRectangleInclination, paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
+import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
-import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
+import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, SavedRectangle } from "./types";
 import { createSaveSegmentButton } from "./buttons-unselect-save-rectangle";
 import { addAssociatedMarker } from "./setup-segments-interactive-functions";
+import { setupSolarPanels } from "./setup-solar-panels";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
@@ -48,6 +49,8 @@ const setupRectangles = function() {
 
   const allSavedRectangles = window.cocoSavedRectangles || [];
   allSavedRectangles.forEach(r => paintSavedRectangle(cocoMapSetup.map, r));
+
+  setupSolarPanels();
 }
 
 export const paintSavedRectangle = function(gmap: google.maps.Map, rectangleInfo: SavedRectangle) {
@@ -143,7 +146,7 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 
     // WIP - currently not in use
     // the rectangle polygon has been created, we save the inclination, which can be modified with rotation tool.
-    window.cocoDrawingRectangle.inclinationWhenCreated = getRectangleInclination( window.cocoDrawingRectangle.polygon );
+    window.cocoDrawingRectangle.inclinationWhenCreated = getInclinationByPolygonPath( window.cocoDrawingRectangle.polygon );
     window.cocoDrawingRectangle.currentInclinationAfterRotation = window.cocoDrawingRectangle.inclinationWhenCreated;
 
   });

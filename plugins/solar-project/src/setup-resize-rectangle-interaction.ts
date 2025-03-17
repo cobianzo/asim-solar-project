@@ -70,26 +70,6 @@ const endDrag = function(e: google.maps.MapMouseEvent) {
 }
 
 
-// MOVE to trigonometry TODELETE: i think it doesnt work ok
-export const getRectangleInclination = function( polygon: google.maps.Polygon | undefined ): number {
-  if ( ! polygon ) return 0;
-  const pointsPath = convertPolygonPathToPoints( polygon );
-  const pointA = pointsPath[0];
-  const pointB = pointsPath[1];
-
-  // Calcula las diferencias en las coordenadas
-  const deltaX = pointB.x - pointA.x;
-  const deltaY = pointB.y - pointA.y;
-
-  // Calcula el ángulo en radianes respecto al eje Y
-  const angleInRadians = Math.atan2(deltaX, deltaY);
-
-  // Convierte el ángulo a grados (opcional)
-  const angleInDegrees = (-1 * angleInRadians * (180 / Math.PI) + 360 ) % 360;
-
-  return angleInDegrees; // Devuelve el ángulo en grados
-}
-
 export const destroyHandlersInRectanglePolygon = function() {
 
   delete window.cocoDrawingRectangle.draggingHandler;

@@ -70,16 +70,25 @@ describe("Testing an inclined rectangle", () => {
 
   });
 
-  describe("scale Rectangle", () => {
+  describe("scale the right Rectangle", () => {
     test("Scale rectangle to 0.5", () => {
-      const newPoints = scaleRectangleByPoints(rightRect, 0.5);
-
+      const newPoints = scaleRectangleByPoints(rightRect, 0.5, 0.5);
 
       expect(newPoints).toEqual([
         new google.maps.Point(1.5, 1.75),
         new google.maps.Point(1.5, 3.25),
         new google.maps.Point(2.5, 3.25),
         new google.maps.Point(2.5, 1.75),
+      ]);
+    });
+    test("Scale rectangle to 0.5 and keep y the same", () => {
+      const newPoints = scaleRectangleByPoints(rightRect, 0.5, 1);
+
+      expect(newPoints).toEqual([
+        new google.maps.Point(1.5, 1),
+        new google.maps.Point(1.5, 4),
+        new google.maps.Point(2.5, 4),
+        new google.maps.Point(2.5, 1),
       ]);
     });
   });

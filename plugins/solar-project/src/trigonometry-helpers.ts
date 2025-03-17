@@ -196,42 +196,60 @@ export const rotateRectangle = (
 };
 
 /** Not in use but it works like charm  */
-export const rotateRectanglePolygon = function( polygon: google.maps.Polygon, angle: number ) {
+export const rotateRectanglePolygon = function( polygon: google.maps.Polygon, angle: number, center: LatitudeLongitudeObject | null, applyRotation: boolean = false ) {
   if (!polygon) {
     console.error('no polygon');
-    return;
+    return null;
   }
   const map = polygon.getMap();
   if (!map) {
     console.error('no map');
-    return;
+    return null;
+  }
+  let centerPoints = null;
+  if (center) {
+    centerPoints = latLngToPoint(map, center);
   }
   const points = convertPolygonPathToPoints(polygon);
-  console.log('posints', points); // todelete
-  const rotatedPoints = rotateRectangle(points, angle);
-  console.log('rotates points', points); // todelete
+  const rotatedPoints = rotateRectangle(points, angle, centerPoints);
   const newPathString = convertPointsArrayToLatLngString(map, rotatedPoints);
-  console.log('new coordinates', newPathString);
   const newPath = convertStringLatLngToArrayLatLng(newPathString!);
-  console.log('new coordinates', newPath);
-  polygon.setPath(newPath);
+
+  if (applyRotation)
+    polygon.setPath(newPath);
+
+  return newPath;
 }
 
-export const scaleRectangleByPoints = function(arrayPoints: Array<google.maps.Point>, scale: number) {
+export const rotatePolygonRectangleToOrthogonal = function(polygon: google.maps.Polygon, applyTranform: boolean = false) {
+  const angle = getInclinationByPolygonPath(polygon);
+  const orthogonalPath = rotateRectanglePolygon(polygon, -1 * angle, null, applyTranform);
+  return orthogonalPath;
+}
+
+export const scaleRectangleByPoints = function(arrayPoints: Array<google.maps.Point>, scaleX: number, scaleY: number) {
   // get the center of the rect
   const center = getCenterByVertexPoints(arrayPoints);
-  return arrayPoints.map((point) => {
+
+  // unrotate to align with Y,X axis
+  const angle = getInclinationByRectanglePoints(arrayPoints);
+  const orthopedicPoints = rotateRectangle(arrayPoints, -1 * angle);
+
+  const scaledOrthogonal = orthopedicPoints.map((point) => {
     const deltaX = point.x - center.x;
     const deltaY = point.y - center.y;
 
-    const scaledDeltaX = deltaX * scale;
-    const scaledDeltaY = deltaY * scale;
+    const scaledDeltaX = deltaX * scaleX;
+    const scaledDeltaY = deltaY * scaleY;
 
     const newX = center.x + scaledDeltaX;
     const newY = center.y + scaledDeltaY;
 
     return new google.maps.Point(newX, newY);
   });
+
+  const scaledInclinedPoints = rotateRectangle(scaledOrthogonal, angle);
+  return scaledInclinedPoints;
 }
 
 /**
@@ -495,15 +513,36 @@ export const getInclinationByRectanglePoints = function( points: Array<google.ma
   const alfa = Math.atan(m); // Radiantes
   const alfaGrados = (alfa * 180) / Math.PI; // Grados
 
-  let orientation = 'north';
-
   // 3. Calcular el ángulo con respecto al eje Y (beta)
   // Depending on the quadrant we need to substract 180.
   let betaGrados = (alfaGrados + 270 );
+  // not sure very well why (there are probably more elegant ways to do this), but
   // if the first side of the rect is facing East we need to do this.
   if (points[1].x > points[0].x)
     betaGrados -= 180;
 
-  return betaGrados;
+  return betaGrados % 360;
 
 }
+
+export const getInclinationByPolygonPath = function( polygon: google.maps.Polygon | undefined ): number {
+  if ( ! polygon ) return 0;
+  const asPoints = convertPolygonPathToPoints(polygon);
+  if (!asPoints || !asPoints.length || !asPoints[0].x || isNaN(asPoints[0].x) ) {
+    console.error('error in the polygone', asPoints, polygon);
+    return 0;
+  }
+  const inclination = getInclinationByRectanglePoints(asPoints);
+
+  return inclination; // Devuelve el ángulo en grados
+}
+
+export const getRectangleSideDimensionsByPolygonPath = function( polygon: google.maps.Polygon ) {
+  const pathAsArray = polygon.getPath().getArray();
+
+  const side1_length = google.maps.geometry.spherical.computeDistanceBetween(pathAsArray[0], pathAsArray[1]);
+  const side2_length = google.maps.geometry.spherical.computeDistanceBetween(pathAsArray[1], pathAsArray[2]);
+
+  return [side1_length, side2_length];
+}
+

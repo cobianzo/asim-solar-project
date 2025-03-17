@@ -69,6 +69,16 @@ The DB inside the container of tests is
 `tests-wordpress`
 user: 
 
+# Debug and test in console
+
+I have nicely exposed in console many functions, and you can expose more, to test visually some functions.
+Check debug.ts. I expose the trigonometry functions, so you can call them with data, like this:
+```
+s0 = debug.getSegmentAsPoints(0); // gets the points of the segment with index 0.
+s0 = debug.rotateRectangle(s0, 45); // paints the segment, and the paints the segment rotated 45 degrees
+```
+The rotateRectangle has been overwritten to paint a preview of the result in an overlay. You can do it with any other function to see the result or print in the screen any info, for example, the result of getInclinationByRectanglePoints(points) of the segment before and anfter the rotation.
+
 # PHPCS
 
 composer run-script lint plugins/solar-project/solar-project.php
