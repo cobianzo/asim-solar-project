@@ -59,17 +59,6 @@ const startDrag = function(e: MouseEvent) {
   });
 }
 
-// todelete
-const moveDrag = function(this: google.maps.Map, e: google.maps.MapMouseEvent) {
-  const map = this;
-  const point = latLngToPoint(map, { latitude: e.latLng.lat(), longitude: e.latLng.lng() });
-};
-
-const endDrag = function(e: google.maps.MapMouseEvent) {
-
-}
-
-
 export const destroyHandlersInRectanglePolygon = function() {
 
   delete window.cocoDrawingRectangle.draggingHandler;

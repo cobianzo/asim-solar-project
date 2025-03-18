@@ -32,7 +32,7 @@ import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup } from './step3_functions';
 import { createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
-import setupRectangles, { highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive'
+import setupRectangles, { highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
 
 // colours of the polygons
 export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
@@ -313,7 +313,9 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   if (rectangleInfo?.polygon) {
 
     // remove the edited rectangleInfo from the saved rectangles, if we need to recreate it, we will on save.
-    window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segm.indexInMap)
+    if ( undefined !== segm.indexInMap) {
+      removeSavedRectangleBySegmentIndex(segm.indexInMap);
+    }
 
     // we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
     window.cocoDrawingRectangle.polygon = rectangleInfo.polygon;

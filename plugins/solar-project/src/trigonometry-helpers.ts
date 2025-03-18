@@ -233,7 +233,7 @@ export const scaleRectangleByPoints = function(arrayPoints: Array<google.maps.Po
 
   // unrotate to align with Y,X axis
   const angle = getInclinationByRectanglePoints(arrayPoints);
-  const orthopedicPoints = rotateRectangle(arrayPoints, -1 * angle);
+  const orthopedicPoints = rotateRectangle(arrayPoints, -1 * (angle == null ? 0 : angle));
 
   const scaledOrthogonal = orthopedicPoints.map((point) => {
     const deltaX = point.x - center.x;
@@ -248,7 +248,7 @@ export const scaleRectangleByPoints = function(arrayPoints: Array<google.maps.Po
     return new google.maps.Point(newX, newY);
   });
 
-  const scaledInclinedPoints = rotateRectangle(scaledOrthogonal, angle);
+  const scaledInclinedPoints = rotateRectangle(scaledOrthogonal, (angle == null ? 0 : angle));
   return scaledInclinedPoints;
 }
 
@@ -546,7 +546,7 @@ export const getInclinationByPolygonPath = function( polygon: google.maps.Polygo
   }
   const inclination = getInclinationByRectanglePoints(asPoints);
 
-  return inclination; // Devuelve el ángulo en grados
+  return inclination == null ? 0 : inclination; // Devuelve el ángulo en grados
 }
 
 export const getRectangleSideDimensionsByPolygonPath = function( polygon: google.maps.Polygon ) {

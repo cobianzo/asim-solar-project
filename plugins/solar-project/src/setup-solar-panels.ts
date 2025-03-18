@@ -1,8 +1,5 @@
 // WIP
-
-import { paintSavedRectangle } from "./setup-rectangle-interactive";
-import { cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
-import { convertPointsArrayToLatLngString, convertPolygonPathToPoints, getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon, scaleRectangleByPoints } from "./trigonometry-helpers";
+import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
 import { SavedRectangle } from "./types"
 
 const PANEL_OPTIONS: google.maps.PolygonOptions = {
@@ -13,7 +10,7 @@ const PANEL_OPTIONS: google.maps.PolygonOptions = {
   visible: true,
   clickable: false,
   draggable: false,
-  zIndex: 0
+  zIndex: 1
 }
 
 
@@ -22,12 +19,16 @@ export const setupSolarPanels = function() {
   // retrieve all rectangles
   const allSavedRectangles = window.cocoSavedRectangles || [];
   allSavedRectangles.forEach( rect => {
-    paintSolarPanelsForSavedRectangle(rect);
+
+    // cleanup solar panels if they were drawn.
+    cleanupSolarPanelForSavedRectangle(rect);
+
+    paintSolarPanelsForSavedRectangle(rect, 1);
   });
 }
 
 
-export const paintSolarPanelsForSavedRectangle = function( savedRectangle: SavedRectangle) {
+export const paintSolarPanelsForSavedRectangle = function( savedRectangle: SavedRectangle, orientation: number = 0) {
   const { polygon } = savedRectangle;
   if (!polygon) {
     return;
@@ -40,9 +41,13 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
   const [lengthSideY, lengthSideX] = getRectangleSideDimensionsByPolygonPath(polygon);
 
   // calculate the fatorfacto to scale to get a rectangle 10x15m
-  const dimensionsPanel = [2,1]; // 2 meters x 1 meter
-  const factorX = dimensionsPanel[0] / lengthSideX; //
-  const factorY = dimensionsPanel[1] / lengthSideY; //
+  let dimensionsPanel = [1.5,1]; // 1.5 meters x 1 meter
+  if (orientation) {
+    const [width, height] = dimensionsPanel;
+    dimensionsPanel = [height, width];
+  }
+  const factorX = dimensionsPanel[0] / lengthSideX;
+  const factorY = dimensionsPanel[1] / lengthSideY;
 
   console.log(`Panel Size: `, dimensionsPanel.join('x') + 'm' )
   console.log( `Y is ${lengthSideY} m. The length of the panel (${dimensionsPanel[1]}) is ${factorY.toFixed(2)} times that size` )
@@ -52,42 +57,26 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
   const rectPathToNorth = rotatePolygonRectangleToOrthogonal(polygon);
   if (!rectPathToNorth) return;
 
-
-
   const [latSouth, latNorth, lngWest, lngEast] = [
     rectPathToNorth[0].lat(), rectPathToNorth[1].lat(), rectPathToNorth[1].lng(), rectPathToNorth[2].lng()
   ];
   // swap factoX <-> factorY to display panels landscape
   const latLengthPanel = (latNorth - latSouth) * factorY;
   const lngLengthPanel = (lngEast - lngWest) * factorX;
-  console.log(`In Lat Diff of segment it is ${(latNorth - latSouth)}, and the ${dimensionsPanel[1]}m of the solarpanel has lat DIMENSION of `,latLengthPanel);
-  console.log('lngt DIMENSION ',lngLengthPanel);
-  console.log('STARTING AT ', `${latSouth},${lngWest}`);
+  // console.log(`In Lat Diff of segment it is ${(latNorth - latSouth)}, and the ${dimensionsPanel[1]}m of the solarpanel has lat DIMENSION of `,latLengthPanel);
+  // console.log('lngt DIMENSION ',lngLengthPanel);
+  // console.log('STARTING AT ', `${latSouth},${lngWest}`);
 
-  // calculate the vertex of the panel placed in the SW edge of the orthogonal rectangle
-  const coords = [
-    `${latSouth},${lngWest}`, // v0
-    `${latSouth + 1*latLengthPanel},${lngWest}`, // v1 (north west)
-    `${latSouth + 1*latLengthPanel},${lngWest + 1*lngLengthPanel}`, // v2
-    `${latSouth},${lngWest + 1*lngLengthPanel}`, // v3
-  ];
-  console.log('coords panel', coords);
-  const panel = window.paintAPoygonInMap(map, coords.join(' '), PANEL_OPTIONS)
+  const maxPanelsInY = Math.floor(1 / factorY);
+  const maxPanelsInX = Math.floor(1 / factorX);
 
-  // now rotate the panel respect the center of the rectangle to be in the right place
-  const originaInclination = getInclinationByPolygonPath(polygon);
-  const centerRectangle = getPolygonCenterCoords(polygon);
-  const inclinedPanelCoords = rotateRectanglePolygon(
-    panel,
-    originaInclination,
-    { latitude: centerRectangle.lat(), longitude: centerRectangle.lng() },
-    true
-  )
-  // move to paintASolarPanel
-
-
-  // Repeat to see
-  paintASolarPanel( savedRectangle, rectPathToNorth[0], 1, 1, latLengthPanel, lngLengthPanel );
+  for ( let i = 0; i < maxPanelsInY; i++ ) {
+    for ( let j = 0; j < maxPanelsInX; j++) {
+      paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
+    }
+  }
+  paintASolarPanel( savedRectangle, rectPathToNorth[0], 0, 2, latLengthPanel, lngLengthPanel );
+  paintASolarPanel( savedRectangle, rectPathToNorth[0], 0, 3, latLengthPanel, lngLengthPanel );
 }
 
 const paintASolarPanel = function (
@@ -108,7 +97,7 @@ const paintASolarPanel = function (
 
   const panelLatSouth = latSouth + latLengthPanel * orderLat;
   const panelLatNorth = panelLatSouth + latLengthPanel;
-  const panelLngWest = lngWest + lngLengthPanel * orderLat;
+  const panelLngWest = lngWest + lngLengthPanel * orderLng;
   const panelLngEast = panelLngWest + lngLengthPanel;
 
   const coords = [
@@ -121,7 +110,9 @@ const paintASolarPanel = function (
   const panel = window.paintAPoygonInMap(map, coords.join(' '), PANEL_OPTIONS)
 
   /* ====== ====== ====== ====== ====== ======
-  Now we have stopped the calulation in a orthogonoal axis. lets rotate everthing
+  Now we have stopped the calulation in a orthogonoal axis.
+  lets rotate everthing
+  and save the data in the source of truth
   ====== ====== ====== ====== ====== ====== */
 
   const originaInclination = getInclinationByPolygonPath(polygon);
@@ -140,4 +131,19 @@ const paintASolarPanel = function (
     theSavedRectangle.solarPanelsPolygons[orderLng][orderLat].setMap(null);
   }
   theSavedRectangle.solarPanelsPolygons[orderLng][orderLat] = panel;
+}
+
+export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRectangle ) {
+  if ( !savedRect.solarPanelsPolygons || !savedRect.solarPanelsPolygons.length ) {
+    savedRect.solarPanelsPolygons = [];
+    return;
+  }
+  savedRect.solarPanelsPolygons.forEach( row => {
+    if ( ! row.length ) return;
+    row.forEach( panelPolygon  => {
+      google.maps.event.clearInstanceListeners(panelPolygon);
+      panelPolygon.setMap(null);
+    })
+  });
+  savedRect.solarPanelsPolygons = [];
 }

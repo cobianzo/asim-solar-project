@@ -54,6 +54,3 @@ export const getCurrentStepCocoMap = function(): CocoMapSetup | null {
 import './setup-segments-interactive-functions';
 import './step2_functions';
 import './step3_functions';
-
-
-import './trigonometry-solar-panels';

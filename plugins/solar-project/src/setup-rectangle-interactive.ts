@@ -15,8 +15,8 @@ import { getStep3CocoMapSetup } from "./step3_functions";
 import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, SavedRectangle } from "./types";
 import { createSaveSegmentButton } from "./buttons-unselect-save-rectangle";
-import { addAssociatedMarker } from "./setup-segments-interactive-functions";
-import { setupSolarPanels } from "./setup-solar-panels";
+import { addAssociatedMarker, cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
+import { cleanupSolarPanelForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
@@ -289,5 +289,18 @@ export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.Ma
 
 }
 
+export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number ) {
+
+  // before deleting its info, we remove also all the panels
+  if (!window.cocoSavedRectangles || !window.cocoSavedRectangles.length) {
+    window.cocoSavedRectangles = [];
+    return;
+  }
+  const indexInArray = window.cocoSavedRectangles.findIndex( sr => sr.segmentIndex === segmentIndex );
+  if (typeof indexInArray === 'number') {
+    cleanupSolarPanelForSavedRectangle(window.cocoSavedRectangles[indexInArray]);
+  }
+  window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)
+}
 
 export default setupRectangles;

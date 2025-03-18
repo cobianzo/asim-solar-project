@@ -1,6 +1,5 @@
 import { ExtendedSegment } from "./types";
 import * as trigo from './trigonometry-helpers';
-import * as trigoPanels from './trigonometry-solar-panels';
 import { getCurrentStepCocoMap } from ".";
 
 /** ====== ====== ====== ====== ======
@@ -9,7 +8,7 @@ import { getCurrentStepCocoMap } from ".";
 window.debug = window.debug || {};
 
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
-window.debug = { ...window.debug, ...trigo, ...trigoPanels};
+window.debug = { ...window.debug, ...trigo };
 
 // Overwriting rotateRectante
 window.debug.rotateRectangle = function(points: google.maps.Point[], angle: number) {
