@@ -79,7 +79,8 @@ const handlerClickSaveRectangleButton = function(e :MouseEvent) {
   const savedRectangle = {
     polygon: null,
     tempPathAsString: pathAsString,
-    segmentIndex: window.cocoDrawingRectangle.selectedSegment?.indexInMap
+    segmentIndex: window.cocoDrawingRectangle.selectedSegment?.indexInMap,
+    solarPanelsPolygons: []
   };
 
   // all the info for the rectangle is in window.cocoDrawingRectangle

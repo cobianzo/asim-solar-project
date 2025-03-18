@@ -35,7 +35,7 @@ export interface ExtendedSegment extends google.maps.Polygon {
   data?: RoofSegmentStats;
   indexInMap?: number;
   sunMarker?: AdvancedMarkerElement | null;
-  realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees
+  realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees I think I can delete it.
   map: google.maps.Map;
   isPortrait?: boolean;
 }
@@ -71,6 +71,7 @@ export type SavedRectangle = {
   polygon: google.maps.Polygon | null,
   tempPathAsString: string; // we use it to repaint the polygon after it's saved.
   segmentIndex?: number;
+  solarPanelsPolygons: Array<google.maps.Polygon>;
 };
 
 export type SavedRectangles = Array<SavedRectangle>

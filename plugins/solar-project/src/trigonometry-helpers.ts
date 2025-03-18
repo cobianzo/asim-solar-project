@@ -501,13 +501,18 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
   return null;
 }
 
-export const getInclinationByRectanglePoints = function( points: Array<google.maps.Point>) : number {
-  if (!points || points.length !== 4) {
+export const getInclinationByRectanglePoints = function( points: Array<google.maps.Point>) : number | null {
+  if (!points || points.length !== 4 || points.some(p => (!p || p.x === undefined || isNaN(p.x)))) {
+    console.error('error getting inclination', points);
     return 0; // Valor predeterminado si no hay 4 puntos
   }
 
   // 1. Calcular la pendiente (m)
-  const m = (points[1].y - points[0].y) / (points[1].x - points[0].x);
+  const diffX = points[1].x - points[0].x;
+  if (diffX === 0) {
+    return null;
+  }
+  const m = (points[1].y - points[0].y) / diffX;
 
   // 2. Calcular el ángulo con respecto al eje X (alfa)
   const alfa = Math.atan(m); // Radiantes
@@ -521,12 +526,19 @@ export const getInclinationByRectanglePoints = function( points: Array<google.ma
   if (points[1].x > points[0].x)
     betaGrados -= 180;
 
-  return betaGrados % 360;
+  betaGrados %= 360;
+  if (isNaN(betaGrados)) {
+    console.error('betagrados es nan', alfaGrados, betaGrados, points[0], points[1] );
+  }
+  return betaGrados;
 
 }
 
 export const getInclinationByPolygonPath = function( polygon: google.maps.Polygon | undefined ): number {
-  if ( ! polygon ) return 0;
+  if ( ! polygon ) {
+    console.error('can\'t calculate inclination because polygon doesnt exist', polygon);
+    return 0;
+  }
   const asPoints = convertPolygonPathToPoints(polygon);
   if (!asPoints || !asPoints.length || !asPoints[0].x || isNaN(asPoints[0].x) ) {
     console.error('error in the polygone', asPoints, polygon);

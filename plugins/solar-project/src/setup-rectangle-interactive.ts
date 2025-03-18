@@ -8,8 +8,6 @@
  * The created rectangles are in window.cocoSavedRectangles
  *
  */
-
-import { SlotFillProvider } from "@wordpress/components";
 import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsersRectangleInMap, paintRectangleInMap } from "./drawing-helpers";
 import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
@@ -115,12 +113,11 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
     console.error('we need the selected segment , but its not saved.', segm);
     return;
   }
-
-  console.log('click on the segment', segm);
-  console.log('event', e, e.latLng!.lat(), e.latLng!.lng() );
+  const latLng = { lat: e.latLng!.lat(), lng: e.latLng!.lng() };
+  console.log('click on the segment', segm.indexInMap, latLng);
 
   // FIRST CLICK OF RECT DESIGN: Now we mark the first vertex of the rectangle
-  const latLng = { lat: e.latLng!.lat(), lng: e.latLng!.lng() };
+
   window.cocoDrawingRectangle.tempFirstClickPoint = latLngToPoint(segm.map, { latitude: latLng.lat, longitude: latLng.lng });
 
   segm.setOptions({ fillOpacity: 0.1 });
@@ -130,8 +127,6 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
   // paint the arrow marking the first vertex
   window.paintAMarker(segm.map, e.latLng!, `${window.cocoAssetsDir}vertex-sw-white.png`, MARKER_LEFT_BOTTOM_OPTIONS)
     .then(m => addAssociatedMarker(m, window.cocoDrawingRectangle as AssociatedMarkersParent))
-
-
 
   // Now setup the listeners
   google.maps.event.clearListeners(segm, 'click');
@@ -209,16 +204,16 @@ export const handlerSecondClickDrawRectangle = function () {
 export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
 
   const gmap = window.cocoDrawingRectangle.selectedSegment?.map;
-  let polygonAsPoints;
-  if (window.cocoDrawingRectangle.polygon) {
-    polygonAsPoints = convertPolygonPathToPoints(window.cocoDrawingRectangle.polygon);
-  } else {
-    // this is exectuted the first pixel when we move the mouse, as the rectangle polygon doesnt exist,
-    // then we take the inclination of the parent segment.
-    polygonAsPoints = convertPolygonPathToPoints(window.cocoDrawingRectangle.selectedSegment!);
+
+  // When we execute this handler the first time, as the rectangle polygon doesnt exist,
+  // then we take the inclination of the parent segment.
+  const referencePolygonForInclination = window.cocoDrawingRectangle.polygon?? window.cocoDrawingRectangle.selectedSegment!;
+  let angle = getInclinationByPolygonPath(referencePolygonForInclination)
+  if ( null === angle) {
+    angle = getInclinationByPolygonPath(window.cocoDrawingRectangle.selectedSegment)
   }
-  const angle = getInclinationByRectanglePoints(polygonAsPoints)
   // const angle = window.cocoDrawingRectangle.selectedSegment?.realRotationAngle; // this works but I think I've improved it
+  console.log('THE ANGLE that we\'ll use to desing the rectange is', angle, window.cocoDrawingRectangle.polygon? 'USEING rectangle' : 'using parent segment');
 
   if (!gmap || angle === null) return;
 
