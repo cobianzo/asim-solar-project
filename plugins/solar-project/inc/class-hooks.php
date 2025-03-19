@@ -46,8 +46,8 @@ class Hooks {
 				$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
 				// step 3
 				$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
-				// step 4
-				$coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
+				// step 4. Not there yet.
+				// $coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
 				// ...
 			}
 

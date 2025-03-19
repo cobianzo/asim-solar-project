@@ -1,3 +1,11 @@
+# TODO NEXT
+
+Make the solar panels editable on off
+Make a command to rotate the solar panels
+Make a notice message suite
+Save the data from the rectangles and solar panels
+Fix form back and fw.
+
 # What 
 
 - Dependencies : 
@@ -23,8 +31,9 @@
     - The map in step 2 must have the adminLabel === 'map-segments-offset' >> We apply offset position of the segments and rotate them if needed
     - The radio select in step 2, for the orientation of the segments 
 must have the class === 'segment-rotation' AND the adminLabel  === 'segment-rotation'
+    - That radio button must have two options, with values: `no-extra-rotation` and `rotate-90-only-portrait`
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
-    - The map in step 3 must have the adminLabel === 'map-panelli'    
+    - The map in step 3 must have the adminLabel === 'map-rectangle'    
 
 # Develop
 

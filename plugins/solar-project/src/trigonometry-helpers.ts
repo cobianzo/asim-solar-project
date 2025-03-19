@@ -534,7 +534,7 @@ export const getInclinationByRectanglePoints = function( points: Array<google.ma
 
 }
 
-export const getInclinationByPolygonPath = function( polygon: google.maps.Polygon | undefined ): number {
+export const getInclinationByPolygonPath = function( polygon: google.maps.Polygon | undefined ): number | null {
   if ( ! polygon ) {
     console.error('can\'t calculate inclination because polygon doesnt exist', polygon);
     return 0;
@@ -546,7 +546,7 @@ export const getInclinationByPolygonPath = function( polygon: google.maps.Polygo
   }
   const inclination = getInclinationByRectanglePoints(asPoints);
 
-  return inclination == null ? 0 : inclination; // Devuelve el ángulo en grados
+  return inclination; // Devuelve el ángulo en grados
 }
 
 export const getRectangleSideDimensionsByPolygonPath = function( polygon: google.maps.Polygon ) {

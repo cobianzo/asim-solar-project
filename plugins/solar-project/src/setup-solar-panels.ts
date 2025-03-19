@@ -75,8 +75,6 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
       paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
     }
   }
-  paintASolarPanel( savedRectangle, rectPathToNorth[0], 0, 2, latLengthPanel, lngLengthPanel );
-  paintASolarPanel( savedRectangle, rectPathToNorth[0], 0, 3, latLengthPanel, lngLengthPanel );
 }
 
 const paintASolarPanel = function (
@@ -119,7 +117,7 @@ const paintASolarPanel = function (
   const centerRectangle = getPolygonCenterCoords(polygon);
   rotateRectanglePolygon(
     panel,
-    originaInclination,
+    originaInclination?? 0,
     { latitude: centerRectangle.lat(), longitude: centerRectangle.lng() },
     true
   )

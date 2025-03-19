@@ -2,8 +2,10 @@
  * The use defines rectangles where the solar panels go.
  * There is one rectangle per segment
  *
- * The rectangles can be selected and edited.
- * When edited the info of the edited rectangle is in window.cocoDrawingRectangle
+ * The rectangles can be
+ * 1) created from scratch (you need to select the segment first)
+ * 2) edited if they existed when you select the segment
+ * When editing, the info of the edited rectangle is in window.cocoDrawingRectangle
  *
  * The created rectangles are in window.cocoSavedRectangles
  *
@@ -141,7 +143,8 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 
     // WIP - currently not in use
     // the rectangle polygon has been created, we save the inclination, which can be modified with rotation tool.
-    window.cocoDrawingRectangle.inclinationWhenCreated = getInclinationByPolygonPath( window.cocoDrawingRectangle.polygon );
+    const degreesInc = getInclinationByPolygonPath( window.cocoDrawingRectangle.polygon );
+    window.cocoDrawingRectangle.inclinationWhenCreated = degreesInc == null? 0 : degreesInc;
     window.cocoDrawingRectangle.currentInclinationAfterRotation = window.cocoDrawingRectangle.inclinationWhenCreated;
 
   });
