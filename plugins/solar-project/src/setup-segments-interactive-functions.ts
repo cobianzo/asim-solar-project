@@ -1,4 +1,5 @@
 /**
+ * === In step 3 mostly, but also called in step 2 ===
  * All these functions are related to the step 2, setting up the map
  * to paint the segments over the building and assign the listeners to
  * interact with them.
@@ -40,14 +41,12 @@ export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
   fillOpacity: 0.4,
   strokeColor: 'black',
   strokeWeight: 0,
-  strokeOpacity: 1,
   clickable: true
 }
 
 export const SEGMENT_WHEN_RECTANGLE: google.maps.PolygonOptions = {
-  fillColor: 'red',
+  ...SEGMENT_DEFAULT,
   fillOpacity: 0.1,
-  strokeColor: 'black',
   strokeWeight: 1,
   strokeOpacity: 0.5,
   clickable: true
@@ -116,8 +115,6 @@ const setupSegments = (
   // get the info of the segments and paint them, one by one
   const roofSegments = window.cocoBuildingSegments;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // @ts-ignore
   if ( roofSegments.length ) {
     roofSegments.forEach((element : RoofSegmentStats, i: number) => {
       console.log( 'Calculos par segment ', i, element);
@@ -139,6 +136,7 @@ const setupSegments = (
         return null;
       }
 
+      // is higher than wider?
       const isPortrait = rectPoints ?
         Math.abs(rectPoints[0].x - rectPoints[2].x) < Math.abs(rectPoints[0].y - rectPoints[1].y)
         : false;
@@ -148,12 +146,11 @@ const setupSegments = (
       // but if the rectangle is portrait, we need to add 90 degrees to the angle (still verifying that)
       let realAngleRotation = azimuthDegrees;
       switch ( rotationSegments ) {
-        case 'no-rotation-at-all': realAngleRotation = 0; break;
+        case 'no-rotation-at-all': realAngleRotation = 0; break; // not in use
         case 'no-extra-rotation': break;
         case 'rotate-90-only-portrait':
           realAngleRotation += isPortrait ? 90 : 0; break;
-        case 'rotate-all':
-          realAngleRotation += 90; break;
+        default: break;
       }
       const newRectPoints = rotateRectangle(rectPoints, realAngleRotation);
       const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
@@ -204,13 +201,12 @@ const setupSegments = (
   } // end of painting the segments.
 }
 
-
 // handlers
 function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
   const segment: ExtendedSegment = this;
   const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 3 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
+    console.error(`Not found the coco-map of step 3 . Early exit`, cocoMapSetup);
     return;
   }
 
@@ -237,7 +233,7 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
   const segment: ExtendedSegment  = this;
   const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 3 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
+    console.error(`Not found the coco-map of step 3--. Early exit`, cocoMapSetup);
     return;
   }
   // verifications
@@ -262,7 +258,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   const segm: ExtendedSegment = this;
   const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 3 in page handlerMouseOverHighlightSegment. Early exit`, cocoMapSetup);
+    console.error(`:Not found the coco-map of step 3 Early exit`, cocoMapSetup);
     return;
   }
 
@@ -282,7 +278,10 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
     createPopup(popoverInfo);
   }
 
+
   createUnselectSegmentButton(segm.map, 'Unselect');
+  // if the segment had a rectangle, we automatically select the rectangle,
+  // so with the buttons  can save it or delete ir
   if ( getRectangleBySegment(segm) ) {
     createSaveSegmentButton(segm.map);
   }
@@ -311,11 +310,6 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   // NOTE: we could allow having more than one rectangle per segment. For that we would not
   // select the rectangle just yet, but add a click event for the rectangles of this segment first.
   if (rectangleInfo?.polygon) {
-
-    // remove the edited rectangleInfo from the saved rectangles, if we need to recreate it, we will on save.
-    if ( undefined !== segm.indexInMap) {
-      removeSavedRectangleBySegmentIndex(segm.indexInMap);
-    }
 
     // we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
     window.cocoDrawingRectangle.polygon = rectangleInfo.polygon;

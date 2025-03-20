@@ -2,6 +2,7 @@ import { getCurrentStepCocoMap } from ".";
 
 
 const PRESET_MSG: Record<string, string> = {
+  STEP1_SELECT_ROOF: 'Please select a roof in the map where you want to install your solar panels.',
   STEP1_ROOF_SELECTED: 'Good. You have selected the roof. Now, click on the next button.',
   STEP2_DRAGGABLE_BOUNDING_BOX: 'We have detected %s segments in your roof. There might be a small displacement with the satellite image, please adjust it by dragging the segments',
 };

@@ -72,12 +72,13 @@ export type SavedRectangle = {
   tempPathAsString: string; // we use it to repaint the polygon after it's saved.
   segmentIndex?: number;
   solarPanelsPolygons: Array<google.maps.Polygon>;
-  panelOrientation: 'horizontal' | 'vertical';
+  panelOrientation: SolarPanelsOrientation;
 };
 
 export type SavedRectangles = Array<SavedRectangle>
 
-export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait' | 'rotate-all';
+export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait';
 
 export type CoupleOfPoints = [google.maps.Point, google.maps.Point] | [];
 
+export type SolarPanelsOrientation = 'horizontal' | 'vertical' | null;

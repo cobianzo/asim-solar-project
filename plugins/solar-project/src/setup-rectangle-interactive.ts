@@ -64,7 +64,7 @@ export const paintSavedRectangle = function(gmap: google.maps.Map, rectangleInfo
   }
 }
 
-export const getRectangleBySegment = function( segment: ExtendedSegment ) {
+export const getRectangleBySegment = function( segment: ExtendedSegment ) : SavedRectangle | undefined {
   return (window.cocoSavedRectangles || []).find(
     (r) => r.segmentIndex === segment.indexInMap
   );
@@ -284,7 +284,7 @@ export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.Ma
 
 
     // if the polygon is drawn, we remove it and repaint it and update the params of the rectangle
-    paintRectangleInMap(gmap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords, vertexPoints);
+    paintRectangleInMap(gmap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords);
     console.log('Rectangle painted, ', success);
   }
 

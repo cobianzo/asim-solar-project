@@ -216,8 +216,7 @@ export const fadeSegment =function(roofSegment: ExtendedSegment) {
 export const paintRectangleInMap = (
   gmap: google.maps.Map,
   segment: ExtendedSegment | null,
-  rectangleAsStringOfCoords: string,
-  vertexPoints?: Array<google.maps.Point>
+  rectangleAsStringOfCoords: string
 ) => {
 
   if (! segment ) {

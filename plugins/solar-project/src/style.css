@@ -108,3 +108,22 @@ body .coco-solar-notification {
   z-index: 9999;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.75);
 }
+
+
+body #coco-orientation-panels-radiobtns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #FFFFFFCC;
+  padding: 10px;
+  border: 1px solid #000000aa;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.75);
+  font-size: 1rem;;
+
+  label {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+}

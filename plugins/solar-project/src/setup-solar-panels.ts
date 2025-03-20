@@ -1,7 +1,7 @@
 // WIP
 import { createOrientationRadio } from "./buttons-unselect-save-rectangle";
 import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
-import { SavedRectangle } from "./types"
+import { SavedRectangle, SolarPanelsOrientation } from "./types"
 
 const PANEL_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
@@ -24,12 +24,12 @@ export const setupSolarPanels = function() {
     // cleanup solar panels if they were drawn.
     cleanupSolarPanelForSavedRectangle(rect);
 
-    paintSolarPanelsForSavedRectangle(rect, 1);
+    paintSolarPanelsForSavedRectangle(rect, 'vertical');
   });
 }
 
 
-export const paintSolarPanelsForSavedRectangle = function( savedRectangle: SavedRectangle, orientation: number = 0) {
+export const paintSolarPanelsForSavedRectangle = function( savedRectangle: SavedRectangle, orientation: SolarPanelsOrientation = 'vertical') {
   const { polygon } = savedRectangle;
   if (!polygon) {
     return;
@@ -43,7 +43,7 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
 
   // calculate the fatorfacto to scale to get a rectangle 10x15m
   let dimensionsPanel = [1.5,1]; // 1.5 meters x 1 meter
-  if (orientation) {
+  if ( 'horizontal' == orientation ) {
     const [width, height] = dimensionsPanel;
     dimensionsPanel = [height, width];
   }
@@ -77,8 +77,6 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
     }
   }
 
-
-  createOrientationRadio( map );
 }
 
 

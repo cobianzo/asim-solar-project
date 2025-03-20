@@ -206,6 +206,8 @@ class Hooks {
 				popover.classList.toggle('hidden')
 			}
 		</script>
+
+		<button onClick="window.debug.showAllJSGlobalVarsInPopup(event); return false;">Mostra JS variables</button>
 		<?php
 	}
 

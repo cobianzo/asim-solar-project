@@ -1,4 +1,5 @@
 /**
+ * ==== In STEP 2 only ===
  * In the step 2 we desgin the segments as per the solar API response.
  * These segments have a small displacement rispect the Satellite map.
  * We allow the user to drag the segments all together to correct this displacement.
@@ -16,7 +17,7 @@ import { getCurrentStepCocoMap } from ".";
 import { applyRotationPortraitSegmentsByRadioSelected } from "./command-rotate-portrait-segments";
 import { paintBoundingBoxAsRectangle } from "./drawing-helpers";
 import { createNotification, removeNotification } from "./notification-api";
-import setupSegments, { deactivateInteractivityOnSegment } from "./setup-segments-interactive-functions";
+import { deactivateInteractivityOnSegment } from "./setup-segments-interactive-functions";
 import getStep2CocoMapSetup from "./step2_functions";
 import { ExtendedSegment } from "./types";
 

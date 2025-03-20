@@ -53,7 +53,7 @@ window.debug.getRectangleAsPoints = (index: number) => {
  *   POPUPS showing info
  * ====== ====== ====== ====== ====== */
 
-export const createPopup = function (elementContentToClone: Element) {
+export const createPopup = function (elementContentToClone?: Element): Element{
   const oldPopup = document.getElementById('popup-info');
   if (oldPopup) {
     oldPopup.remove();
@@ -63,13 +63,16 @@ export const createPopup = function (elementContentToClone: Element) {
   popup.id = `popup-info`;
   popup.classList.add('popup');
   // Add content to the popup
-  popup.innerHTML = elementContentToClone.innerHTML;
+  if (elementContentToClone instanceof Element) {
+    popup.innerHTML = elementContentToClone.innerHTML;
+  }
   document.body.appendChild(popup);
 
   popup.addEventListener('click', (event) => {
     popup.remove();
   });
 
+  return popup;
 }
 
 export const highlightSegmentInfo = function(roofSegment: ExtendedSegment) {
@@ -134,6 +137,107 @@ export function previewPolygonPoints(points: google.maps.Point[]) {
       document.body.removeChild(canvas);
   });
 }
+
+/** ====== ====== ====== ====== ======
+ *   SHOW DATA OF ALL THE JS GLOBAL VARIABLES
+ *
+ *  ====== ====== ====== ====== ====== ==== */
+function showVariableAsString(varName: string, varValue: any, seen: Set<unknown>) {
+  let readableValue;
+
+  try {
+    readableValue = JSON.stringify(varValue, (key, val) => {
+      // exceptions that I don't need to show completely
+      if (key === 'solarPanelsPolygons') {
+        const row = val.length;
+        const col = val[0]?.length;
+        return `${row} rows of ${col} google.maps.Polygon`;
+      }
+
+      if (val === null) {
+        return 'null';
+      }
+      if (val && val.getMapId) {
+        return '[google.maps object]';
+      }
+      if (val && val.classList) {
+        return '[DOM element]';
+      }
+      if (val && typeof val.indexInMap === 'number') {
+        return '[extended Segment Polygon] - index in map: ' + val.indexInMap;
+      }
+      if (val && val.getPath) {
+        return '[google.maps.Polygon]';
+      }
+      if (typeof val === 'object' && val !== null) {
+        if (seen.has(val)) return '[Circular]';
+        seen.add(val);
+      }
+      return val;
+    }, 2);
+  } catch (error) {
+    readableValue = '[Unserializable]' + (error instanceof Error ? error.message : String(error));
+  }
+  return `<b>${varName}</b>: ${readableValue}`;
+}
+window.debug.showAllJSGlobalVarsInPopup = function(e: Event) {
+  e.preventDefault();
+  const popup = createPopup();
+  let innerHTML = '';
+
+  // 1. show the variables from the plugin gravity forms plugin: cocoMaps.
+  if (window.cocoMaps) {
+    const firstKetCocoMaps = Object.keys(window.cocoMaps)[0]; // gets 'input_1_11' for example.'
+    innerHTML += '<h2>window.cocoMaps.'+firstKetCocoMaps+'</h2>';
+    innerHTML += '<p>The variable initialized but coco-gf-map-field plugin with extra params.</p>';
+
+    const cocoMapsKeys = Object.keys(window.cocoMaps[firstKetCocoMaps]);
+    const seen = new Set(); // Initialize the 'seen' Set to track circular references
+    const cocoMapsVars = cocoMapsKeys.map((key) => {
+        const value = (window.cocoMaps[firstKetCocoMaps] as Record<string, any>)[key];
+        return showVariableAsString(key, value, seen);
+      } )
+      .join('<br>');
+    innerHTML += `<pre>${cocoMapsVars}</pre>`;
+  } else {
+    innerHTML += "No cocoMaps variables found.";
+  }
+  if (window.cocoVars) {
+    innerHTML += "<h3>window.cocoVars</h3>";
+    innerHTML += "<pre>" + showVariableAsString('window.cocoVars (object from coco-gf-map=field plugin)', window['cocoVars'], new Set()) + " </pre>";
+  }
+
+  // 2. show the variables exposed in php:
+  const globalCocoVars = Object.keys(window).filter(key => (
+    key.startsWith('coco') || key.startsWith('step')) && ! ['cocoMaps', 'cocoVars', 'cocoDrawingRectangle'].includes(key)
+  );
+  innerHTML += '<h2>Global Variables Exposed in class-hooks.php</h2>';
+  innerHTML += '<pre><ul>';
+  globalCocoVars.forEach(key => {
+    if (key === 'cocoBuildingSegments') {
+      innerHTML += `<li><b>${key}</b>: there is a button show thi long var</li>`;
+      return;
+    }
+    if (key === 'cocoBuildingProfile') {
+      innerHTML += `<li><b>${key}</b>: ${window[key].length} polygons</li>`;
+      return;
+    }
+    const stringValue = showVariableAsString(key, window[key], new Set());
+    innerHTML += `<li>${stringValue}</li>`;
+  });
+  innerHTML += '</ul></pre>';
+
+  // window.cocoDrawingRectangle is an important state variable deserves a new section
+  innerHTML += '<h1>window.cocoDrawingRectangle</h1>';
+  innerHTML += '<p>variable with infor about the selection of a segment and creation of the rectangle<p><pre><ul>';
+  const stringValue = showVariableAsString('cocoDrawingRectangle', window['cocoDrawingRectangle'], new Set());
+  innerHTML += `<li>${stringValue}</li>`;
+  innerHTML += '</ul></pre>';
+
+  // show the global variables exposed with PHP
+  popup.innerHTML = innerHTML;
+}
+
 
 /*
 // Ejemplo de uso con un polígono
