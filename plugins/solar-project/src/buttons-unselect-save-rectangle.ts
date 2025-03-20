@@ -39,6 +39,21 @@ export const createSaveSegmentButton = ( gmap : google.maps.Map ) => {
   return createBtn( gmap, 'Save', handlerClickSaveRectangleButton, {id: 'save-rectangle-btn'} );
 }
 
+export const createOrientationRadio = ( gmap: google.maps.Map ) => {
+  const radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = 'panels-rotation';
+  radio.value = 'horizontal';
+  radio.checked = true;
+  radio.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement;
+    console.log(target.value);
+  });
+
+  gmap.controls[google.maps.ControlPosition.TOP_RIGHT].push(radio);
+  return radio;
+}
+
 const exitFromEditRectangle = function() {
   // rebuild all the segments
   setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );

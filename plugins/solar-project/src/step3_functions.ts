@@ -1,10 +1,6 @@
 // RENAME TO step 4 TODO:
-import { paintCenterOfUsersRectangleInMap, paintRectangleInMap } from './drawing-helpers';
 import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
-import { getRectangleInclination, paintResizeHandlersInPolygon } from './setup-resize-rectangle-interaction';
-import rectangleRotationInteractionSetup from './setup-rotate-rectangle-interaction';
 import setupSegments from './setup-segments-interactive-functions';
-import { calculatePathRectangleByOppositePointsAndInclination, convertPointsArrayToLatLngString, convertPolygonPathToStringLatLng, getInclinedAxisAsLinesFromCoordenates, getLineIntersection, latLngToPoint, convertPolygonPathToPoints } from './trigonometry-helpers';
 import { CocoMapSetup } from './types';
 
 /**

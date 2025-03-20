@@ -4,15 +4,19 @@ import { RoofSegmentStats, ExtendedSegment, CocoMapSetup, CocoDrawingRectangleIn
 declare global {
   interface Window {
 
+    cocoNotifications: any;
+
     cocoDrawingRectangle: CocoDrawingRectangleInfo;
     cocoSavedRectangles: SavedRectangles;
 
     // data exposed in php, in class-hooks:
+    cocoIsStepSelectRoof: Boolean;
     cocoIsStepSelectOffset: Boolean;
     cocoIsStepSelectRectangle: Boolean;
-    cocoIsStepSelectPanelli: Boolean;
+
 
     cocoAssetsDir: string;
+    step1CocoMapInputId: string;
     step2CocoMapInputId: string;
     step2RotationInserted: SelectRotationPortraitSegmentsOptions;
     step2OffsetInserted: string;
@@ -51,6 +55,7 @@ export const getCurrentStepCocoMap = function(): CocoMapSetup | null {
 }
 
 // imports
-import './setup-segments-interactive-functions';
+
+import './step1_functions';
 import './step2_functions';
 import './step3_functions';

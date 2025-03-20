@@ -15,6 +15,7 @@
 import { getCurrentStepCocoMap } from ".";
 import { applyRotationPortraitSegmentsByRadioSelected } from "./command-rotate-portrait-segments";
 import { paintBoundingBoxAsRectangle } from "./drawing-helpers";
+import { createNotification, removeNotification } from "./notification-api";
 import setupSegments, { deactivateInteractivityOnSegment } from "./setup-segments-interactive-functions";
 import getStep2CocoMapSetup from "./step2_functions";
 import { ExtendedSegment } from "./types";
@@ -24,9 +25,10 @@ import { ExtendedSegment } from "./types";
  * Deactivate the interactivity of the segments, as the only interaction will be
  * dragging the big bouniding box containing them all
  */
-export const setupSegmentsAndDraggableBoundingBox = () => {
+const setupSegmentsAndDraggableBoundingBox = function() {
   applyRotationPortraitSegmentsByRadioSelected( false );
   createDraggableBoundingBoxForMovingAllSegments(); // remove segment's listeners and paint bounding box w/ dragabble listeners
+  createNotification('STEP2_DRAGGABLE_BOUNDING_BOX', [window.cocoBuildingSegments.length.toString()] );
 }
 
 export const createDraggableBoundingBoxForMovingAllSegments = () => {
@@ -127,6 +129,8 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
         lngDragDiff = newCenter.lng() - startDragCenter.lng();
       }
 
+
+
       // alert(`Displacement of this drag ${latDragDiff},${lngDragDiff}. Total displacement: ${latDiffFromOriginal},${lngDiffFromOriginal}`);
 
       // update the single source of truth for the position of the segments
@@ -134,6 +138,8 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
 
       // restart everything, paiting from scratch the segments and boundg box with new values
       setupSegmentsAndDraggableBoundingBox();
+
+      removeNotification('STEP2_DRAGGABLE_BOUNDING_BOX');
     };
     // ======================================================================
 
@@ -227,6 +233,12 @@ export const paintCenterOfDisplacedBoundingBox = () => {
     ).then(marker => {
       // we save the marker for future access.
       window.cocoMovingBoundingBoxCenterMarker?.push(marker);
+      marker.content.title = `Center of the bounding box \n ${center.lat()}, ${center.lng()}`;
+
+      // Once everything's drawn, we initialize the value for the input
+      if (cocoMapSetup.inputElement && !cocoMapSetup.inputElement.value) {
+        cocoMapSetup.inputElement.value = `${window.cocoOriginalBoundingBoxCenter.latitude},${window.cocoOriginalBoundingBoxCenter.longitude}`;
+      }
     });
   }
 }
@@ -251,3 +263,5 @@ export const getOffsetFromOriginBoundingBox = function(): [number, number] {
   ];
   return [offsetLat, offsetLng];
 }
+
+export default setupSegmentsAndDraggableBoundingBox;

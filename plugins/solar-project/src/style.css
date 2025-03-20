@@ -93,3 +93,18 @@ gmp-advanced-marker .handler-resize {
     border-color: white;
   }
 }
+
+
+body .coco-solar-notification {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ffffffcc;
+  color: #000;
+  font-size: 1rem;;
+  padding: 10px;
+  text-align: center;
+  z-index: 9999;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.75);
+}

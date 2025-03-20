@@ -54,14 +54,14 @@ Export both plugins in the zip into `./dist`
 
 **In development env**
 npx wp-env run cli wp db reset --yes
-npx wp-env run cli wp core install --url="http://localhost:8777" --title="Mi Test Site WP" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
-npx wp-env run cli -- wp plugin activate coco-gravity-form-map-field gravityforms solar-project solar
+npx wp-env run cli wp core install --url=http://localhost:8777 --title=DevSITE --admin_user=admin --admin_password=password --admin_email=admin@example.com
+npx wp-env run cli plugin activate coco-gravity-form-map-field gravityforms solar-project solar
 
 # Testing playwright
 
 npx wp-env run tests-cli wp db reset --yes
 npx wp-env run tests-cli wp core install --url="http://localhost:8889" --title="Mi Test Site WP" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
-npx wp-env run tests-cli -- wp plugin activate coco-gravity-form-map-field gravityforms solar-project solar
+npx wp-env run tests-cli plugin activate coco-gravity-form-map-field gravityforms solar-project solar
 
 # Testing unit test of js (jest)
 

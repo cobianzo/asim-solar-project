@@ -7,7 +7,7 @@ class Hooks {
 
 	public static function init() {
 
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'inject_js_script_step_2_and_3' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'inject_js_script_step_1_2_and_3' ) );
 
 		add_action( 'wp_enqueue_scripts', function () {
 			$url_style = plugins_url( 'src/style.css', __DIR__ );
@@ -32,29 +32,26 @@ class Hooks {
 
 	}
 
-	public static function inject_js_script_step_2_and_3() {
-		$form_id = $_POST['gform_submit'] ?? null;
-
+	public static function inject_js_script_step_1_2_and_3() {
+		$form_id = $_POST['gform_submit'] ?? Helper::get_gravity_form_id_from_page();
 		if ( $form_id ) {
 
 			// grab the already insterted values in the form and expose them to js globals
 			$form           = \GFAPI::get_form( $form_id );
-			$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
-			if ( $coco_map_entry ) {
-				// step 2 fields
-				$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
-				$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
-				// step 3
-				$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
-				// step 4. Not there yet.
-				// $coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
-				// ...
-			}
 
-			// we need to be at least in step 2 to expose the js vars
-			if ( ! $coco_mapfieldoffset_instance ) {
-				return;
-			}
+			// step 1 fields
+			$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+			$coco_map_entry = $coco_maproofselect_instance->value;
+
+			// step 2 fields
+			$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
+			$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
+			// step 3
+			$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
+			// step 4. Not there yet.
+			// $coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
+			// ...
+
 
 			// From here we continue in the ES6 script, loading build/index.js
 			$asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
@@ -70,12 +67,16 @@ class Hooks {
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url() . "'; \n" .
+				// step 1
+				"window.step1CocoMapInputId = 'input_{$coco_maproofselect_instance->formId}_{$coco_maproofselect_instance->id}'; \n" .
+				// step 2
 				"window.step2CocoMapInputId = 'input_{$coco_mapfieldoffset_instance->formId}_{$coco_mapfieldoffset_instance->id}'; \n" .
 				"window.step2RotationInserted = " . wp_json_encode( $coco_segmentrotationtype_instance->value ) ." \n" .
 				"window.step2OffsetInserted = " . wp_json_encode( $coco_mapfieldoffset_instance->value ) ." \n" . // respect the center of the bounding box
-
+				// step 3
 				"window.step3CocoMapInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
 				'window.step3RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
+				// gravity forms related
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
@@ -110,10 +111,12 @@ class Hooks {
 			//  );
 			// }
 
-			$step_map_segments_offset = $step_map_rectangle = $step_map_panelli = null;
+			$step_map_roof = $step_map_segments_offset = $step_map_rectangle = null;
 
 			foreach ( $form['fields'] as $field ) {
-				if ( 'map-segments-offset' === $field->adminLabel ) {
+				if ( 'map-roof' === $field->adminLabel ) {
+					$step_map_roof = $field->pageNumber; // 1
+				} elseif ( 'map-segments-offset' === $field->adminLabel ) {
 					$step_map_segments_offset = $field->pageNumber; // 2
 				} elseif ( 'map-rectangle' === $field->adminLabel ) {
 					$step_map_rectangle = $field->pageNumber; // 3
@@ -121,14 +124,16 @@ class Hooks {
 				// $step_map_panelli = $field->pageNumber; // 4
 			}
 			$current_page                    = \GFFormDisplay::get_current_page( $form_id );
+			$current_page_is_select_marker   = $current_page === $step_map_roof; // step 1
 			$current_page_is_segments_offset = $current_page === $step_map_segments_offset; // step 2
-			$current_page_is_rectangle       = $current_page === $step_map_rectangle; // step 2
-			$current_page_is_panelli         = $current_page === $step_map_panelli; // step 3
+			$current_page_is_rectangle       = $current_page === $step_map_rectangle; // step 3
+			// $current_page_is_panelli         = $current_page === $step_map_panelli; // step 3
 
 			wp_add_inline_script( 'coco-solar-functions',
-				'window.cocoIsStepSelectOffset = ' . wp_json_encode( $current_page_is_segments_offset ) . "; \n" .
-				'window.cocoIsStepSelectRectangle = ' . wp_json_encode( $current_page_is_rectangle ) . "; \n" .
-				'window.cocoIsStepSelectPanelli = ' . wp_json_encode( $current_page_is_panelli ) . "; \n"
+				'window.cocoIsStepSelectRoof = ' . wp_json_encode( $current_page_is_select_marker ) . "; \n" . // step 1
+				'window.cocoIsStepSelectOffset = ' . wp_json_encode( $current_page_is_segments_offset ) . "; \n" . // step 2
+				'window.cocoIsStepSelectRectangle = ' . wp_json_encode( $current_page_is_rectangle ) . "; \n" // step 3
+				// 'window.cocoIsStepSelectPanelli = ' . wp_json_encode( $current_page_is_panelli ) . "; \n"
 			);
 			wp_enqueue_script( 'coco-solar-functions' );
 
@@ -136,12 +141,12 @@ class Hooks {
 	}
 
 	public static function form_top_message( $field_instance, $form, $value ) {
-		$coco_map_entry = Helper::capture_coco_map_field_value_in_step_1( $form );
-		if ( ! $coco_map_entry ) {
+		$coco_map_entry = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+		if ( empty( $coco_map_entry->value ) ) {
 			return;
 		}
-		echo 'You have selected the roof at : ' . $coco_map_entry;
-		$previous_marker_value = explode( ',', $coco_map_entry );
+		echo 'You have selected the roof at : ' . $coco_map_entry->value;
+		$previous_marker_value = explode( ',', $coco_map_entry->value );
 		$building_data         = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 		$stats                 = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		echo '<div class="grid-h">';

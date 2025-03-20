@@ -6,7 +6,8 @@ class Helper {
 
 
 	/**
-	 * Undocumented function
+	 * Undocumented function TODO: we can use now capture_coco_map_field_instance($form, 'map-roof') and the ->lcg_value
+	 * TODELETE
 	 *
 	 * @param array $form
 	 * @return ?string
@@ -43,17 +44,17 @@ class Helper {
 
 	public static function capture_coco_map_field_instance( $form, $adminLabel ) {
 		$entry = \GFFormsModel::get_current_lead(); // get all data already inputted in the form
-		if ( $entry ) {
-			// we detect the coco-form which is hidden now because we are not in the page 1.
-			foreach ( $form['fields'] as $field ) {
-				if (
-					! rgar( $field, 'isHidden' ) && $adminLabel === $field->adminLabel
-				) {
-					$field->value = $entry[ $field->id ] ?? null;
-					return $field;
-				}
+
+		// we detect the coco-form which is hidden now because we are not in the page 1.
+		foreach ( $form['fields'] as $field ) {
+			if (
+				! rgar( $field, 'isHidden' ) && $adminLabel === $field->adminLabel
+			) {
+				$field->value = $entry[ $field->id ] ?? null;
+				return $field;
 			}
 		}
+
 		return null;
 	}
 	/**
@@ -267,6 +268,23 @@ class Helper {
 		}
 
 		return implode( ' ', $expandedPoints );
+	}
+
+	public static function get_gravity_form_id_from_page( $post_id = null ) {
+		$post_id = $post_id ?? get_the_ID();
+    $content = get_post_field( 'post_content', $post_id );
+
+    if ( has_block( 'gravityforms/form', $content ) ) {
+        // Extract form ID from the block
+        $blocks = parse_blocks( $content );
+        foreach ( $blocks as $block ) {
+            if ( $block['blockName'] === 'gravityforms/form' && !empty($block['attrs']['formId']) ) {
+                return $block['attrs']['formId'];
+            }
+        }
+    }
+
+    return false; // No Gravity Forms block found
 	}
 }
 

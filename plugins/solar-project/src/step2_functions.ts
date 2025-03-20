@@ -8,8 +8,9 @@ import { CocoMapSetup } from './types';
 import {
   paintPolygonsByArrayOfStrings,
  } from './drawing-helpers';
+import setupSegmentsAndDraggableBoundingBox from './setup-drag-all-segments-interaction';
 
-import { setupSegmentsAndDraggableBoundingBox, updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion, updateValuesCoordsSegmentsWithOffset } from './setup-drag-all-segments-interaction';
+// import setupSegmentsAndDraggableBoundingBox, { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
 
 
 /**
@@ -50,15 +51,11 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
 
   // If this is not the first time we load the step 2, we might have setup already a value for
   // the offset
-  updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
+  // updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
 
   // Create the segments and the bounding box to drag them
   setupSegmentsAndDraggableBoundingBox();
 
-  // Once everything's drawn, we initialize the value for the input
-  if (cocoMapSetup.inputElement && !cocoMapSetup.inputElement.value) {
-    cocoMapSetup.inputElement.value = `${window.cocoOriginalBoundingBoxCenter.latitude},${window.cocoOriginalBoundingBoxCenter.longitude}`;
-  }
 } );
 
 

@@ -1,4 +1,5 @@
 // WIP
+import { createOrientationRadio } from "./buttons-unselect-save-rectangle";
 import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
 import { SavedRectangle } from "./types"
 
@@ -75,7 +76,13 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
       paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
     }
   }
+
+
+  createOrientationRadio( map );
 }
+
+
+
 
 const paintASolarPanel = function (
   theSavedRectangle: SavedRectangle,
