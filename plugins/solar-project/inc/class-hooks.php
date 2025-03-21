@@ -62,7 +62,6 @@ class Hooks {
 				true
 			);
 
-			$previous_marker_value = explode( ',', $coco_map_entry );
 			// $data_layers           = \Coco_Solar\Solar_API::get_datalayer_urls( $previous_marker_value[0], $previous_marker_value[1] );
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
@@ -80,28 +79,33 @@ class Hooks {
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
-			// new calculated data
-			$solar_building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
-			$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
-			if ( $stats ) {
-				wp_add_inline_script( 'coco-solar-functions',
-					'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
-					'window.cocoOriginalBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
-					'window.cocoOriginalBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
-				);
-			}
+			if ( $coco_map_entry ) {
 
-			// building profile data
-			$building_profile_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
-			if ( isset( $building_profile_data['results'] ) ) {
-				$buildings_coords = \Coco_Solar\Solar_API::extract_building_profile_from_map_geocode_response( $building_profile_data );
-				wp_add_inline_script( 'coco-solar-functions',
-					"window.cocoBuildingProfile = []; \n"
-				);
-				foreach ( $buildings_coords as $i => $building_coords ) {
+
+				$previous_marker_value = explode( ',', $coco_map_entry );
+				// new calculated data
+				$solar_building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+				$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
+				if ( $stats ) {
 					wp_add_inline_script( 'coco-solar-functions',
-						'window.cocoBuildingProfile[' . $i . '] = ' . wp_json_encode( $building_coords ) . "; \n"
+						'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
+						'window.cocoOriginalBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
+						'window.cocoOriginalBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
 					);
+				}
+
+				// building profile data
+				$building_profile_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+				if ( isset( $building_profile_data['results'] ) ) {
+					$buildings_coords = \Coco_Solar\Solar_API::extract_building_profile_from_map_geocode_response( $building_profile_data );
+					wp_add_inline_script( 'coco-solar-functions',
+						"window.cocoBuildingProfile = []; \n"
+					);
+					foreach ( $buildings_coords as $i => $building_coords ) {
+						wp_add_inline_script( 'coco-solar-functions',
+							'window.cocoBuildingProfile[' . $i . '] = ' . wp_json_encode( $building_coords ) . "; \n"
+						);
+					}
 				}
 			}
 			// TODELETE:

@@ -32,8 +32,8 @@ import {
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup } from './step3_functions';
-import { createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
-import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
+import { createButtonActivateDeactivateSolarPanels, createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
+import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getSavedRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
 
 // colours of the polygons
 export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
@@ -211,7 +211,6 @@ function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
     return;
   }
 
-  console.log('hover on roof segment', segment);
   highlightSegment(segment);
   highlightSavedRectangle(segment);
   highlightSegmentInfo(segment); // debug info highlighted.
@@ -291,7 +290,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   });
 
 
-  const rectangleInfo = getRectangleBySegment(segm);
+  const rectangleInfo = getSavedRectangleBySegment(segm);
 
   // hide all other rectangles, they are not being edited
   window.cocoSavedRectangles?.forEach( r => {
@@ -323,8 +322,14 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   createUnselectSegmentButton(segm.map, 'Unselect');
   // if the segment had a rectangle, we automatically select the rectangle,
   // so with the buttons  can save it or delete it
-  if ( getRectangleBySegment(segm) ) {
+  if ( getSavedRectangleBySegment(segm) ) {
     createSaveSegmentButton(segm.map);
+  }
+  
+  // show button to start 'edit solar panels activate/desactivate' mode.
+  const sr = getSavedRectangleBySegment(segm);
+  if (sr) {
+    createButtonActivateDeactivateSolarPanels(segm.map, sr);
   }
 
 }

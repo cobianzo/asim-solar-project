@@ -1,9 +1,9 @@
 // WIP
-import { createOrientationRadio } from "./buttons-unselect-save-rectangle";
+import { createButtonActivateDeactivateSolarPanels, createOrientationRadio } from "./buttons-unselect-save-rectangle";
 import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
 import { SavedRectangle, SolarPanelsOrientation } from "./types"
 
-const PANEL_OPTIONS: google.maps.PolygonOptions = {
+export const PANEL_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
   strokeWeight: 1,
   fillColor:'white',
@@ -14,15 +14,33 @@ const PANEL_OPTIONS: google.maps.PolygonOptions = {
   zIndex: 1
 }
 
+export const EDITABLE_PANEL_OPTIONS: google.maps.PolygonOptions = {
+  ...PANEL_OPTIONS,
+  strokeColor: 'red',
+  strokeWeight: 3,
+  fillOpacity: 0.9,
+  clickable: true,
+  zIndex: 9999
+}
+
+export const HIGHLIGHTED_PANEL_OPTIONS: google.maps.PolygonOptions = {
+  ...EDITABLE_PANEL_OPTIONS,
+  fillColor: 'yellow',
+  fillOpacity: 0.9,
+};
+
+export const DELETED_PANEL_OPTIONS: google.maps.PolygonOptions = {
+  fillColor: 'gray',
+  fillOpacity: 0.1,
+  clickable: true,
+}
+
 
 export const setupSolarPanels = function() {
 
   // retrieve all rectangles
   const allSavedRectangles = window.cocoSavedRectangles || [];
   allSavedRectangles.forEach( rect => {
-
-    // cleanup solar panels if they were drawn.
-    cleanupSolarPanelForSavedRectangle(rect);
 
     paintSolarPanelsForSavedRectangle(rect);
     // syncOrientationRadioButton
@@ -39,6 +57,15 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
   if (!map) {
     return;
   }
+
+  // delete all the polygons first.
+  const existingSolarPanels = savedRectangle.solarPanelsPolygons;
+  if ( existingSolarPanels.length ) {
+    cleanupSolarPanelForSavedRectangle(savedRectangle);
+  }
+  // end of cleanup
+
+
   console.log('%c TITLE: solar panels for saved rectangle ', 'font-size:2rem;color:blue',savedRectangle);
   const [lengthSideY, lengthSideX] = getRectangleSideDimensionsByPolygonPath(polygon);
 
@@ -76,7 +103,10 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
 
   for ( let i = 0; i < maxPanelsInY; i++ ) {
     for ( let j = 0; j < maxPanelsInX; j++) {
+      // delete the polygon if it exists
       paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
+
+      updateSolarPanelDeactivation(savedRectangle, i, j, false);
     }
   }
 
@@ -137,9 +167,14 @@ const paintASolarPanel = function (
     theSavedRectangle.solarPanelsPolygons[orderLng][orderLat].setMap(null);
   }
   theSavedRectangle.solarPanelsPolygons[orderLng][orderLat] = panel;
+
+  // update the stlye if the panel is deactivated
+  if ( getSolarPanelDeactivation(theSavedRectangle, orderLng, orderLat) ) {
+    panel.setOptions(DELETED_PANEL_OPTIONS);
+  } else panel.setOptions(PANEL_OPTIONS);
 }
 
-export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRectangle ) {
+export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRectangle, cleanupOnlyPolygons = true ) {
   if ( !savedRect.solarPanelsPolygons || !savedRect.solarPanelsPolygons.length ) {
     savedRect.solarPanelsPolygons = [];
     return;
@@ -151,5 +186,26 @@ export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRect
       panelPolygon.setMap(null);
     })
   });
+
   savedRect.solarPanelsPolygons = [];
+
+  if (!cleanupOnlyPolygons) {
+    // reset the rest of the things in the savedRectangle
+    savedRect.deactivatedSolarPanels = [];
+  }
+}
+
+export const getSolarPanelDeactivation = function( savedRect: SavedRectangle, i: number, j: number ) {
+  if ( !savedRect.deactivatedSolarPanels || !savedRect.deactivatedSolarPanels.length ) {
+    return false;
+  }
+  if (!savedRect.deactivatedSolarPanels[i] || !savedRect.deactivatedSolarPanels[i].length) {
+    return false;
+  }
+  return savedRect.deactivatedSolarPanels[i][j];
+}
+export const updateSolarPanelDeactivation = function( savedRect: SavedRectangle, i: number, j: number, deactivated: boolean ) {
+  savedRect.deactivatedSolarPanels = savedRect.deactivatedSolarPanels || [];
+  savedRect.deactivatedSolarPanels[i] = savedRect.deactivatedSolarPanels[i] || [];
+  savedRect.deactivatedSolarPanels[i][j] = deactivated? true: false;
 }

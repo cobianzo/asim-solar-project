@@ -29,9 +29,10 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
     || ( cocoMapSetup.inputElement.id !== customEvent.detail.inputElement.id )
   ) {
     // we are not in step 1
+    console.log('are we in step 1? NO');
     return;
   }
-
+  console.log('are we in step 1? YES');
   // Initial state for step 1. If there is a default value, we move to the state thatzoom to 19
   setup_step_1(cocoMapSetup);
 });
@@ -64,7 +65,7 @@ function show_message_to_click_next(map:google.maps.Map, inputEl: HTMLInputEleme
     // State: Shows message to move forward, make the NEXT btn available
     const [lat, lng] = inputEl.value.split(',');
     const currentZoom = map.getZoom();
-    console.log(`Current map zoom level: ${currentZoom}`);
+    console.log(`Current map zoom level: ${currentZoom}`, [lat, lng]);
     if ( currentZoom && currentZoom < 19 ) {
       map.panTo({ lat: parseFloat(lat), lng: parseFloat(lng) });
       map.setZoom(19);

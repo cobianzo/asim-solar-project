@@ -26,17 +26,29 @@ export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   fillColor:'blue',
   fillOpacity: 0.8,
   visible: true,
+  clickable: false,
+  draggable: false,
   zIndex: 0
 }
 export const HIGHLIGHTED_RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
+  ...RECTANGLE_OPTIONS,
   strokeColor: 'yellow',
   fillColor:'yellow',
   zIndex: 10000
 }
 
+export const SELECTED_RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
+  ...RECTANGLE_OPTIONS,
+  strokeWeight: 10,
+  clickable: true,
+  draggable: true,
+}
+
 export const FADED_RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   fillOpacity: 0.2,
-  zIndex: -1
+  zIndex: -1,
+  clickable: false,
+  draggable: true,
 }
 
 
@@ -70,18 +82,38 @@ export const paintSavedRectangle = function(gmap: google.maps.Map, rectangleInfo
   }
 }
 
-export const getRectangleBySegment = function( segment: ExtendedSegment ) : SavedRectangle | undefined {
+export const getSavedRectangleBySegment = function( segment: ExtendedSegment ) : SavedRectangle | undefined {
   return (window.cocoSavedRectangles || []).find(
     (r) => (r.segmentIndex === segment.indexInMap)
   );
 }
+
+export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number ) {
+
+  if ( segmentIndex == null) {
+    console.error('no sement index to remove the rectangle');
+    return;
+  }
+  // before deleting its info
+  if (!window.cocoSavedRectangles || !window.cocoSavedRectangles.length) {
+    window.cocoSavedRectangles = [];
+    return;
+  }
+  const indexInArray = window.cocoSavedRectangles.findIndex( sr => sr.segmentIndex === segmentIndex );
+  if (typeof indexInArray === 'number' && indexInArray >= 0) {
+    // delete all the polygons for the solar panels
+    cleanupSolarPanelForSavedRectangle(window.cocoSavedRectangles[indexInArray]);
+  }
+  window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)
+}
+
 
 export const hideAllRectangles = function() {}
 
 export const showAllRectangles = function() {}
 
 export const highlightSavedRectangle = function(segm: ExtendedSegment) {
-  const rectangle = getRectangleBySegment(segm);
+  const rectangle = getSavedRectangleBySegment(segm);
   if (rectangle && rectangle.polygon) {
     rectangle.polygon.setOptions(HIGHLIGHTED_RECTANGLE_OPTIONS);
   }
@@ -89,7 +121,7 @@ export const highlightSavedRectangle = function(segm: ExtendedSegment) {
 
 export const unhighlightSavedRectangle = function(segm: ExtendedSegment) {
   // find the rectangle associated to this segment
-  const rectangle = getRectangleBySegment(segm);
+  const rectangle = getSavedRectangleBySegment(segm);
 
   if (rectangle && rectangle.polygon) {
     rectangle.polygon.setOptions(RECTANGLE_OPTIONS);
@@ -171,7 +203,6 @@ export const handlerSecondClickDrawRectangle = function () {
   delete window.cocoDrawingRectangle.tempFirstClickPoint;
 
   // Finish setup and paint hte center
-  window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
   paintCenterOfUsersRectangleInMap(segm.map);
 
   // assign the event listeners that allow the user to rotate the rectangle on the map
@@ -186,7 +217,7 @@ export const handlerSecondClickDrawRectangle = function () {
 
   // make the polygon draggable
   if (window.cocoDrawingRectangle.polygon) {
-    window.cocoDrawingRectangle.polygon.setOptions({ draggable: true });
+    window.cocoDrawingRectangle.polygon.setOptions(SELECTED_RECTANGLE_OPTIONS);
 
     // Add event listener to handle drag end
     window.cocoDrawingRectangle.polygon.addListener('dragend', () => {
@@ -201,12 +232,11 @@ export const handlerSecondClickDrawRectangle = function () {
 
       // Repaint the rectangle with all the accessories
       delete window.cocoDrawingRectangle.tempFirstClickPoint;
-      window.cocoDrawingRectangle.polygon?.setOptions({ clickable: true });
       paintCenterOfUsersRectangleInMap(segm.map);
       rectangleRotationInteractionSetup();
       paintResizeHandlersInPolygon(); // TODO: apply after rotation.
       // The rectangle has been updated. We need to update the saved rectangle if it exists.
-      const savedRectangle = getRectangleBySegment(segm);
+      const savedRectangle = getSavedRectangleBySegment(segm);
       if (savedRectangle) {
         savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
       }
@@ -214,12 +244,10 @@ export const handlerSecondClickDrawRectangle = function () {
   }
 
   // The rectangle has been updated. We need to update the saved rectangle if it exists.
-  const savedRectangle = getRectangleBySegment(segm);
+  const savedRectangle = getSavedRectangleBySegment(segm);
   if (savedRectangle) {
     savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
   }
-  // paint the solar panels
-  // handlerClickSaveRectangleButton(null);
 }
 
 export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
@@ -308,23 +336,4 @@ export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.Ma
 
   return success;
 
-}
-
-export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number ) {
-
-  if ( segmentIndex == null) {
-    console.error('no sement index to remove the rectangle');
-    return;
-  }
-  // before deleting its info
-  if (!window.cocoSavedRectangles || !window.cocoSavedRectangles.length) {
-    window.cocoSavedRectangles = [];
-    return;
-  }
-  const indexInArray = window.cocoSavedRectangles.findIndex( sr => sr.segmentIndex === segmentIndex );
-  if (typeof indexInArray === 'number') {
-    // delete all the polygons for the solar panels
-    cleanupSolarPanelForSavedRectangle(window.cocoSavedRectangles[indexInArray]);
-  }
-  window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)
 }

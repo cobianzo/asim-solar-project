@@ -127,3 +127,12 @@ body #coco-orientation-panels-radiobtns {
     gap: 1rem;
   }
 }
+
+body #activate-deactivate-solar-panels-btn {
+  &.active {
+    background-color: #d1d1d1;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+    transform: translateY(2px);
+    color: var(--gf-local-bg-color);
+  }
+}

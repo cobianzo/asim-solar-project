@@ -1,6 +1,6 @@
 import { ExtendedSegment } from "./types";
 import * as trigo from './trigonometry-helpers';
-import { getRectangleBySegment } from "./setup-rectangle-interactive";
+import { getSavedRectangleBySegment } from "./setup-rectangle-interactive";
 import * as notification from './notification-api';
 import { getCurrentStepCocoMap } from ".";
 
@@ -11,8 +11,8 @@ window.debug = window.debug || {};
 
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
 window.debug = { ...window.debug , ...trigo, ...notification };
-window.debug.getRectangleBySegment =  function(s: ExtendedSegment) {
-  getRectangleBySegment( s );
+window.debug.getSavedRectangleBySegment =  function(s: ExtendedSegment) {
+  getSavedRectangleBySegment( s );
 };
 
 // Overwriting rotateRectante
@@ -85,7 +85,6 @@ export const highlightSegmentInfo = function(roofSegment: ExtendedSegment) {
   const divInfo = document.querySelectorAll(`.grid-h ${id}`);
   if (divInfo.length) Array.from(divInfo).forEach(el => {
     el.classList.add('highlight');
-    console.log('%c Highlighting segment info', 'background: #222; color: #bada55', id, el.classList, divInfo);
   });
 }
 export const resetSegmentsInfo = function() {

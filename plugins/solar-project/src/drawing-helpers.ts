@@ -5,7 +5,7 @@ import {
 } from './trigonometry-helpers';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
 import { addAssociatedMarker, cleanupAssociatedMarkers, SEGMENT_DEFAULT, SEGMENT_HOVER, SEGMENT_HOVER_WHEN_RECTANGLE, SEGMENT_WHEN_RECTANGLE } from './setup-segments-interactive-functions';
-import { getRectangleBySegment } from './setup-rectangle-interactive';
+import { getSavedRectangleBySegment } from './setup-rectangle-interactive';
 import { rawHandler } from '@wordpress/blocks';
 
 export const MARKER_CENTERED_OPTIONS = {
@@ -183,7 +183,7 @@ export const paintSegment = function( gmap: google.maps.Map, stringCoords: strin
 }
 
 export const highlightSegment = function(roofSegment: ExtendedSegment, extraParams = {}) {
-  const options = getRectangleBySegment(roofSegment) ? SEGMENT_HOVER_WHEN_RECTANGLE : SEGMENT_HOVER;
+  const options = getSavedRectangleBySegment(roofSegment) ? SEGMENT_HOVER_WHEN_RECTANGLE : SEGMENT_HOVER;
   roofSegment.setOptions(options);
   if (roofSegment.sunMarker?.content) {
     roofSegment.sunMarker.content.style.border = '1px solid orange';
@@ -192,7 +192,7 @@ export const highlightSegment = function(roofSegment: ExtendedSegment, extraPara
 }
 export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
   // check if the segment has a rectangle. The style is different thena
-  if ( getRectangleBySegment(roofSegment) ) {
+  if ( getSavedRectangleBySegment(roofSegment) ) {
     console.log('has todelete');
     roofSegment.setOptions(SEGMENT_WHEN_RECTANGLE);
   } else {
