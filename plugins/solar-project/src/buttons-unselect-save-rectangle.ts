@@ -2,9 +2,11 @@ import { contextConnect } from '@wordpress/components/build-types/context';
 import { resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
-import { getRectangleBySegment, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive';
+import { getRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
 import { paintSolarPanelsForSavedRectangle } from './setup-solar-panels';
+import { getCurrentStepCocoMap } from '.';
+import { showVariableAsString } from './debug';
 
 function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: MouseEvent) => void, attrs: Record<string, any> = {}) {
   if (attrs.id) {
@@ -165,9 +167,9 @@ const handlerClickUnselectButton = function(e: MouseEvent) {
 }
 
 // saves the current rectangle whose path is defined in window.cocoDrawingRectangle.polygon
-const handlerClickSaveRectangleButton = function(e :MouseEvent) {
+export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
 
-  e.preventDefault();
+  e?.preventDefault();
 
   if ( !window.cocoDrawingRectangle?.polygon) {
     console.error('There is no rectangle to save');
@@ -204,6 +206,9 @@ const handlerClickSaveRectangleButton = function(e :MouseEvent) {
     window.cocoSavedRectangles.push(savedRectangle);
   }
 
+  // the rectangle must be updated:
+  const cocomapsetup = getCurrentStepCocoMap();
+  paintSavedRectangle(cocomapsetup?.map!, savedRectangle);
 
   // change the look of the segment now that it has a rectangle
   if (window.cocoDrawingRectangle.selectedSegment) {

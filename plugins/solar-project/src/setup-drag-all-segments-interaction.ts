@@ -26,7 +26,9 @@ import { ExtendedSegment } from "./types";
  * Deactivate the interactivity of the segments, as the only interaction will be
  * dragging the big bouniding box containing them all
  */
-const setupSegmentsAndDraggableBoundingBox = function() {
+export const setupSegmentsAndDraggableBoundingBox = function() {
+  const cocoSetupMap = getCurrentStepCocoMap();
+  if (!cocoSetupMap) return;
   applyRotationPortraitSegmentsByRadioSelected( false );
   createDraggableBoundingBoxForMovingAllSegments(); // remove segment's listeners and paint bounding box w/ dragabble listeners
   createNotification('STEP2_DRAGGABLE_BOUNDING_BOX', [window.cocoBuildingSegments.length.toString()] );
@@ -264,5 +266,3 @@ export const getOffsetFromOriginBoundingBox = function(): [number, number] {
   ];
   return [offsetLat, offsetLng];
 }
-
-export default setupSegmentsAndDraggableBoundingBox;

@@ -33,7 +33,7 @@ import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup } from './step3_functions';
 import { createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
-import setupRectangles, { highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
+import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
 
 // colours of the polygons
 export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {

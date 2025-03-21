@@ -14,11 +14,12 @@ import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsers
 import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
-import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
+import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, SavedRectangle } from "./types";
-import { createSaveSegmentButton } from "./buttons-unselect-save-rectangle";
+import { createSaveSegmentButton, handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
 import { addAssociatedMarker, cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
 import { cleanupSolarPanelForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
+import { showVariableAsString } from "./debug";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
@@ -40,7 +41,7 @@ export const FADED_RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
 
 
 /** paint the rectangles and make them selectables */
-const setupRectangles = function() {
+export const setupRectangles = function() {
 
   const cocoMapSetup = getStep3CocoMapSetup();
   if (! cocoMapSetup?.map ) {
@@ -61,12 +62,17 @@ export const paintSavedRectangle = function(gmap: google.maps.Map, rectangleInfo
       rectangleInfo.tempPathAsString,
       RECTANGLE_OPTIONS
     );
+  } else {
+    // paint again the polygon. tempPathAsString must be ready with the new coords
+    const path = convertStringLatLngToArrayLatLng(rectangleInfo.tempPathAsString);
+    rectangleInfo.polygon.setPath(path);
+    rectangleInfo.polygon.setOptions(RECTANGLE_OPTIONS);
   }
 }
 
 export const getRectangleBySegment = function( segment: ExtendedSegment ) : SavedRectangle | undefined {
   return (window.cocoSavedRectangles || []).find(
-    (r) => r.segmentIndex === segment.indexInMap
+    (r) => (r.segmentIndex === segment.indexInMap)
   );
 }
 
@@ -169,7 +175,7 @@ export const handlerSecondClickDrawRectangle = function () {
   paintCenterOfUsersRectangleInMap(segm.map);
 
   // assign the event listeners that allow the user to rotate the rectangle on the map
-  rectangleRotationInteractionSetup();
+  rectangleRotationInteractionSetup(); // currently deactivated
   paintResizeHandlersInPolygon(); // TODO: apply after rotation.
 
   // Clear the listeners for mousedown, click, and mousemove on segm.map
@@ -178,7 +184,7 @@ export const handlerSecondClickDrawRectangle = function () {
   window.google.maps.event.clearListeners(segm.map, 'mousemove');
   window.google.maps.event.clearListeners(segm.map, 'mouseup');
 
-  // make the polygon draggable WIP
+  // make the polygon draggable
   if (window.cocoDrawingRectangle.polygon) {
     window.cocoDrawingRectangle.polygon.setOptions({ draggable: true });
 
@@ -199,9 +205,21 @@ export const handlerSecondClickDrawRectangle = function () {
       paintCenterOfUsersRectangleInMap(segm.map);
       rectangleRotationInteractionSetup();
       paintResizeHandlersInPolygon(); // TODO: apply after rotation.
-
+      // The rectangle has been updated. We need to update the saved rectangle if it exists.
+      const savedRectangle = getRectangleBySegment(segm);
+      if (savedRectangle) {
+        savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
+      }
     });
   }
+
+  // The rectangle has been updated. We need to update the saved rectangle if it exists.
+  const savedRectangle = getRectangleBySegment(segm);
+  if (savedRectangle) {
+    savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
+  }
+  // paint the solar panels
+  // handlerClickSaveRectangleButton(null);
 }
 
 export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
@@ -310,5 +328,3 @@ export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number
   }
   window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)
 }
-
-export default setupRectangles;

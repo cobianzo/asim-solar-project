@@ -1,5 +1,6 @@
 import { ExtendedSegment } from "./types";
 import * as trigo from './trigonometry-helpers';
+import { getRectangleBySegment } from "./setup-rectangle-interactive";
 import * as notification from './notification-api';
 import { getCurrentStepCocoMap } from ".";
 
@@ -9,7 +10,10 @@ import { getCurrentStepCocoMap } from ".";
 window.debug = window.debug || {};
 
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
-window.debug = { ...window.debug, ...trigo, ...notification };
+window.debug = { ...window.debug , ...trigo, ...notification };
+window.debug.getRectangleBySegment =  function(s: ExtendedSegment) {
+  getRectangleBySegment( s );
+};
 
 // Overwriting rotateRectante
 window.debug.rotateRectangle = function(points: google.maps.Point[], angle: number) {
@@ -142,7 +146,7 @@ export function previewPolygonPoints(points: google.maps.Point[]) {
  *   SHOW DATA OF ALL THE JS GLOBAL VARIABLES
  *
  *  ====== ====== ====== ====== ====== ==== */
-function showVariableAsString(varName: string, varValue: any, seen: Set<unknown>) {
+export function showVariableAsString(varName: string, varValue: any, seen: Set<unknown> = new Set()) {
   let readableValue;
 
   try {

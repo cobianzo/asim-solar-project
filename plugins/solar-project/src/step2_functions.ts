@@ -8,7 +8,7 @@ import { CocoMapSetup } from './types';
 import {
   paintPolygonsByArrayOfStrings,
  } from './drawing-helpers';
-import setupSegmentsAndDraggableBoundingBox from './setup-drag-all-segments-interaction';
+import {setupSegmentsAndDraggableBoundingBox} from './setup-drag-all-segments-interaction';
 
 // import setupSegmentsAndDraggableBoundingBox, { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
 
