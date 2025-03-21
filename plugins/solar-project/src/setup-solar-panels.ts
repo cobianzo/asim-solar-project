@@ -145,7 +145,7 @@ export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRect
     return;
   }
   savedRect.solarPanelsPolygons.forEach( row => {
-    if ( ! row.length ) return;
+    if ( !row || ! row.length ) return;
     row.forEach( panelPolygon  => {
       google.maps.event.clearInstanceListeners(panelPolygon);
       panelPolygon.setMap(null);

@@ -2,7 +2,7 @@ import { contextConnect } from '@wordpress/components/build-types/context';
 import { resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
-import { getRectangleBySegment, RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
+import { getRectangleBySegment, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
 import { paintSolarPanelsForSavedRectangle } from './setup-solar-panels';
 
@@ -148,6 +148,12 @@ const exitFromEditRectangle = function() {
 const handlerClickUnselectButton = function(e: MouseEvent) {
 
     e.preventDefault();
+
+    // If the segment had a rectangle, we delete the rectangle
+
+
+    removeSavedRectangleBySegmentIndex(window.cocoDrawingRectangle.selectedSegment!.indexInMap!);
+
 
     exitFromEditRectangle();
 

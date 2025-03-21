@@ -294,13 +294,18 @@ export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.Ma
 
 export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number ) {
 
-  // before deleting its info, we remove also all the panels
+  if ( segmentIndex == null) {
+    console.error('no sement index to remove the rectangle');
+    return;
+  }
+  // before deleting its info
   if (!window.cocoSavedRectangles || !window.cocoSavedRectangles.length) {
     window.cocoSavedRectangles = [];
     return;
   }
   const indexInArray = window.cocoSavedRectangles.findIndex( sr => sr.segmentIndex === segmentIndex );
   if (typeof indexInArray === 'number') {
+    // delete all the polygons for the solar panels
     cleanupSolarPanelForSavedRectangle(window.cocoSavedRectangles[indexInArray]);
   }
   window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)

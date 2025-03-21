@@ -71,7 +71,7 @@ export type SavedRectangle = {
   polygon: google.maps.Polygon | null,
   tempPathAsString: string; // we use it to repaint the polygon after it's saved.
   segmentIndex?: number;
-  solarPanelsPolygons: Array<google.maps.Polygon>;
+  solarPanelsPolygons: Array<google.maps.Polygon[]>;
   panelOrientation: SolarPanelsOrientation;
 };
 
