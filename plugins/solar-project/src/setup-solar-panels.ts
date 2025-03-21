@@ -24,12 +24,13 @@ export const setupSolarPanels = function() {
     // cleanup solar panels if they were drawn.
     cleanupSolarPanelForSavedRectangle(rect);
 
-    paintSolarPanelsForSavedRectangle(rect, 'vertical');
+    paintSolarPanelsForSavedRectangle(rect);
+    // syncOrientationRadioButton
   });
 }
 
 
-export const paintSolarPanelsForSavedRectangle = function( savedRectangle: SavedRectangle, orientation: SolarPanelsOrientation = 'vertical') {
+export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedRectangle) {
   const { polygon } = savedRectangle;
   if (!polygon) {
     return;
@@ -42,8 +43,10 @@ export const paintSolarPanelsForSavedRectangle = function( savedRectangle: Saved
   const [lengthSideY, lengthSideX] = getRectangleSideDimensionsByPolygonPath(polygon);
 
   // calculate the fatorfacto to scale to get a rectangle 10x15m
-  let dimensionsPanel = [1.5,1]; // 1.5 meters x 1 meter
-  if ( 'horizontal' == orientation ) {
+  // let dimensionsPanel = [ 1.134, 1.172 ]; // meters
+  let dimensionsPanel = [ 2, 1 ]; // meters
+
+  if ( 'horizontal' == savedRectangle.panelOrientation ) {
     const [width, height] = dimensionsPanel;
     dimensionsPanel = [height, width];
   }

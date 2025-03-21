@@ -203,6 +203,7 @@ const setupSegments = (
 
 // handlers
 function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
+
   const segment: ExtendedSegment = this;
   const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! cocoMapSetup ) {
@@ -226,6 +227,7 @@ function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
       fadeSegment(segm);
     }
   })
+
 }
 
 const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Event) {
@@ -254,6 +256,7 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
 }
 
 function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
+
   // init vars
   const segm: ExtendedSegment = this;
   const cocoMapSetup = getStep3CocoMapSetup();
@@ -276,14 +279,6 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
   if (popoverInfo) {
     createPopup(popoverInfo);
-  }
-
-
-  createUnselectSegmentButton(segm.map, 'Unselect');
-  // if the segment had a rectangle, we automatically select the rectangle,
-  // so with the buttons  can save it or delete ir
-  if ( getRectangleBySegment(segm) ) {
-    createSaveSegmentButton(segm.map);
   }
 
   window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
@@ -322,6 +317,14 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
     // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
     google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
 
+  }
+
+  // commands in the top right UI of the map
+  createUnselectSegmentButton(segm.map, 'Unselect');
+  // if the segment had a rectangle, we automatically select the rectangle,
+  // so with the buttons  can save it or delete it
+  if ( getRectangleBySegment(segm) ) {
+    createSaveSegmentButton(segm.map);
   }
 
 }

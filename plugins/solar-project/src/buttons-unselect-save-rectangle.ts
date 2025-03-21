@@ -43,6 +43,13 @@ export const createSaveSegmentButton = ( gmap : google.maps.Map ) => {
   return saveButtonEl;
 }
 
+/**
+ * create radio buttons
+ * 🔘 Horizontal
+ * 🔘 Vertical
+ * @param gmap
+ * @returns
+ */
 export const createOrientationRadio = ( gmap: google.maps.Map ) => {
 
   // helper fn create a single radio button. We'll call it twice
@@ -121,7 +128,7 @@ const syncOrientationRadioButton = ( syncDirection: 'panelsToRadio' | 'radioToPa
     const currentSegment = window.cocoDrawingRectangle.selectedSegment;
     const currentSavedRectangle = getRectangleBySegment(currentSegment!);
     if (currentSavedRectangle) {
-      paintSolarPanelsForSavedRectangle(currentSavedRectangle, selectedValue as SolarPanelsOrientation) ;
+      paintSolarPanelsForSavedRectangle(currentSavedRectangle) ;
     }
   }
 }
@@ -166,14 +173,18 @@ const handlerClickSaveRectangleButton = function(e :MouseEvent) {
   }
 
   const pathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon);
+  const selectedRadio = document.querySelector('input[name="panels-orientation"]:checked') as HTMLInputElement;
+
   // check if the rectangle exists
   const existingRectangle = getRectangleBySegment(window.cocoDrawingRectangle.selectedSegment);
+
+  // default saved rectangle
   let savedRectangle: SavedRectangle = {
     polygon: null,
     tempPathAsString: pathAsString,
     segmentIndex: window.cocoDrawingRectangle.selectedSegment?.indexInMap,
     solarPanelsPolygons: [],
-    panelOrientation: null
+    panelOrientation: ( selectedRadio?.value as SolarPanelsOrientation )?? null,
   };
   if (existingRectangle) {
     // update the existing rectangle
