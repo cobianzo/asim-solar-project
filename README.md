@@ -1,5 +1,6 @@
 # TODO NEXT
 
+When dragging and redimensioning the rect, hide the solar panels
 Fix step 2 displacement t something correct.
 Save the data from the rectangles and solar panels
 Fix form back and fw.
@@ -30,6 +31,7 @@ Fix form back and fw.
     must have the class === 'segment-rotation' AND the adminLabel === 'segment-rotation' - That radio button must have two options, with values: `no-extra-rotation` and `rotate-90-only-portrait`
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
     - The map in step 3 must have the adminLabel === 'map-rectangle'
+    - below the map in step 3 we need a gf textarea with adminLabel and class === 'saved-rectangles'
 
 # Develop
 

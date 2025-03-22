@@ -1,4 +1,4 @@
-import { convertPointsArrayToLatLngString, getCenterByVertexPoints, getInclinationByRectanglePoints, rotateRectangle, scaleRectangleByPoints } from "../trigonometry-helpers";
+import { convertPointsArrayToLatLngString, getCenterByVertexPoints, getInclinationByRectanglePoints, getPolygonCenterBySWNE, rotateRectangle, scaleRectangleByPoints } from "../trigonometry-helpers";
 // import { otraFuncionTrigonometrica } from "../../src/otraFuncion";
 
 describe("Testing an inclined rectangle", () => {
@@ -109,5 +109,21 @@ describe("Testing an inclined rectangle", () => {
       deg = getInclinationByRectanglePoints(rotatedPointsback);
       console.log('degback', deg);
     });
+  });
+
+  describe("GET ANGLE: getInclinationByRectanglePoints", () => {
+    test("getPolygonCenterBySWNE", () => {
+      const bb = {
+        sw: {latitude: 45.467262399999996, longitude: 8.6111345},
+        ne: {latitude: 45.467108599999996, longitude: 8.610896799999999}
+      };
+
+      const a = getPolygonCenterBySWNE(bb);
+      console.log('‼️‼️🔔', bb);
+      console.log('‼️‼️🔔', a);
+    });
+    // test("getPolygonCenterCoords", () => {
+
+    // });
   });
 });

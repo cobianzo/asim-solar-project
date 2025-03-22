@@ -1,4 +1,4 @@
-import { CoupleOfPoints, LatitudeLongitudeObject } from './types';
+import { boxBySWNE, CoupleOfPoints, LatitudeLongitudeObject } from './types';
 
 
 /**
@@ -228,6 +228,7 @@ export const rotateRectanglePolygon = function( polygon: google.maps.Polygon, an
 
 export const rotatePolygonRectangleToOrthogonal = function(polygon: google.maps.Polygon, applyTranform: boolean = false) {
   const angle = getInclinationByPolygonPath(polygon);
+  if ( angle == null) return null;
   const orthogonalPath = rotateRectanglePolygon(polygon, -1 * angle, null, applyTranform);
   return orthogonalPath;
 }
@@ -364,17 +365,28 @@ export const getCenterByVertexPoints = function(polygonVertexPoints: Array<googl
 /**
  * polygon => { lat(), lng() }
  * Given the polygon, returns the center (getCenter() only works for rectangles)
+ * We can use getBounds().getCenter(), but I found a little displacemente
  * @param polygon
  * @returns
  */
-export const getPolygonCenterCoords = function(polygon: google.maps.Polygon) : google.maps.LatLng{
+export const getPolygonCenterCoords = function(polygon: google.maps.Polygon) : google.maps.LatLng {
   const path = polygon.getPath().getArray();
-  const sumLat = path.reduce((acc, latLng) => acc + latLng.lat(), 0);
-  const sumLng = path.reduce((acc, latLng) => acc + latLng.lng(), 0);
-
-  return new google.maps.LatLng(sumLat / path.length, sumLng / path.length);
+  const v0 = path[0]; // sw
+  const v2 = path[2]; // ne
+  const coordObject = {
+    sw: { latitude: v0.lat(), longitude: v0.lng() },
+    ne: { latitude: v2.lat(), longitude: v2.lng() }
+  };
+  return getPolygonCenterBySWNE(coordObject);
 }
 
+export const getPolygonCenterBySWNE = function(swNE: boxBySWNE) : google.maps.LatLng {
+
+  const midLat = swNE.sw.latitude + (swNE.ne.latitude - swNE.sw.latitude ) / 2;
+  const midLng = swNE.ne.longitude + (swNE.ne.longitude - swNE.sw.longitude) / 2;
+
+  return new google.maps.LatLng(midLat, midLng);
+}
 
 /**
  * Calculates the 2 right lines that define the an inclined axis.
@@ -509,13 +521,13 @@ export const calculatePathRectangleByOppositePointsAndInclination = function(
 export const getInclinationByRectanglePoints = function( points: Array<google.maps.Point>) : number | null {
   if (!points || points.length !== 4 || points.some(p => (!p || p.x === undefined || isNaN(p.x)))) {
     console.error('error getting inclination', points);
-    return 0; // Valor predeterminado si no hay 4 puntos
+    return null; // Valor predeterminado si no hay 4 puntos
   }
 
   // 1. Calcular la pendiente (m)
   const diffX = points[1].x - points[0].x;
   if (diffX === 0) {
-    return null;
+    return 0;
   }
   const m = (points[1].y - points[0].y) / diffX;
 

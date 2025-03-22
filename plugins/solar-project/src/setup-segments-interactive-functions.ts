@@ -105,7 +105,7 @@ const setupSegments = (
   }
 
 
-  // If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
+  // reset: If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
   removeRectangleInMap(theMap, true);
 
   /** ========================================

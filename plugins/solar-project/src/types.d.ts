@@ -76,6 +76,14 @@ export type SavedRectangle = {
   panelOrientation: SolarPanelsOrientation;
 };
 
+// the data that we store in a textarea to rebuild the model in the map
+export type LoadedSavedRectangeData = {
+  rectanglePath: string;
+  indexSegment: number;
+  deactivatedSolarPanels: Set<string>;
+  panelOrientation: SolarPanelsOrientation;
+}
+
 export type SavedRectangles = Array<SavedRectangle>
 
 export type SelectRotationPortraitSegmentsOptions = 'no-rotation-at-all' | 'no-extra-rotation' | 'rotate-90-only-portrait';

@@ -2,7 +2,7 @@ import { contextConnect } from '@wordpress/components/build-types/context';
 import { resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
-import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
+import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
 import { DELETED_PANEL_OPTIONS, EDITABLE_PANEL_OPTIONS, isSolarPanelDeactivated, HIGHLIGHTED_PANEL_OPTIONS, paintSolarPanelsForSavedRectangle, activateSolarPanel, deactivateSolarPanel, PANEL_OPTIONS } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
@@ -224,33 +224,7 @@ export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
   /**
    * Important part. Save the state of the rectangles and panels in a field of GF
    */
-  const dataToSave = window.cocoSavedRectangles.map( savedR => {
-    // 1. save the shape of the rectangle
-    const rectData = {};
-    if (!savedR.polygon) return null;
-    rectData.rectanglePath = convertPolygonPathToStringLatLng(savedR.polygon);
-
-    // 2. save deactivated solar panels
-    rectData.deactivatedSolarPanels = Array.from(savedR.deactivatedSolarPanels?? []);
-
-    // 3. save orientation of solar panels
-    rectData.panelOrientation = savedR.panelOrientation ?? '';
-
-    // 4. associated segment
-    rectData.indexSegment = savedR.segmentIndex!;
-
-    return rectData;
-  }).filter(a => a != null);
-
-  const dataStringified = JSON.stringify(dataToSave);
-
-  // find the textarea to save the data.
-  const textAreaEl = document.querySelector('.gfield.saved-rectangles textarea');
-  if (!textAreaEl) {
-    console.error('the textarea with class and with adminLabbel saved-rectangles doesnt exist');
-    return;
-  }
-  (textAreaEl as HTMLTextAreaElement).value = dataStringified;
+  saveSavedRectanglesInTextArea();
 }
 
 export const createButtonActivateDeactivateSolarPanels = function(gmap: google.maps.Map, savedRectangle: SavedRectangle) {

@@ -217,11 +217,11 @@ export const paintRectangleInMap = (
   gmap: google.maps.Map,
   segment: ExtendedSegment | null,
   rectangleAsStringOfCoords: string
-) => {
+): google.maps.Polygon | null => {
 
   if (! segment ) {
     console.error('we cant paint the rectangle if no segment is selected');
-    return;
+    return null;
   }
   if (window.cocoDrawingRectangle?.polygon) {
     removeRectangleInMap(gmap, false);
@@ -233,6 +233,7 @@ export const paintRectangleInMap = (
     // { clickable: true }
   );
 
+  return window.cocoDrawingRectangle.polygon;
 }
 
 /**

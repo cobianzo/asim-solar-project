@@ -15,11 +15,13 @@ import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interacti
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
 import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
-import { ExtendedSegment, SavedRectangle } from "./types";
+import { ExtendedSegment, LoadedSavedRectangeData, SavedRectangle } from "./types";
 import { createSaveSegmentButton, handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
 import { addAssociatedMarker, cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
 import { cleanupSolarPanelsForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
 import { showVariableAsString } from "./debug";
+import { getMostCommonUnit } from "@wordpress/components/build-types/border-box-control/utils";
+import { getCurrentStepCocoMap } from ".";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeWeight: 2,
@@ -128,6 +130,91 @@ export const unhighlightSavedRectangle = function(segm: ExtendedSegment) {
   if (rectangle && rectangle.polygon) {
     rectangle.polygon.setOptions(RECTANGLE_OPTIONS);
   }
+}
+
+export const saveSavedRectanglesInTextArea = function() {
+  const dataToSave = window.cocoSavedRectangles.map( savedR => {
+    // 1. save the shape of the rectangle
+    const rectData = {};
+    if (!savedR.polygon) return null;
+    rectData.rectanglePath = convertPolygonPathToStringLatLng(savedR.polygon);
+
+    // 2. save deactivated solar panels
+    rectData.deactivatedSolarPanels = Array.from(savedR.deactivatedSolarPanels?? []);
+
+    // 3. save orientation of solar panels
+    rectData.panelOrientation = savedR.panelOrientation ?? '';
+
+    // 4. associated segment
+    rectData.indexSegment = savedR.segmentIndex;
+
+    return rectData;
+  }).filter(a => a != null);
+
+  const dataStringified = JSON.stringify(dataToSave);
+
+  // find the textarea to save the data.
+  const textAreaEl = document.querySelector('.gfield.saved-rectangles textarea');
+  if (!textAreaEl) {
+    console.error('the textarea with class and with adminLabbel saved-rectangles doesnt exist');
+    return;
+  }
+
+  // We save the data in the textarea. GF will keep it persistent along the steps and submission
+  (textAreaEl as HTMLTextAreaElement).value = dataStringified;
+
+}
+
+export const loadSavedRectanglesFromTextArea = function() {
+
+  const textAreaEl = document.querySelector('.gfield.saved-rectangles textarea');
+  if (!textAreaEl) {
+    console.error('the textarea with class and with adminLabbel saved-rectangles doesnt exist');
+    return;
+  }
+  const cocoMapSetup = getCurrentStepCocoMap();
+  const segments = cocoMapSetup?.segments;
+  if (!cocoMapSetup || !segments) {
+    return;
+  }
+
+
+  const stringified = (textAreaEl as HTMLTextAreaElement).value;
+  const data = JSON.parse(stringified);
+  data.forEach( (savedRectangleData: LoadedSavedRectangeData) => {
+
+    // 1. load the shape of the rectangle
+    const pathAsString = savedRectangleData.rectanglePath;
+    const savedRectangle: SavedRectangle = {
+      polygon: null,
+      tempPathAsString: pathAsString,
+      segmentIndex: savedRectangleData.indexSegment,
+      solarPanelsPolygons: [],
+      deactivatedSolarPanels: new Set(savedRectangleData.deactivatedSolarPanels),
+      panelOrientation: savedRectangleData.panelOrientation,
+    };
+
+    window.cocoSavedRectangles = window.cocoSavedRectangles || [];
+    window.cocoSavedRectangles.push(savedRectangle);
+
+    paintSavedRectangle( cocoMapSetup.map, savedRectangle );
+
+    // once the rectagnle is painted, we paint the solar panels
+  });
+
+  // now the source of truth has the data ready to paint the rectangles and solar panels.
+  // we just need to wait for google.maps.geometry, which might take some secs
+  if (typeof google === 'undefined' || !google.maps || !google.maps.geometry) {
+    const interval = setInterval(() => {
+      if (typeof google !== 'undefined' && google.maps && google.maps.geometry) {
+        clearInterval(interval);
+        setupRectangles();
+      }
+    }, 100);
+  } else {
+    setupRectangles();
+  }
+
 }
 
 
@@ -339,3 +426,5 @@ export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.Ma
   return success;
 
 }
+
+

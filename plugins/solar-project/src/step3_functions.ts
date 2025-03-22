@@ -1,5 +1,6 @@
 // RENAME TO step 4 TODO:
 import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
+import { loadSavedRectanglesFromTextArea } from './setup-rectangle-interactive';
 import setupSegments from './setup-segments-interactive-functions';
 import { CocoMapSetup } from './types';
 
@@ -25,12 +26,14 @@ document.addEventListener("solarMapReady", (event: Event) => {
     return;
   }
 
+
+
   console.log(' Exectued cocoMap for field', window.cocoMapSetup);
   const theMap = cocoMapSetup.map;
 
   updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
 
   setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );
-//  window.paintAPoygonInMap(theMap, window.step3RectangleCoords, { fillOpacity: 0.35 });
 
+  loadSavedRectanglesFromTextArea();
 });
