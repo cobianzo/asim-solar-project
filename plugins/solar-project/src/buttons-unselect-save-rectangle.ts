@@ -4,7 +4,7 @@ import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
-import { DELETED_PANEL_OPTIONS, EDITABLE_PANEL_OPTIONS, getSolarPanelDeactivation, HIGHLIGHTED_PANEL_OPTIONS, paintSolarPanelsForSavedRectangle, updateSolarPanelDeactivation } from './setup-solar-panels';
+import { DELETED_PANEL_OPTIONS, EDITABLE_PANEL_OPTIONS, isPolygonDeactivated, HIGHLIGHTED_PANEL_OPTIONS, paintSolarPanelsForSavedRectangle, updateSolarPanelDeactivation, activatePolygon, deactivatePolygon } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
 import { showVariableAsString } from './debug';
 
@@ -193,8 +193,8 @@ export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
     tempPathAsString: pathAsString,
     segmentIndex: window.cocoDrawingRectangle.selectedSegment?.indexInMap,
     solarPanelsPolygons: [],
-    panelOrientation: ( selectedRadio?.value as SolarPanelsOrientation )?? null,
-    deactivatedSolarPanels: [],
+    panelOrientation: ( selectedRadio?.value as SolarPanelsOrientation ) ?? null,
+    deactivatedSolarPanels: new Set(),
   };
   if (existingRectangle) {
     // update the existing rectangle
@@ -250,24 +250,30 @@ export const startEditSolarPanelsMode = function() {
     // while every tile of a solar panel becomes interactive
     currentSavedRectangle.solarPanelsPolygons.forEach( (row,i) => {
       row.forEach( (sp,j) => {
-        const options = getSolarPanelDeactivation(currentSavedRectangle, i, j)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
+        const options = isPolygonDeactivated(currentSavedRectangle, sp)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
         sp.setOptions(options);
 
         // add an event listener to each solar panel
-        sp.addListener('mouseover', function() {
-          console.log('highlithes solar panel');
+        sp.addListener('mouseover', function(this: google.maps.Polygon, e: MouseEvent) {
           sp.setOptions(HIGHLIGHTED_PANEL_OPTIONS);
         });
-        sp.addListener('mouseout', function() {
-          const options = getSolarPanelDeactivation(currentSavedRectangle, i, j)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
+        sp.addListener('mouseout', function(this: google.maps.Polygon, e: MouseEvent) {
+          const polygonClicked = this;
+          const options = isPolygonDeactivated(currentSavedRectangle, polygonClicked)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
           sp.setOptions(options);
         });
-        sp.addListener('click', function() {
-          let isDeactivated = getSolarPanelDeactivation(currentSavedRectangle, i, j);
-          updateSolarPanelDeactivation(currentSavedRectangle, i, j, !isDeactivated);
-          isDeactivated = getSolarPanelDeactivation(currentSavedRectangle, i, j);
+        sp.addListener('click', function(this: google.maps.Polygon, e: MouseEvent) {
+          const polygonClicked = this;
+          let isDeactivated = isPolygonDeactivated(currentSavedRectangle, polygonClicked);
+          if (isDeactivated) {
+            // activate
+            activatePolygon(currentSavedRectangle, polygonClicked);
+          } else {
+            deactivatePolygon(currentSavedRectangle, polygonClicked);
+          }
+          isDeactivated = isPolygonDeactivated(currentSavedRectangle, polygonClicked);
           sp.setOptions(isDeactivated? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS);
-          console.log('click on solar panel');
+          console.log('click on solar panel',this.getPath());
         });
       });
     } );

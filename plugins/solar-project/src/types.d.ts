@@ -72,7 +72,7 @@ export type SavedRectangle = {
   tempPathAsString: string; // we use it to repaint the polygon after it's saved.
   segmentIndex?: number;
   solarPanelsPolygons: Array<google.maps.Polygon[]>;
-  deactivatedSolarPanels: Array<Array<boolean>>;
+  deactivatedSolarPanels: Set<string>;
   panelOrientation: SolarPanelsOrientation;
 };
 

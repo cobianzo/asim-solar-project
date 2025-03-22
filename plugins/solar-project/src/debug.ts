@@ -12,8 +12,23 @@ window.debug = window.debug || {};
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
 window.debug = { ...window.debug , ...trigo, ...notification };
 window.debug.getSavedRectangleBySegment =  function(s: ExtendedSegment) {
-  getSavedRectangleBySegment( s );
+  return getSavedRectangleBySegment( s );
 };
+window.debug.getSavedRectangleBySegmentIndex =  function(i: number) {
+  const c = getCurrentStepCocoMap();
+  const seg = c?.segments ? c.segments[i] : null;
+  return getSavedRectangleBySegment( seg! );
+}
+
+/**
+ Usage:
+ dea = debug.getSavedRectangleBySegmentIndex(0).deactivatedSolarPanels;
+ window.debug('Deactivated panels:' , dea);
+ */
+window.debug.showVarInPopup = function(varName: string, varValue: any) {
+  const popup = createPopup();
+  popup.innerHTML = showVariableAsString(varName, varValue);
+}
 
 // Overwriting rotateRectante
 window.debug.rotateRectangle = function(points: google.maps.Point[], angle: number) {
