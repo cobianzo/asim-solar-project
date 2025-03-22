@@ -1,8 +1,6 @@
 # TODO NEXT
 
-Fix Unselect/Delete rectangle.
 Fix step 2 displacement t something correct.
-Make the solar panels editable on off
 Save the data from the rectangles and solar panels
 Fix form back and fw.
 

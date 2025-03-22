@@ -14,7 +14,7 @@
     "test:php:setup": "wp-env start",
     "test:jest": "cd plugins/solar-project && npm run test",
     "plugins-zip": "sh ./bin/plugins-build.sh",
-    "version": "node ./plugins/solar-project/bin/increase-version.js",
+    "version": "node ./plugins/solar-project/bin/version-increment.js",
     "//comment": "--CLI commands in dev and tests environments--",
     "//comment2": "e.g: `npm run cli bash`, `npm run cli wp get option siteurl`, `npm run cli wp db cli` ",
     "cli": "wp-env run cli",

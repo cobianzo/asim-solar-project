@@ -325,7 +325,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   if ( getSavedRectangleBySegment(segm) ) {
     createSaveSegmentButton(segm.map);
   }
-  
+
   // show button to start 'edit solar panels activate/desactivate' mode.
   const sr = getSavedRectangleBySegment(segm);
   if (sr) {

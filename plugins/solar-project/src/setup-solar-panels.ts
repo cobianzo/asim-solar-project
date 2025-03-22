@@ -30,6 +30,7 @@ export const HIGHLIGHTED_PANEL_OPTIONS: google.maps.PolygonOptions = {
 };
 
 export const DELETED_PANEL_OPTIONS: google.maps.PolygonOptions = {
+  ...PANEL_OPTIONS,
   fillColor: 'gray',
   fillOpacity: 0.1,
   clickable: true,
@@ -41,7 +42,6 @@ export const setupSolarPanels = function() {
   // retrieve all rectangles
   const allSavedRectangles = window.cocoSavedRectangles || [];
   allSavedRectangles.forEach( rect => {
-
     paintSolarPanelsForSavedRectangle(rect);
     // syncOrientationRadioButton
   });
@@ -61,7 +61,7 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
   // delete all the polygons first.
   const existingSolarPanels = savedRectangle.solarPanelsPolygons;
   if ( existingSolarPanels.length ) {
-    cleanupSolarPanelForSavedRectangle(savedRectangle);
+    cleanupSolarPanelsForSavedRectangle(savedRectangle);
   }
   // end of cleanup
 
@@ -103,15 +103,8 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
 
   for ( let i = 0; i < maxPanelsInY; i++ ) {
     for ( let j = 0; j < maxPanelsInX; j++) {
-      // delete the polygon if it exists
-      const sp = paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
-
-      if (sp) {
-        // update the stlye if the panel is deactivated
-        if ( isPolygonDeactivated(savedRectangle, sp) ) {
-          sp.setOptions(DELETED_PANEL_OPTIONS);
-        } else sp.setOptions(PANEL_OPTIONS);
-      }
+      // Paint the solar panel and apply the style depending on it is deselected or not
+      paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
     }
   }
 
@@ -173,10 +166,18 @@ const paintASolarPanel = function (
   }
   theSavedRectangle.solarPanelsPolygons[orderLng][orderLat] = panel;
 
+
+  if (panel) {
+    // update the stlye if the panel is deactivated
+    if ( isSolarPanelDeactivated(theSavedRectangle, panel) ) {
+      panel.setOptions(DELETED_PANEL_OPTIONS);
+    } else panel.setOptions(PANEL_OPTIONS);
+  }
+
   return panel;
 }
 
-export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRectangle, cleanupOnlyPolygons = true ) {
+export const cleanupSolarPanelsForSavedRectangle = function( savedRect: SavedRectangle, cleanupOnlyPolygons = true ) {
   if ( !savedRect.solarPanelsPolygons || !savedRect.solarPanelsPolygons.length ) {
     savedRect.solarPanelsPolygons = [];
     return;
@@ -193,16 +194,19 @@ export const cleanupSolarPanelForSavedRectangle = function( savedRect: SavedRect
 
   if (!cleanupOnlyPolygons) {
     // reset the rest of the things in the savedRectangle
+    // so far the information about what solar panels are deactivated by the user
     savedRect.deactivatedSolarPanels = new Set();
   }
 }
 
 /**
  * API to access and edit which solar panels are deactivated (clicked to remove them)
+ * ============= ============= ============= ============= ============= =============
  */
 
 // Function to get a unique identifier for a polygon based on its position in the array
-function getPolygonIndexIdentifier(savedRect: SavedRectangle, polygon: google.maps.Polygon): string | null {
+// We use it to find the polygon of a solar panel and assign to it the property of deactivated
+function getSolaPanelIndexIdentifier(savedRect: SavedRectangle, polygon: google.maps.Polygon): string | null {
   for (let i = 0; i < savedRect.solarPanelsPolygons.length; i++) {
     for (let j = 0; j < savedRect.solarPanelsPolygons[i].length; j++) {
       if (savedRect.solarPanelsPolygons[i][j] === polygon) {
@@ -214,29 +218,27 @@ function getPolygonIndexIdentifier(savedRect: SavedRectangle, polygon: google.ma
 }
 
 
-export function isPolygonDeactivated(savedRect: SavedRectangle, polygon: google.maps.Polygon): boolean {
-  const id = getPolygonIndexIdentifier(savedRect, polygon);
+export function isSolarPanelDeactivated(savedRect: SavedRectangle, polygon: google.maps.Polygon): boolean {
+  const id = getSolaPanelIndexIdentifier(savedRect, polygon);
   return id ? savedRect.deactivatedSolarPanels.has(id) : false;
 }
 
 // Function to deactivate a polygon
-export function deactivatePolygon(savedRect: SavedRectangle, polygon: google.maps.Polygon): void {
-  const id = getPolygonIndexIdentifier(savedRect, polygon);
+export function deactivateSolarPanel(savedRect: SavedRectangle, polygon: google.maps.Polygon): void {
+  const id = getSolaPanelIndexIdentifier(savedRect, polygon);
   if (id) {
     savedRect.deactivatedSolarPanels.add(id);
   }
 }
 
 // Function to activate a polygon
-export function activatePolygon(savedRect: SavedRectangle, polygon: google.maps.Polygon): void {
-  const id = getPolygonIndexIdentifier(savedRect, polygon);
+export function activateSolarPanel(savedRect: SavedRectangle, polygon: google.maps.Polygon): void {
+  const id = getSolaPanelIndexIdentifier(savedRect, polygon);
   if (id) {
     savedRect.deactivatedSolarPanels.delete(id);
   }
 }
 
-export const updateSolarPanelDeactivation = function( savedRect: SavedRectangle, i: number, j: number, deactivated: boolean ) {
-  savedRect.deactivatedSolarPanels = savedRect.deactivatedSolarPanels || [];
-  savedRect.deactivatedSolarPanels[i] = savedRect.deactivatedSolarPanels[i] || [];
-  savedRect.deactivatedSolarPanels[i][j] = deactivated? true: false;
-}
+/**
+ * * ============= ============= ============= ============= ============= ============= *
+ */

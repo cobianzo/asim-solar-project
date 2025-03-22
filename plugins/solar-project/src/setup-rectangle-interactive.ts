@@ -18,12 +18,13 @@ import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPat
 import { ExtendedSegment, SavedRectangle } from "./types";
 import { createSaveSegmentButton, handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
 import { addAssociatedMarker, cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
-import { cleanupSolarPanelForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
+import { cleanupSolarPanelsForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
 import { showVariableAsString } from "./debug";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
+  strokeWeight: 2,
   strokeColor: 'black',
-  fillColor:'blue',
+  fillColor:'lightblue',
   fillOpacity: 0.8,
   visible: true,
   clickable: false,
@@ -102,7 +103,7 @@ export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number
   const indexInArray = window.cocoSavedRectangles.findIndex( sr => sr.segmentIndex === segmentIndex );
   if (typeof indexInArray === 'number' && indexInArray >= 0) {
     // delete all the polygons for the solar panels
-    cleanupSolarPanelForSavedRectangle(window.cocoSavedRectangles[indexInArray]);
+    cleanupSolarPanelsForSavedRectangle(window.cocoSavedRectangles[indexInArray]);
   }
   window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)
 }
