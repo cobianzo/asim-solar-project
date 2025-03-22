@@ -43,6 +43,7 @@ export const SELECTED_RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeWeight: 10,
   clickable: true,
   draggable: true,
+  zIndex: 100
 }
 
 export const FADED_RECTANGLE_OPTIONS: google.maps.PolygonOptions = {

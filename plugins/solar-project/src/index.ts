@@ -20,8 +20,8 @@ declare global {
     step2CocoMapInputId: string;
     step2RotationInserted: SelectRotationPortraitSegmentsOptions;
     step2OffsetInserted: string;
-    step3RectangleCoords: string;
-    step3CocoMapInputId: string; // TODO:
+    // step3RectangleCoords: string; todel
+    step3CocoMapInputId: string;
 
     cocoBuildingProfile: Array<string>;
     gf_current_page: number;

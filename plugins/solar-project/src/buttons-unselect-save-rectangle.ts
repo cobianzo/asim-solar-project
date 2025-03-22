@@ -220,6 +220,37 @@ export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
 
   // delete the selected rectangle and its painted polygon
   exitFromEditRectangle();
+
+  /**
+   * Important part. Save the state of the rectangles and panels in a field of GF
+   */
+  const dataToSave = window.cocoSavedRectangles.map( savedR => {
+    // 1. save the shape of the rectangle
+    const rectData = {};
+    if (!savedR.polygon) return null;
+    rectData.rectanglePath = convertPolygonPathToStringLatLng(savedR.polygon);
+
+    // 2. save deactivated solar panels
+    rectData.deactivatedSolarPanels = Array.from(savedR.deactivatedSolarPanels?? []);
+
+    // 3. save orientation of solar panels
+    rectData.panelOrientation = savedR.panelOrientation ?? '';
+
+    // 4. associated segment
+    rectData.indexSegment = savedR.segmentIndex!;
+
+    return rectData;
+  }).filter(a => a != null);
+
+  const dataStringified = JSON.stringify(dataToSave);
+
+  // find the textarea to save the data.
+  const textAreaEl = document.querySelector('.gfield.saved-rectangles textarea');
+  if (!textAreaEl) {
+    console.error('the textarea with class and with adminLabbel saved-rectangles doesnt exist');
+    return;
+  }
+  (textAreaEl as HTMLTextAreaElement).value = dataStringified;
 }
 
 export const createButtonActivateDeactivateSolarPanels = function(gmap: google.maps.Map, savedRectangle: SavedRectangle) {

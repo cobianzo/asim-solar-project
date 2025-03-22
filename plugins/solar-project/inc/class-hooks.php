@@ -48,8 +48,8 @@ class Hooks {
 			$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
 			// step 3
 			$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
+			$coco_savedrectangles_instance     = Helper::capture_coco_map_field_instance( $form, 'saved-rectangles' );
 			// step 4. Not there yet.
-			// $coco_mapfieldpanelli_instance     = Helper::capture_coco_map_field_instance( $form, 'map-panelli' );
 			// ...
 
 
@@ -74,7 +74,8 @@ class Hooks {
 				"window.step2OffsetInserted = " . wp_json_encode( $coco_mapfieldoffset_instance->value ) ." \n" . // respect the center of the bounding box
 				// step 3
 				"window.step3CocoMapInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
-				'window.step3RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
+				// 'window.step3RectangleCoords = ' . wp_json_encode( $coco_mapfieldrectangle_instance->value ) . "; \n" .
+				"window.step3Rectangles = " . wp_json_encode( $coco_savedrectangles_instance->value ) ." \n" .
 				// gravity forms related
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);

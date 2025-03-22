@@ -134,7 +134,12 @@ export const convertStringLatLngToArrayLatLng = function (coordinatesAsString: s
 	return newPolygonCoords;
 };
 
-export const convertPolygonPathToStringLatLng = function (polygon: google.maps.Polygon) {
+/**
+ * google.maps.polygon ==> '34.43243,11.423423 34.5567,12.432423 ...'
+ * @param polygon
+ * @returns
+ */
+export const convertPolygonPathToStringLatLng = function (polygon: google.maps.Polygon): string {
   let stringCoords = '';
   const path = polygon.getPath().getArray();
   const stringCoordsArray = path.map(latLng => `${latLng.lat()},${latLng.lng()}`);
