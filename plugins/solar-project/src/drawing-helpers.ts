@@ -7,6 +7,8 @@ import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-inte
 import { addAssociatedMarker, cleanupAssociatedMarkers, SEGMENT_DEFAULT, SEGMENT_HOVER, SEGMENT_HOVER_WHEN_RECTANGLE, SEGMENT_WHEN_RECTANGLE } from './setup-segments-interactive-functions';
 import { getSavedRectangleBySegment } from './setup-rectangle-interactive';
 import { rawHandler } from '@wordpress/blocks';
+import { getCurrentStepCocoMap } from '.';
+import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
 
 export const MARKER_CENTERED_OPTIONS = {
   style: {
@@ -150,7 +152,6 @@ export const paintBoundingBoxAsPolygon = (
 }
 
 export const paintBoundingBoxAsRectangle = (
-  gmap: google.maps.Map,
   boundingBox: boxBySWNE,
   extraParams: google.maps.RectangleOptions = {}
 ): google.maps.Rectangle | null => {
@@ -161,16 +162,14 @@ export const paintBoundingBoxAsRectangle = (
     west: boundingBox.sw.longitude,
   };
 
+  const currentCocoMapSetup = getCurrentStepCocoMap()!;
+
   const rectangle = new google.maps.Rectangle({
     bounds: bounds,
-    editable: false,   // No permite editar vértices
-    draggable: true,   // Se puede mover
-    map: gmap,
-    strokeColor: "#FF0000",
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: "#FF0000",
-    fillOpacity: 0.35,
+    map: currentCocoMapSetup.map,
+  });
+  rectangle.setOptions({
+    ...MOVING_BOUNDINGBOX_OPTIONS,
     ...extraParams
   });
 
@@ -178,7 +177,6 @@ export const paintBoundingBoxAsRectangle = (
 }
 
 export const paintSegment = function( gmap: google.maps.Map, stringCoords: string, options: google.maps.PolygonOptions = {} ) {
-  console.log('>>>> Painting segment ', stringCoords);
   return window.paintAPoygonInMap( gmap, stringCoords, { ...SEGMENT_DEFAULT, ...options} )
 }
 

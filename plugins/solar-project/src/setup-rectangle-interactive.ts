@@ -180,6 +180,10 @@ export const loadSavedRectanglesFromTextArea = function() {
 
 
   const stringified = (textAreaEl as HTMLTextAreaElement).value;
+  if (!stringified.length) {
+    console.log('nothing to load');
+    return;
+  }
   const data = JSON.parse(stringified);
   data.forEach( (savedRectangleData: LoadedSavedRectangeData) => {
 

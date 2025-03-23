@@ -337,6 +337,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
 /** Add the three handlers to the segment  */
 export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
   if (!window.cocoIsStepSelectRectangle) return;
+  segment.setOptions({clickable:true});
   segment.addListener('mouseover', handlerMouseOverHighlightSegment );
   google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
   google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
@@ -345,6 +346,7 @@ export const deactivateInteractivityOnSegment = (segm: ExtendedSegment) => {
   ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
     google.maps.event.clearListeners(segm, eventName);
     google.maps.event.clearListeners(segm.map, eventName);
+    segm.setOptions({clickable:false});
   });
 }
 

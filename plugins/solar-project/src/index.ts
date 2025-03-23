@@ -31,9 +31,10 @@ declare global {
 
     // segments source of truth
     cocoBuildingSegments: Array<RoofSegmentStats>;
+    cocoSegmentsOriginalFirstVertex: google.maps.LatLng;
     cocoOriginalBoundingBox: boxBySWNE; // the data
     cocoMovingBoundingBoxPolygon: google.maps.Rectangle | null; // the painteed object from the data.
-    cocoMovingBoundingBoxCenterMarker: AdvancedMarkerElement[] | null;
+    cocoMovingBoundingBoxAssociatedMarkers: AdvancedMarkerElement[] | null;
     cocoOriginalBoundingBoxCenter: LatitudeLongitudeObject; // to calculate the offset respect the painted polygon
 
     // this fn is exposed by the external plugin coco-map0-field

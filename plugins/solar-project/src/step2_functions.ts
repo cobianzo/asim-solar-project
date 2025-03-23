@@ -6,11 +6,11 @@
 import { CocoMapSetup } from './types';
 
 import {
+  paintBoundingBoxAsRectangle,
   paintPolygonsByArrayOfStrings,
  } from './drawing-helpers';
-import {setupSegmentsAndDraggableBoundingBox} from './setup-drag-all-segments-interaction';
-
-// import setupSegmentsAndDraggableBoundingBox, { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
+import {setupSegmentsAndDraggableBoundingBox, updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion} from './setup-drag-all-segments-interaction';
+import { moveGoogleMapsRectangleToCenter } from './trigonometry-helpers';
 
 
 /**
@@ -49,12 +49,42 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
     paintPolygonsByArrayOfStrings(theMap, window.cocoBuildingProfile, { strokeColor: 'black' });
   }
 
-  // If this is not the first time we load the step 2, we might have setup already a value for
-  // the offset
+  // on page load we save the original position of all segments in coco `Segments Original First Vertex`
+  // Paint the Bounding Box the first time.
+
+  /**
+   * =======
+   */
+  // Paint Moving Bounding box according t sw ne values
+  window.cocoMovingBoundingBoxPolygon = paintBoundingBoxAsRectangle(window.cocoOriginalBoundingBox);
+
+  // move the MovingBoundingBox if we have some offset already in the db.
+  // verification sw ne:
+  const deviation = (window.cocoOriginalBoundingBox.ne.longitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getNorthEast().lng())
+      + (window.cocoOriginalBoundingBox.ne.latitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getNorthEast().lat())
+      + (window.cocoOriginalBoundingBox.sw.latitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest().lat())
+      + (window.cocoOriginalBoundingBox.sw.longitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest().lng());
+  if (deviation !== 0) {
+    alert('error in placing rect.');
+  } else {
+    console.log('>>>>> Rect well placed!!!');
+  }
+
+  /**
+   * =======
+   */
+
+
+  // on page load, we paint the bounding box, and if the input had a value
+  //  we initialize the Moving Bounding Box to that value
   // updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
 
+
   // Create the segments and the bounding box to drag them
-  setupSegmentsAndDraggableBoundingBox();
+  // setupSegmentsAndDraggableBoundingBox();
+
+
+
 
 } );
 

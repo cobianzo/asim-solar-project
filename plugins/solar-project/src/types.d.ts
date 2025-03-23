@@ -25,7 +25,11 @@ export interface RoofSegmentStats {
     sunshineQuantiles: number[];
     groundAreaMeters2: number;
   };
-  center: LatitudeLongitudeObject;
+  center: LatitudeLongitudeObject; // this might be changed by the user with drag and drop
+  originalCoords: {
+    originalBoundingBox: boxBySWNE,
+    originalCenter: LatitudeLongitudeObject,
+  },
   boundingBox: boxBySWNE;
   planeHeightAtCenterMeters: number;
 }

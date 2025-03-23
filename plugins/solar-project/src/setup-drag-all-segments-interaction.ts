@@ -8,8 +8,7 @@
  * - the rectangle is aligned with the Satellite view.
  * We use that displacement to translate the rectangle into the Map view.
  * the sources of truth here are:
- * - window.cocoOriginalBoundingBox (sw/ne) and cocoOriginalBoundingBoxCenter (never changes)
- * - cocoMapSetup.inputElement.value the input value of the coco-map, giving the center of the dragged boundingBox
+ * - window.cocoOriginalBoundingBox (sw/ne) (never changes)
  * - window.cocoMovingBoundingBoxPolygon The google.maps.Rectangle object with the dragged boundingBox
  */
 
@@ -19,7 +18,21 @@ import { paintBoundingBoxAsRectangle } from "./drawing-helpers";
 import { createNotification, removeNotification } from "./notification-api";
 import { deactivateInteractivityOnSegment } from "./setup-segments-interactive-functions";
 import getStep2CocoMapSetup from "./step2_functions";
+import { convertStringCoordsInLatitudeLongitude, convertStringCoordsInLatLng, getPolygonCenterBySWNE, getPolygonCenterCoords } from "./trigonometry-helpers";
 import { ExtendedSegment } from "./types";
+
+
+export const MOVING_BOUNDINGBOX_OPTIONS: google.maps.RectangleOptions =  {
+  editable: false,   // No permite editar vértices
+  draggable: true,   // We can drag it
+  clickable: true,
+  zIndex: 9999,
+  strokeColor: "#FF0000",
+  strokeOpacity: 0.8,
+  strokeWeight: 2,
+  fillColor: "#FF0000",
+  fillOpacity: 0.35,
+}
 
 /**
  * Setup draggable bounding box for moving all segments.
@@ -46,8 +59,15 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
     return;
   }
 
-  // reset things if needed.
+  /**
+   * =========
+   * RESET THINGS before repaiting
+   * (delete the bounding box to repaint it later). we save the current pos of bbox before that.
+   */
+  const [offsetLat, offsetLng] = getOffsetFromOriginBoundingBox();
   if (window.cocoMovingBoundingBoxPolygon) {
+    // alert('this shouldnt be needed, we should exit here');
+    // return;
     google.maps.event.clearListeners(window.cocoMovingBoundingBoxPolygon, 'mousedown');
     google.maps.event.clearListeners(window.cocoMovingBoundingBoxPolygon, 'bounds_changed');
     google.maps.event.clearListeners(window.cocoMovingBoundingBoxPolygon, 'mouseup');
@@ -55,24 +75,29 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
     window.cocoMovingBoundingBoxPolygon = null;
   }
 
-  // first time design of the bounding box in the original value given by Solar API
-  const [offsetLat, offsetLng] = getOffsetFromOriginBoundingBox();
-  // alert(`painting bb, calculated offset of ${offsetLat} ${offsetLng}`  );
+  /**
+   * =========
+   * PAINT (or repaint) the bounding box with the center circle
+   * (delete the bounding box to repaint it later). we save the current pos of bbox before that.
+   */
   window.cocoMovingBoundingBoxPolygon = paintBoundingBoxAsRectangle(
-    gmap,
     {
       sw: { latitude: window.cocoOriginalBoundingBox.sw.latitude + offsetLat, longitude: window.cocoOriginalBoundingBox.sw.longitude + offsetLng},
       ne: { latitude: window.cocoOriginalBoundingBox.ne.latitude + offsetLat, longitude: window.cocoOriginalBoundingBox.ne.longitude + offsetLng},
     },
-    {fillOpacity: 0.1, strokeOpacity: 0.3, fillColor: 'black' }
+    {fillOpacity: 0.1, strokeOpacity: 0.3, strokeWeight: 5, fillColor: 'black' }
   );
-  paintCenterOfDisplacedBoundingBox();
+  paintCenterOfMovingBoundingBox();
 
   if (!window.cocoMovingBoundingBoxPolygon) {
     console.error('No bounding box was created');
     return;
   }
 
+  /**
+   * =========
+   * DEACTIVATE any interactivity in the segments (we don't click on them)
+   */
   if (segments.length) {
     console.log('in creating bounding box, deactivate interaction segments');
     segments.forEach((segment: ExtendedSegment) => {
@@ -80,6 +105,10 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
     });
   }
 
+  /**
+   * =========
+   * Apply LISTENERS to the Bounding Box Rectangle ()
+   */
   google.maps.event.addListener(window.cocoMovingBoundingBoxPolygon, 'mousedown', (e: google.maps.MapMouseEvent) => {
 
     // scoped vars that I need
@@ -99,7 +128,7 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
 
       cocoMapSetup.segments?.forEach( (s,i) => {
         const originalPath = allSegmentsStartDragPath[i];
-        applyDisplacementToPolygon(s, originalPath, latDragDiff, lngDragDiff);
+        applyDisplacementToSegment(s, originalPath, latDragDiff, lngDragDiff);
       })
     };
 
@@ -110,20 +139,6 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
         google.maps.event.removeListener(upListener);
       }
 
-      // update input with the center of the dragged bounding box
-      const cocoMapSetup = getStep2CocoMapSetup();
-      if ( cocoMapSetup?.inputElement ) {
-        const center = window.cocoMovingBoundingBoxPolygon?.getBounds()?.getCenter();
-        if (center) {
-          cocoMapSetup.inputElement.value = `${center.lat()},${center.lng()}`;
-        }
-      }
-
-      // get abosulte and relative to the drag displacements
-
-      // absolute to the original bounding box:
-      const [latDiffFromOriginal, lngDiffFromOriginal] = getOffsetFromOriginBoundingBox();
-
       // relative to this drag
       const newCenter = window.cocoMovingBoundingBoxPolygon?.getBounds()?.getCenter();
       let [latDragDiff, lngDragDiff] = [0,0];
@@ -132,14 +147,13 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
         lngDragDiff = newCenter.lng() - startDragCenter.lng();
       }
 
-
-
       // alert(`Displacement of this drag ${latDragDiff},${lngDragDiff}. Total displacement: ${latDiffFromOriginal},${lngDiffFromOriginal}`);
 
       // update the single source of truth for the position of the segments
-      updateValuesCoordsSegmentsWithOffset(latDragDiff, lngDragDiff);
+      updateValuesCoordsSegmentsWithOffset();
 
-      // restart everything, paiting from scratch the segments and boundg box with new values
+      // restart everything, painting from scratch the segments and boundg box with new values
+      // the value of the input is updated when we paing the center circle
       setupSegmentsAndDraggableBoundingBox();
 
       removeNotification('STEP2_DRAGGABLE_BOUNDING_BOX');
@@ -156,7 +170,7 @@ export const createDraggableBoundingBoxForMovingAllSegments = () => {
 }
 
 
-function applyDisplacementToPolygon(polygon: ExtendedSegment, originalPath: Array<google.maps.LatLng>, latOffset: number, lngOffset: number ) {
+function applyDisplacementToSegment(polygon: ExtendedSegment, originalPath: Array<google.maps.LatLng>, latOffset: number, lngOffset: number ) {
   const indexInMap = polygon.indexInMap;
   if (indexInMap == null) {
     console.error('not index for polygon segment', polygon);
@@ -177,38 +191,69 @@ function applyDisplacementToPolygon(polygon: ExtendedSegment, originalPath: Arra
 }
 
 // updates the single source of truth for the position of the segments
-export const updateValuesCoordsSegmentsWithOffset = function( latOffset: number, lngOffset: number ) {
+export const updateValuesCoordsSegmentsWithOffset = function() {
+
+  const [latOffset, lngOffset] = getOffsetFromOriginBoundingBox();
+
   // alert(`Applying offset ${latOffset*100000}, ${lngOffset*100000}`);
   if (isNaN(latOffset) || isNaN(lngOffset)) {
     console.error('Error. offsets are not numbers. Check out why with the developer. updateValuesCoordsSegmentsWithOffset');
     return;
   }
   window.cocoBuildingSegments.forEach( s => {
-    s.boundingBox.sw.latitude += latOffset;
-    s.boundingBox.sw.longitude += lngOffset;
-    s.boundingBox.ne.latitude += latOffset;
-    s.boundingBox.ne.longitude += lngOffset;
-    s.center.latitude += latOffset;
-    s.center.longitude += lngOffset;
+    s.boundingBox.sw.latitude = s.originalCoords.originalBoundingBox.sw.latitude + latOffset;
+    s.boundingBox.sw.longitude = s.originalCoords.originalBoundingBox.sw.longitude + lngOffset;
+    s.boundingBox.ne.latitude = s.originalCoords.originalBoundingBox.ne.latitude + latOffset;
+    s.boundingBox.ne.longitude = s.originalCoords.originalBoundingBox.ne.longitude + lngOffset;
+    s.center.latitude = s.originalCoords.originalCenter.latitude + latOffset;
+    s.center.longitude = s.originalCoords.originalCenter.longitude + lngOffset;
   })
 }
 
 // For the page load, we might need to apply the offset inserted in the step 2 in the form.
-// window.cocoOriginalBoundingBoxCenter is the center of the boundingBox without modifying it from the Solar API response
 export const updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion = () => {
-  if (window.step2OffsetInserted?.length && window.cocoOriginalBoundingBoxCenter) {
-    const displacedLatLng = window.step2OffsetInserted.split(',');
-    const diffLat = window.cocoOriginalBoundingBoxCenter.latitude - parseFloat(displacedLatLng[0]);
-    const diffLng = window.cocoOriginalBoundingBoxCenter.longitude - parseFloat(displacedLatLng[1]);
-    updateValuesCoordsSegmentsWithOffset(-diffLat, -diffLng);
+  const cocoMapSetup = getStep2CocoMapSetup();
+  const initialCenter = window.step2OffsetInserted;
+  if (!initialCenter) return;
+
+  if (cocoMapSetup?.inputElement && initialCenter) {
+    cocoMapSetup.inputElement.value = initialCenter;
   }
+
+  // We paint the bounding box in that center, as it is the source of truth
+  const iniCenterCoords = convertStringCoordsInLatLng(initialCenter);
+  if (!iniCenterCoords) {
+    console.error(`erroe in initial center inserted in the DB`, initialCenter);
+    return;
+  }
+
+  const latLength = window.cocoOriginalBoundingBox.ne.latitude - window.cocoOriginalBoundingBox.sw.latitude;
+  const lngLength = window.cocoOriginalBoundingBox.ne.longitude - window.cocoOriginalBoundingBox.sw.longitude;
+  const bboxCoords = {
+    sw: { latitude: iniCenterCoords.lat() - (latLength/2), longitude: iniCenterCoords.lng() - (lngLength/2) },
+    ne: { latitude: iniCenterCoords.lat() - (latLength/2), longitude: iniCenterCoords.lng() - (lngLength/2) },
+  };
+  window.cocoMovingBoundingBoxPolygon = paintBoundingBoxAsRectangle( bboxCoords, { strokeColor: 'pink'} );
+
+  // This is the real original center.
+  window.cocoOriginalBoundingBoxCenter = {
+    latitude: window.cocoMovingBoundingBoxPolygon!.getBounds()!.getCenter().lat(),
+    longitude: window.cocoMovingBoundingBoxPolygon!.getBounds()!.getCenter().lng(),
+  };
+  if (cocoMapSetup?.inputElement) {
+    cocoMapSetup.inputElement.value = `${window.cocoOriginalBoundingBoxCenter.latitude},${window.cocoOriginalBoundingBoxCenter.longitude}`;
+  }
+  // initialCenter vs center of window.cocoMovingBoundingBoxPolygon
+
+  // now that the bounding box is updated, we can apply the changes to the segments.
+  updateValuesCoordsSegmentsWithOffset();
 }
 
-export const paintCenterOfDisplacedBoundingBox = () => {
+export const paintCenterOfMovingBoundingBox = () => {
 
   // delete if any previous marker was painted.
-  window.cocoMovingBoundingBoxCenterMarker = window.cocoMovingBoundingBoxCenterMarker || [];
-  window.cocoMovingBoundingBoxCenterMarker.forEach(m => m.map = null);
+  window.cocoMovingBoundingBoxAssociatedMarkers = window.cocoMovingBoundingBoxAssociatedMarkers || [];
+  window.cocoMovingBoundingBoxAssociatedMarkers.forEach(m => m.map = null);
 
   if (! window.cocoMovingBoundingBoxPolygon ) {
     return;
@@ -235,34 +280,65 @@ export const paintCenterOfDisplacedBoundingBox = () => {
       }
     ).then(marker => {
       // we save the marker for future access.
-      window.cocoMovingBoundingBoxCenterMarker?.push(marker);
-      marker.content.title = `Center of the bounding box \n ${center.lat()}, ${center.lng()}`;
+      window.cocoMovingBoundingBoxAssociatedMarkers?.push(marker);
+      if (marker.content)
+        marker.content.title = `Center of the bounding box \n ${center.lat()}, ${center.lng()}`;
 
       // Once everything's drawn, we initialize the value for the input
-      if (cocoMapSetup.inputElement && !cocoMapSetup.inputElement.value) {
-        cocoMapSetup.inputElement.value = `${window.cocoOriginalBoundingBoxCenter.latitude},${window.cocoOriginalBoundingBoxCenter.longitude}`;
+      if (cocoMapSetup.inputElement) {
+        const currentCenter = getMovingBoundingBoxCenter();
+        cocoMapSetup.inputElement.value = `${currentCenter?.lat()},${currentCenter?.lng()}`;
       }
     });
   }
 }
 
 /**
- * The offset is calculated by the value of the input of the step 2 (if we are in the step 2,
- *  otherwise by the saved value in that input, and exposed in php on window.step2OffsetInserted)
- * and the original center of the bounding box window.cocoOriginalBoundingBoxCenter
+ * The offset is calculated by the center of the moving rectangle bbox
+ * and the original center of the bounding boxr
  * @returns
  */
 export const getOffsetFromOriginBoundingBox = function(): [number, number] {
-  const cocoMapSetup = getStep2CocoMapSetup();
-  const inputNewCenterValue = cocoMapSetup ? cocoMapSetup.inputElement.value : window.step2OffsetInserted;
-  if (!inputNewCenterValue.length) {
-    return [0,0];
+
+  if (!window.cocoMovingBoundingBoxPolygon) {
+    return [0, 0];
   }
-  const [newCenterLat, newCenterLng] = inputNewCenterValue.split(',');
-  console.log('inputvalue: ', [newCenterLat, newCenterLng]);
-  const [offsetLat, offsetLng] = [
-    parseFloat(newCenterLat) - window.cocoOriginalBoundingBoxCenter.latitude,
-    parseFloat(newCenterLng) - window.cocoOriginalBoundingBoxCenter.longitude,
+  // original center
+  const originalCenter = getPolygonCenterBySWNE(window.cocoOriginalBoundingBox);
+
+  let newCenter = null;
+  if (!window.cocoMovingBoundingBoxPolygon) {
+    newCenter = convertStringCoordsInLatLng(window.step2OffsetInserted);
+    if (!newCenter) {
+      console.warn('The is no value of the moving Bounding box inserted in the DB');
+      return [0,0];;
+    }
+  }
+  else newCenter = getMovingBoundingBoxCenter();
+
+  if (!newCenter) {
+    console.error('Error: Unable to get the center of the bounding box.');
+    return [0, 0];
+  }
+  return [
+    newCenter.lat() - originalCenter.lat(),
+    newCenter.lng() - originalCenter.lng(),
   ];
-  return [offsetLat, offsetLng];
+}
+
+
+function getMovingBoundingBoxCenter() {
+  if (!window.cocoMovingBoundingBoxPolygon) {
+    console.error('Error: cocoMovingBoundingBoxPolygon is undefined. Unable to calculate the center.');
+    return null;
+  }
+  const bounds = window.cocoMovingBoundingBoxPolygon.getBounds();
+  if (!bounds) {
+    console.error('Error: getBounds error. Unable to calculate the center.');
+    return null;
+  }
+  return getPolygonCenterBySWNE({
+    sw: { latitude: bounds.getSouthWest().lat(), longitude: bounds.getSouthWest().lng() },
+    ne: { latitude: bounds.getNorthEast().lat(), longitude: bounds.getNorthEast().lng(), },
+  });
 }

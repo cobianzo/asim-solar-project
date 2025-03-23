@@ -27,11 +27,11 @@ document.addEventListener("solarMapReady", (event: Event) => {
   }
 
 
-
+  alert('step3');
   console.log(' Exectued cocoMap for field', window.cocoMapSetup);
-  const theMap = cocoMapSetup.map;
-
+  // this also paints the bounding box. It is needed as reference of the offset for all segments.
   updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
+  window.cocoMovingBoundingBoxPolygon?.setVisible(false);
 
   setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );
 

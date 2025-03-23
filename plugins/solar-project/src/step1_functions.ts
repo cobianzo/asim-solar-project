@@ -3,6 +3,7 @@
  * The GF coco-map field works ok out of the box.
  */
 import { createNotification } from "./notification-api";
+import { convertStringCoordsInLatLng } from "./trigonometry-helpers";
 import { CocoMapSetup } from "./types";
 
 
@@ -63,11 +64,11 @@ function setup_step_1(mapSetup: CocoMapSetup) {
 function show_message_to_click_next(map:google.maps.Map, inputEl: HTMLInputElement) {
   if (inputEl.value) {
     // State: Shows message to move forward, make the NEXT btn available
-    const [lat, lng] = inputEl.value.split(',');
+    const coords = convertStringCoordsInLatLng(inputEl);
+    if (!coords) createNotification('Error in the value of the input')
     const currentZoom = map.getZoom();
-    console.log(`Current map zoom level: ${currentZoom}`, [lat, lng]);
     if ( currentZoom && currentZoom < 19 ) {
-      map.panTo({ lat: parseFloat(lat), lng: parseFloat(lng) });
+      map.panTo(coords);
       map.setZoom(19);
     }
     createNotification('STEP1_ROOF_SELECTED');

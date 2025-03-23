@@ -88,6 +88,16 @@ class Hooks {
 				$solar_building_data = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 				$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
 				if ( $stats ) {
+
+					// We add more data to the segments as we'll use it in the js side.
+					$stats = array_map( fn($segment_data) => array_merge(
+						$segment_data,
+						array('originalCoords' => [
+							'originalBoundingBox' => $segment_data['boundingBox'],
+							'originalCenter'      => $segment_data['center'],
+						])
+					), $stats );
+
 					wp_add_inline_script( 'coco-solar-functions',
 						'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
 						'window.cocoOriginalBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
@@ -177,8 +187,6 @@ class Hooks {
 		$building_profile_data = \Coco_Solar\Solar_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 		$solar_building_data   = \Coco_Solar\Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 		?>
-		<p>Clicca qui per mostrare le informazione del palazzo da Google Maps.
-			Da qui si disegna il poligono del profilo del palazzo. Cerca i campi <u>buildings</u></p>
 		<button onClick="showBuildingProfile_<?php echo esc_attr( $current_page ); ?>(event); return false;">Mostra profilo di palazzo</button>
 		<div id="buildingProfilePopover_<?php echo esc_attr( $current_page ); ?>" class="popup-info hidden" onclick="this.classList.toggle('hidden');">
 			<div class="popover-content">

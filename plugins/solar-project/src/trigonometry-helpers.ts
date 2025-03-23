@@ -127,12 +127,50 @@ export const convertPolygonPathToPoints = function( polygon: google.maps.Polygon
  */
 export const convertStringLatLngToArrayLatLng = function (coordinatesAsString: string) {
 	const coordinatesArray = coordinatesAsString.split(' ');
-	const newPolygonCoords = coordinatesArray.map((coord) => {
-		const [lat, lng] = coord.split(',');
-		return new window.google.maps.LatLng({ lat: parseFloat(lat), lng: parseFloat(lng) });
-	});
-	return newPolygonCoords;
+	const newPolygonCoords = coordinatesArray.map((coordStr) => convertStringCoordsInLatLng(coordStr));
+	return newPolygonCoords.filter(val => val !== null);
 };
+
+/**
+ * 44.5425,23.543534 => google.maps.LatLng  { lat(), lng() }
+ * Similar as the one on top but only with a coord lat lng,
+ * @param commaSeparated
+ * @returns
+ */
+export const convertStringCoordsInLatLng = function(
+  commaSeparated: string | HTMLInputElement
+ ) : google.maps.LatLng | null{
+
+  let lat = null;
+  let lng = null;
+
+  if (commaSeparated instanceof HTMLInputElement) {
+    commaSeparated = commaSeparated.value;
+  }
+  if (typeof commaSeparated === 'string') {
+    const values = commaSeparated.split(',');
+
+    // Validate that values is an array of two elements and both can be converted to numbers
+    if (values.length === 2 && ! isNaN(Number(values[0])) && ! isNaN(Number(values[1]))) {
+      lat = parseFloat(values[0]);
+      lng = parseFloat(values[1]);
+    }
+  }
+
+  if (lat===null || lng===null) {
+    console.warn('converting to Lat Lng returns null. This is due to an error');
+    return null;
+  }
+  // switch (returnAs) {
+  //   case 'LatitudeLongitude':
+  //     return { latitude: lat, longitude: lng };
+  //   case 'LatLngLiteral':
+  //     return { lat, lng };
+  //   default: // LatLng
+    return new google.maps.LatLng(lat, lng);
+  // }
+}
+
 
 /**
  * google.maps.polygon ==> '34.43243,11.423423 34.5567,12.432423 ...'
@@ -256,6 +294,32 @@ export const scaleRectangleByPoints = function(arrayPoints: Array<google.maps.Po
 
   const scaledInclinedPoints = rotateRectangle(scaledOrthogonal, (angle == null ? 0 : angle));
   return scaledInclinedPoints;
+}
+
+export const moveGoogleMapsRectangleToCenter = function(rectangle: google.maps.Rectangle, lat:number, lng:number) {
+
+  // Obtener los límites actuales del rectángulo
+  const boundsActuales = rectangle.getBounds();
+  if (!boundsActuales) {
+    return null;
+  }
+  const centroActual = boundsActuales.getCenter();
+
+  // Calcular la diferencia de latitud y longitud
+  const diffLat = lat - centroActual.lat();
+  const diffLng = lng - centroActual.lng();
+
+  // Calcular las nuevas esquinas
+  const ne = boundsActuales.getNorthEast();
+  const sw = boundsActuales.getSouthWest();
+
+  const nuevoNE = new google.maps.LatLng(ne.lat() + diffLat, ne.lng() + diffLng);
+  const nuevoSW = new google.maps.LatLng(sw.lat() + diffLat, sw.lng() + diffLng);
+
+  // Establecer los nuevos límites
+  rectangle.setBounds(new google.maps.LatLngBounds(nuevoSW, nuevoNE));
+
+  return rectangle.getBounds()?.getCenter();
 }
 
 /**
