@@ -191,12 +191,19 @@ function applyDisplacementToSegment(polygon: ExtendedSegment, originalPath: Arra
 }
 
 // updates the single source of truth for the position of the segments
-export const updateValuesCoordsSegmentsWithOffset = function() {
+export const updateValuesCoordsSegmentsWithOffset = function( useOffsetLat: number | null = null, useOffsetLng: number | null = null) {
 
-  const [latOffset, lngOffset] = getOffsetFromOriginBoundingBox();
+  let latOffset = null;
+  let lngOffset = null;
+  if (useOffsetLat === null || useOffsetLng === null ) {
+    [latOffset, lngOffset] = getOffsetFromOriginBoundingBox();
+  } else {
+    latOffset = useOffsetLat;
+    lngOffset = useOffsetLng;
+  }
 
   // alert(`Applying offset ${latOffset*100000}, ${lngOffset*100000}`);
-  if (isNaN(latOffset) || isNaN(lngOffset)) {
+  if ( null === latOffset || null === lngOffset || isNaN(latOffset) || isNaN(lngOffset) ) {
     console.error('Error. offsets are not numbers. Check out why with the developer. updateValuesCoordsSegmentsWithOffset');
     return;
   }
@@ -212,41 +219,11 @@ export const updateValuesCoordsSegmentsWithOffset = function() {
 
 // For the page load, we might need to apply the offset inserted in the step 2 in the form.
 export const updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion = () => {
-  const cocoMapSetup = getStep2CocoMapSetup();
-  const initialCenter = window.step2OffsetInserted;
-  if (!initialCenter) return;
 
-  if (cocoMapSetup?.inputElement && initialCenter) {
-    cocoMapSetup.inputElement.value = initialCenter;
-  }
-
-  // We paint the bounding box in that center, as it is the source of truth
-  const iniCenterCoords = convertStringCoordsInLatLng(initialCenter);
-  if (!iniCenterCoords) {
-    console.error(`erroe in initial center inserted in the DB`, initialCenter);
-    return;
-  }
-
-  const latLength = window.cocoOriginalBoundingBox.ne.latitude - window.cocoOriginalBoundingBox.sw.latitude;
-  const lngLength = window.cocoOriginalBoundingBox.ne.longitude - window.cocoOriginalBoundingBox.sw.longitude;
-  const bboxCoords = {
-    sw: { latitude: iniCenterCoords.lat() - (latLength/2), longitude: iniCenterCoords.lng() - (lngLength/2) },
-    ne: { latitude: iniCenterCoords.lat() - (latLength/2), longitude: iniCenterCoords.lng() - (lngLength/2) },
-  };
-  window.cocoMovingBoundingBoxPolygon = paintBoundingBoxAsRectangle( bboxCoords, { strokeColor: 'pink'} );
-
-  // This is the real original center.
-  window.cocoOriginalBoundingBoxCenter = {
-    latitude: window.cocoMovingBoundingBoxPolygon!.getBounds()!.getCenter().lat(),
-    longitude: window.cocoMovingBoundingBoxPolygon!.getBounds()!.getCenter().lng(),
-  };
-  if (cocoMapSetup?.inputElement) {
-    cocoMapSetup.inputElement.value = `${window.cocoOriginalBoundingBoxCenter.latitude},${window.cocoOriginalBoundingBoxCenter.longitude}`;
-  }
-  // initialCenter vs center of window.cocoMovingBoundingBoxPolygon
+  const [offsetLat, offsetLng] = getOffsetFromValueInDB();
 
   // now that the bounding box is updated, we can apply the changes to the segments.
-  updateValuesCoordsSegmentsWithOffset();
+  updateValuesCoordsSegmentsWithOffset(offsetLat, offsetLng);
 }
 
 export const paintCenterOfMovingBoundingBox = () => {
@@ -315,8 +292,8 @@ export const getOffsetFromOriginBoundingBox = function(): [number, number] {
 }
 
 // The value stored in the gravity forms entry is exposed in window. step2·OffsetInserted
-export const getOffsetFromValueInDB = function() {
-  const coords = convertStringCoordsInLatLng( window.step2OffsetInserted );
+export const getOffsetFromValueInDB = function(): [number, number] {
+  const coords = convertStringCoordsInLatLng(window.step2OffsetInserted);
   if (!coords) {
     return [0, 0];
   }

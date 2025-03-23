@@ -66,6 +66,8 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
    */
   if ( window.step2OffsetInserted ) {
     const [offsetLat, offsetLng] = getOffsetFromValueInDB();
+
+    // Apply that offset to the bounding box
     const newSWNE =
     {
       sw: { latitude: window.cocoOriginalBoundingBox.sw.latitude + offsetLat, longitude: window.cocoOriginalBoundingBox.sw.longitude + offsetLng },
