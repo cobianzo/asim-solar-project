@@ -33,7 +33,7 @@ document.addEventListener("solarMapReady", (event: Event) => {
   updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
   window.cocoMovingBoundingBoxPolygon?.setVisible(false);
 
-  setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );
+  setupSegments();
 
   loadSavedRectanglesFromTextArea();
 });

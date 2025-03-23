@@ -34,6 +34,7 @@ import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup } from './step3_functions';
 import { createButtonActivateDeactivateSolarPanels, createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
 import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getSavedRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
+import { getRotationTypePortraitSelected } from './command-rotate-portrait-segments';
 
 // colours of the polygons
 export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
@@ -74,10 +75,7 @@ export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {
  *
  * This uses the exposed js vars set up in class-hooks.php
  */
-const setupSegments = (
-  rotationSegments: SelectRotationPortraitSegmentsOptions = 'no-extra-rotation',
-  paintSunMarkers = true
- ) => {
+const setupSegments = ( paintSunMarkers = true ) => {
 
   const cocoMapSetup = getCurrentStepCocoMap();
   if ( ! cocoMapSetup ) {
@@ -89,6 +87,11 @@ const setupSegments = (
 
   // retrieve the segments to. In a just-loaded page, they won't exist yet.
   const segments: ExtendedSegment[] = cocoMapSetup.segments? cocoMapSetup.segments : [];
+
+  // retrieve the exra rotation, if any
+  let rotationSegments = window.step2RotationInserted ?? 'no-extra-rotation';
+  rotationSegments = getRotationTypePortraitSelected( rotationSegments );
+
 
   /** ========================================
    * RESET THINGS, IF THEY EXISTED ALREADY
@@ -179,9 +182,10 @@ const setupSegments = (
         paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
           addAssociatedMarker(sunMarker, segment as unknown as AssociatedMarkersParent);
         });
+        // now the marker for the first vertex
+        window.paintAMarker( theMap, segment.getPath().getArray()[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
+          .then(m => addAssociatedMarker(m, segment as unknown as AssociatedMarkersParent))
       }
-      window.paintAMarker( theMap, segment.getPath().getArray()[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
-        .then(m => addAssociatedMarker(m, segment as unknown as AssociatedMarkersParent))
 
       segment.realRotationAngle = realAngleRotation;
       segment.isPortrait = isPortrait;
@@ -355,6 +359,11 @@ export const addAssociatedMarker = (marker: AdvancedMarkerElement, parent: Assoc
   parent.associatedMarkers.push(marker);
 };
 
+/**
+ * Not always works ok if the markers are creating many times very quickly, as they are
+ * created asyncronously. (e.g. when creating markers on every mousemove)
+ * @param parent
+ */
 export const cleanupAssociatedMarkers = ( parent: AssociatedMarkersParent) => {
   parent.associatedMarkers ||= [];
   deleteMarkersCompletely(parent.associatedMarkers);

@@ -303,30 +303,35 @@ export const getOffsetFromOriginBoundingBox = function(): [number, number] {
   if (!window.cocoMovingBoundingBoxPolygon) {
     return [0, 0];
   }
-  // original center
-  const originalCenter = getPolygonCenterBySWNE(window.cocoOriginalBoundingBox);
-
-  let newCenter = null;
-  if (!window.cocoMovingBoundingBoxPolygon) {
-    newCenter = convertStringCoordsInLatLng(window.step2OffsetInserted);
-    if (!newCenter) {
-      console.warn('The is no value of the moving Bounding box inserted in the DB');
-      return [0,0];;
-    }
-  }
-  else newCenter = getMovingBoundingBoxCenter();
-
-  if (!newCenter) {
-    console.error('Error: Unable to get the center of the bounding box.');
-    return [0, 0];
-  }
-  return [
-    newCenter.lat() - originalCenter.lat(),
-    newCenter.lng() - originalCenter.lng(),
+  const [currentLat, currentLng] = [
+    window.cocoMovingBoundingBoxPolygon?.getBounds()?.getSouthWest().lat(),
+    window.cocoMovingBoundingBoxPolygon?.getBounds()?.getSouthWest().lng()
   ];
+  const [offsetLat, offsetLng] = [
+    currentLat! - window.cocoOriginalBoundingBox.sw.latitude,
+    currentLng! - window.cocoOriginalBoundingBox.sw.longitude,
+  ];
+  return [offsetLat, offsetLng];
 }
 
+// The value stored in the gravity forms entry is exposed in window. step2·OffsetInserted
+export const getOffsetFromValueInDB = function() {
+  const coords = convertStringCoordsInLatLng( window.step2OffsetInserted );
+  if (!coords) {
+    return [0, 0];
+  }
+  const [currentLat, currentLng] = [
+    coords.lat(),
+    coords.lng()
+  ];
+  const [offsetLat, offsetLng] = [
+    currentLat! - window.cocoOriginalBoundingBox.sw.latitude,
+    currentLng! - window.cocoOriginalBoundingBox.sw.longitude,
+  ];
+  return [offsetLat, offsetLng];
+}
 
+// TODELETE
 function getMovingBoundingBoxCenter() {
   if (!window.cocoMovingBoundingBoxPolygon) {
     console.error('Error: cocoMovingBoundingBoxPolygon is undefined. Unable to calculate the center.');

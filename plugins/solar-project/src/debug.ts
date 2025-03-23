@@ -4,6 +4,7 @@ import { getSavedRectangleBySegment } from "./setup-rectangle-interactive";
 import * as notification from './notification-api';
 import { getCurrentStepCocoMap } from ".";
 import { getOffsetFromOriginBoundingBox } from "./setup-drag-all-segments-interaction";
+import { cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
 
 /** ====== ====== ====== ====== ======
  *   EXPOSE FUNCIONS IN CONSOLE
@@ -19,6 +20,9 @@ window.debug.getSavedRectangleBySegmentIndex =  function(i: number) {
   const c = getCurrentStepCocoMap();
   const seg = c?.segments ? c.segments[i] : null;
   return getSavedRectangleBySegment( seg! );
+}
+window.debug.cleanupAssociatedMarkers = function(s) {
+  cleanupAssociatedMarkers(s);
 }
 
 /**

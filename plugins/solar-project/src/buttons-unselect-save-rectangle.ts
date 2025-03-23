@@ -139,7 +139,7 @@ const syncOrientationRadioButton = ( syncDirection: 'panelsToRadio' | 'radioToPa
 
 const exitFromEditRectangle = function() {
   // rebuild all the segments
-  setupSegments( window.step2RotationInserted ?? 'no-extra-rotation' );
+  setupSegments();
 
   // make all rectangles visible again
   (window.cocoSavedRectangles || []).forEach( r => r.polygon?.setOptions(RECTANGLE_OPTIONS) );

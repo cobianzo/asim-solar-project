@@ -37,7 +37,7 @@ export const MARKER_DOT = {
 export const deleteMarkersCompletely = function(m: AdvancedMarkerElement[] | AdvancedMarkerElement | null) {
   if (!m) return;
   if (Array.isArray(m)) {
-    m.forEach(marker => {
+    m.forEach((marker,i) => {
       google.maps.event.clearInstanceListeners(marker);
       marker.map = null;
     });

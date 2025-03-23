@@ -23,22 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-export const getRotationTypePortraitSelected = (): SelectRotationPortraitSegmentsOptions => {
+export const getRotationTypePortraitSelected = ( fallback = 'no-extra-rotation'): SelectRotationPortraitSegmentsOptions => {
   const radioParent = document.querySelector('.segment-rotation');
   const selected = radioParent?.querySelector('input:checked');
   if (selected) {
     return ((selected as HTMLInputElement).value as SelectRotationPortraitSegmentsOptions);
   }
-  return 'no-extra-rotation';
+  return fallback as SelectRotationPortraitSegmentsOptions ;
 }
 
 export const applyRotationPortraitSegmentsByRadioSelected = ( createBoundingBoxAfterCreatingSegments: Boolean = true ): SelectRotationPortraitSegmentsOptions => {
   const valorSeleccionado = getRotationTypePortraitSelected();
   console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
-  setupSegments( valorSeleccionado as SelectRotationPortraitSegmentsOptions, false );
-  if (createBoundingBoxAfterCreatingSegments) {
-    console.log(`and now the bouding box`);
-    createDraggableBoundingBoxForMovingAllSegments();
-  }
+  setupSegments( false );
+  // if (createBoundingBoxAfterCreatingSegments) {
+  //   console.log(`and now the bouding box`);
+  //   createDraggableBoundingBoxForMovingAllSegments();
+  // }
   return valorSeleccionado;
 }

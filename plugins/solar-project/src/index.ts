@@ -31,7 +31,6 @@ declare global {
 
     // segments source of truth
     cocoBuildingSegments: Array<RoofSegmentStats>;
-    cocoSegmentsOriginalFirstVertex: google.maps.LatLng;
     cocoOriginalBoundingBox: boxBySWNE; // the data
     cocoMovingBoundingBoxPolygon: google.maps.Rectangle | null; // the painteed object from the data.
     cocoMovingBoundingBoxAssociatedMarkers: AdvancedMarkerElement[] | null;
