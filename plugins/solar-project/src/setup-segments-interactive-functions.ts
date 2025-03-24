@@ -73,7 +73,7 @@ export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {
  * the necessary coordinates and angles for rendering on the map,
  * and binds event listeners for interaction with the segments.
  *
- * This uses the exposed js vars set up in class-hooks.php
+ * This uses the exposed js vars set up in class-gravity-hooks.php
  */
 const setupSegments = ( paintSunMarkers = true ) => {
 

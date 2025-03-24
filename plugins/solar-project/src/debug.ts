@@ -238,7 +238,7 @@ window.debug.showAllJSGlobalVarsInPopup = function(e: Event) {
   const globalCocoVars = Object.keys(window).filter(key => (
     key.startsWith('coco') || key.startsWith('step')) && ! ['cocoMaps', 'cocoVars', 'cocoDrawingRectangle'].includes(key)
   );
-  innerHTML += '<h2>Global Variables Exposed in class-hooks.php</h2>';
+  innerHTML += '<h2>Global Variables Exposed in class-gravity-hooks.php</h2>';
   innerHTML += '<pre><ul>';
   globalCocoVars.forEach(key => {
     if (key === 'cocoBuildingSegments') {

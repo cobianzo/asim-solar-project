@@ -1,8 +1,12 @@
 # TODO NEXT
 
+Imprve position of buttons, closer to the segment
+  Btn Delete in Red.
+  Btn Unselect in Blue
+  Btn Save use name 'Finish' in green
+  When resizing Save changes to Apply changes.
 When dragging and redimensioning the rect, hide the solar panels
-Fix step 2 displacement t something correct.
-Save the data from the rectangles and solar panels
+Show in DB the data from the rectangles and solar panels
 Fix form back and fw.
 
 # What

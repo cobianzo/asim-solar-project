@@ -20,8 +20,11 @@ class Solar_Project {
 	public function __construct() {
 			// Initialization code here
 			require_once 'inc/class-helpers.php';
-			require_once 'inc/class-hooks.php';
-			require_once 'inc/class-solar-api.php';
+			require_once 'inc/class-enqueue.php';
+			require_once 'inc/class-gravity-hooks.php';
+			require_once 'inc/api/class-API.php';
+			require_once 'inc/api/class-google-maps-api.php';
+			require_once 'inc/api/class-solar-api.php';
 
 			add_action( 'init', array( $this, 'init_plugin' ) );
 	}
