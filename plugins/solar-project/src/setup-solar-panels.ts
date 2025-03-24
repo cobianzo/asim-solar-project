@@ -1,6 +1,8 @@
 // WIP
 import { createButtonActivateDeactivateSolarPanels, createOrientationRadio } from "./buttons-unselect-save-rectangle";
-import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
+import { createNotification, removeNotification } from "./notification-api";
+import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, SELECTED_RECTANGLE_OPTIONS } from "./setup-rectangle-interactive";
+import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, metersToLatDegrees, metersToLngDegrees, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
 import { SavedRectangle, SolarPanelsOrientation } from "./types"
 
 export const PANEL_OPTIONS: google.maps.PolygonOptions = {
@@ -91,15 +93,17 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
   const [latSouth, latNorth, lngWest, lngEast] = [
     rectPathToNorth[0].lat(), rectPathToNorth[1].lat(), rectPathToNorth[1].lng(), rectPathToNorth[2].lng()
   ];
-  // swap factoX <-> factorY to display panels landscape
+
+  // both of these solutions work the same, i think
   const latLengthPanel = (latNorth - latSouth) * factorY;
   const lngLengthPanel = (lngEast - lngWest) * factorX;
-  // console.log(`In Lat Diff of segment it is ${(latNorth - latSouth)}, and the ${dimensionsPanel[1]}m of the solarpanel has lat DIMENSION of `,latLengthPanel);
-  // console.log('lngt DIMENSION ',lngLengthPanel);
-  // console.log('STARTING AT ', `${latSouth},${lngWest}`);
+  // const latLengthPanel = 1 * metersToLatDegrees( dimensionsPanel[1], latSouth);
+  // const lngLengthPanel = -1 * metersToLngDegrees( dimensionsPanel[0], latSouth, lngWest);
 
   const maxPanelsInY = Math.floor(1 / factorY);
   const maxPanelsInX = Math.floor(1 / factorX);
+  // const maxPanelsInY = Math.abs(Math.floor((latNorth - latSouth) / latLengthPanel));
+  // const maxPanelsInX = Math.abs(Math.floor((lngEast - lngWest) / lngLengthPanel));
 
   for ( let i = 0; i < maxPanelsInY; i++ ) {
     for ( let j = 0; j < maxPanelsInX; j++) {
@@ -128,7 +132,6 @@ const paintASolarPanel = function (
 
   const [latSouth, lngWest] = [ startSWLatLng.lat(), startSWLatLng.lng()  ]
 
-
   const panelLatSouth = latSouth + latLengthPanel * orderLat;
   const panelLatNorth = panelLatSouth + latLengthPanel;
   const panelLngWest = lngWest + lngLengthPanel * orderLng;
@@ -156,7 +159,7 @@ const paintASolarPanel = function (
     originaInclination?? 0,
     { latitude: centerRectangle.lat(), longitude: centerRectangle.lng() },
     true
-  )
+  );
 
   // We save the reference to the panel in the grid
   if ( !theSavedRectangle.solarPanelsPolygons[orderLng] ) {
@@ -240,5 +243,85 @@ export function activateSolarPanel(savedRect: SavedRectangle, polygon: google.ma
 }
 
 /**
+ * Handlers for individual solar panels
  * * ============= ============= ============= ============= ============= ============= *
  */
+
+export const startEditSolarPanelsMode = function() {
+
+  // the button gets the class active
+  const btn = document.getElementById('activate-deactivate-solar-panels-btn');
+  if (btn) {
+    btn.classList.add('active');
+  }
+
+  // change the style of the rectangle polygon and the solar panels
+  const currentSegment = window.cocoDrawingRectangle.selectedSegment;
+  const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
+  if (currentSavedRectangle) {
+    // the rectangle becomes inactive
+    currentSavedRectangle.polygon?.setOptions(FADED_RECTANGLE_OPTIONS);
+
+    // while every tile of a solar panel becomes interactive
+    currentSavedRectangle.solarPanelsPolygons.forEach( (row,i) => {
+      row.forEach( (sp,j) => {
+        const options = isSolarPanelDeactivated(currentSavedRectangle, sp)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
+        sp.setOptions(options);
+
+        // reset the listeners just in case. To assign them again
+        ['click', 'mouseover', 'mouseout'].forEach(evName => google.maps.event.clearListeners(sp, evName));
+
+        // add an event listener to each solar panel
+        sp.addListener('mouseover', function(this: google.maps.Polygon, e: MouseEvent) {
+          sp.setOptions(HIGHLIGHTED_PANEL_OPTIONS);
+        });
+        sp.addListener('mouseout', function(this: google.maps.Polygon, e: MouseEvent) {
+          const polygonClicked = this;
+          const options = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
+          sp.setOptions(options);
+        });
+        sp.addListener('click', function(this: google.maps.Polygon, e: MouseEvent) {
+          const polygonClicked = this;
+          let isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
+          if (isDeactivated) {
+            activateSolarPanel(currentSavedRectangle, polygonClicked);
+          } else {
+            deactivateSolarPanel(currentSavedRectangle, polygonClicked);
+          }
+          isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
+          sp.setOptions(isDeactivated? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS);
+
+          createNotification('STEP3_CLICK_ON_SOLAR_PANEL');
+        });
+      });
+    } );
+  }
+
+  createNotification('STEP3_START_EDIT_PANELS');
+}
+
+export const exitEditSolarPanelsMode = function() {
+  const btn = document.getElementById('activate-deactivate-solar-panels-btn');
+  if (btn) {
+    btn.classList.remove('active');
+  }
+  // set the style of the rectangle to normal
+  const currentSegment = window.cocoDrawingRectangle.selectedSegment;
+  const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
+  if (currentSavedRectangle) {
+    currentSavedRectangle.polygon?.setOptions(SELECTED_RECTANGLE_OPTIONS);
+  }
+
+  // deactivate listeners for all solar panels from all rectangles in the map
+  window.cocoSavedRectangles?.forEach( savedR => {
+    // get all solar panels and reset listeners
+    const {solarPanelsPolygons} = savedR;
+    solarPanelsPolygons.forEach( row => row.forEach( (polyg) => {
+      ['click', 'mouseover', 'mouseout'].forEach(evName => google.maps.event.clearListeners(polyg, evName));
+      const options = isSolarPanelDeactivated(savedR, polyg) ? DELETED_PANEL_OPTIONS : PANEL_OPTIONS;
+      polyg.setOptions(options);
+    }));
+  })
+
+  removeNotification();
+}

@@ -1,7 +1,8 @@
 body {
 
   .gform-field-coco-map {
-    min-height: 800px;
+    min-height: 600px;
+    margin-top: 50px;;
   }
   .gfield .grid-h {
     display: grid;
@@ -96,7 +97,9 @@ gmp-advanced-marker .handler-resize {
 
 
 body .coco-solar-notification {
-  position: sticky;
+  position: fixed;
+  height: 50px;
+  /* transform: translateY(100%); /*  covers the margin-top 50px of the map container */
   top: 0;
   left: 0;
   right: 0;

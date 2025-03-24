@@ -3,7 +3,7 @@ import * as trigo from './trigonometry-helpers';
 import { getSavedRectangleBySegment } from "./setup-rectangle-interactive";
 import * as notification from './notification-api';
 import { getCurrentStepCocoMap } from ".";
-import { getOffsetFromOriginBoundingBox } from "./setup-drag-all-segments-interaction";
+import { getMovingBoundingBoxOffsetFromOrigin } from "./setup-drag-all-segments-interaction";
 import { cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
 
 /** ====== ====== ====== ====== ======
@@ -209,7 +209,7 @@ window.debug.showAllJSGlobalVarsInPopup = function(e: Event) {
   let innerHTML = '';
 
   // 2.show the offset
-  const offset = getOffsetFromOriginBoundingBox();
+  const offset = getMovingBoundingBoxOffsetFromOrigin();
   innerHTML += `<p>Offset moving bbox: ${offset[0]*10000} ${offset[1]*10000}</p>`;
 
   // 1. show the variables from the plugin gravity forms plugin: cocoMaps.

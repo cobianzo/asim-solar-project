@@ -9,15 +9,14 @@ import {
   paintBoundingBoxAsRectangle,
   paintPolygonsByArrayOfStrings,
  } from './drawing-helpers';
-import {getOffsetFromOriginBoundingBox, getOffsetFromValueInDB, setupSegmentsAndDraggableBoundingBox, updateValuesCoordsSegmentsWithOffset, updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion} from './setup-drag-all-segments-interaction';
-import { moveGoogleMapsRectangleToCenter } from './trigonometry-helpers';
-import setupSegments, { cleanupAssociatedMarkers, deactivateInteractivityOnSegment } from './setup-segments-interactive-functions';
+import {getMovingBoundingBoxOffsetFromOrigin, getOffsetFromValueInDB, updateMovingBoundingBoxFromDBOffset, updateValuesCoordsSegmentsFromDBOffset, updateValuesCoordsSegmentsWithOffset} from './setup-drag-all-segments-interaction';
+import setupSegments from './setup-segments-interactive-functions';
+import { createNotification } from './notification-api';
 
 
 /**
  * Returns the CocoMapSetup object for the step2 map (the one with the input text element
  * identified by window.step2CocoMapInputId). The default export of this script
- *
  * @returns {CocoMapSetup | null}
  */
 const getStep2CocoMapSetup = () : CocoMapSetup | null => {
@@ -29,29 +28,20 @@ const getStep2CocoMapSetup = () : CocoMapSetup | null => {
 
 document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Event) => {
 
-  // setup and validations
-  const customEvent = event as CustomEvent<CocoMapSetup>;
+  // setup and validation
   const cocoMapSetup = getStep2CocoMapSetup();
   if ( ! window.cocoIsStepSelectOffset || ! cocoMapSetup
-    || ( cocoMapSetup.inputElement.id !== customEvent.detail.inputElement.id )
-  ) {
+    || ( cocoMapSetup.inputElement.id !== (event as CustomEvent<CocoMapSetup>).detail.inputElement.id ) ) {
     return;
   }
 
-  console.log(' Exectued cocoMap for field', window.cocoMapSetup);
-  const theMap = cocoMapSetup.map;
-
   /**  ================ ================ ================ ================
-   *
    *  PAINTS THE PROFILE OF THE BUILDING. The data has been exposed with PHP.
    *  ================ ================ ================ ================*/
   // design polygon of the whole roof profile (todelete, it does not always work)
   if (window.cocoBuildingProfile?.length) {
-    paintPolygonsByArrayOfStrings(theMap, window.cocoBuildingProfile, { strokeColor: 'black' });
+    paintPolygonsByArrayOfStrings(cocoMapSetup.map, window.cocoBuildingProfile, { strokeColor: 'black' });
   }
-
-  // on page load we save the original position of all segments in coco `Segments Original First Vertex`
-  // Paint the Bounding Box the first time.
 
   /**
    * =======
@@ -59,33 +49,21 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   // Paint Moving Bounding box according t sw ne values
   window.cocoMovingBoundingBoxPolygon = paintBoundingBoxAsRectangle(window.cocoOriginalBoundingBox);
 
-
   /**
-   * Particular case. This is not the first time we visit this page, and the value of
-   * the offset has been previouly inserted, and accessible in the DB
+   * Particular case for pageload:
+   *  This is not the first time we visit this page, and
+   * the value of the offset has been previouly inserted, and accessible in the DB (window.step2·OffsetInserted)
    */
   if ( window.step2OffsetInserted ) {
-    const [offsetLat, offsetLng] = getOffsetFromValueInDB();
+    updateMovingBoundingBoxFromDBOffset();
+    updateValuesCoordsSegmentsFromDBOffset();
 
-    // Apply that offset to the bounding box
-    const newSWNE =
-    {
-      sw: { latitude: window.cocoOriginalBoundingBox.sw.latitude + offsetLat, longitude: window.cocoOriginalBoundingBox.sw.longitude + offsetLng },
-      ne: { latitude: window.cocoOriginalBoundingBox.ne.latitude + offsetLat, longitude: window.cocoOriginalBoundingBox.ne.longitude + offsetLng },
-    };
-    window.cocoMovingBoundingBoxPolygon!.setBounds({
-      south: newSWNE.sw.latitude,
-      west: newSWNE.sw.longitude,
-      north: newSWNE.ne.latitude,
-      east: newSWNE.ne.longitude,
-    });
-
-    // update the source of truth for the position of the segments.
-    // So weverytime we build them we'll apply the offset set up by the user
-    updateValuesCoordsSegmentsWithOffset();
-
+    createNotification('STEP2_RETURNING');
+  } else {
+    createNotification('STEP2_DRAGGABLE_BOUNDING_BOX', [cocoMapSetup.segments?.length.toString()! ]);
   }
-  // verification sw ne:
+
+  // verification sw ne: TODELETE
   // const deviation = (window.cocoOriginalBoundingBox.ne.longitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getNorthEast().lng())
   //     + (window.cocoOriginalBoundingBox.ne.latitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getNorthEast().lat())
   //     + (window.cocoOriginalBoundingBox.sw.latitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest().lat())
@@ -96,6 +74,10 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   //   console.log('>>>>> Rect well placed!!!');
   // }
 
+  /**
+   * Now creating the segments is of because the source of truth
+   * with their coordenates has the offset, if it has been insterted.
+   */
   setupSegments();
 
   // init the inputelement
@@ -104,8 +86,26 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
     cocoMapSetup.inputElement.value = `${SW.lat()},${SW.lng()}`;
   }
 
+  /** END of setup on page load
+   * ======= ======= ======= ======= ======= ======= =======
+   * ======= ======= ======= ======= ======= ======= =======
+   * ======= ======= ======= ======= ======= ======= =======
+   */
+
+
+
+
+
+
+
+
+
+
   /**
-   * ======= APPLY drag listeners
+   * ======= APPLY drag listeners. ======= for moving bounding box  =======
+   * The user can drag the bouding box and all segments move with it.
+   * The SE point of the bounding box is saved in the DB using the input element of the map.
+   * We use that new SE point to find the offset, by comparing with the original SE point by Solar API
    */
   if (!window.cocoMovingBoundingBoxPolygon) {
     return;
@@ -113,15 +113,11 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   // Add drag listeners to the Moving Bounding Box
   google.maps.event.addListener(window.cocoMovingBoundingBoxPolygon, 'drag', () => {
     console.log('Dragging the Moving Bounding Box...');
-    // Get the offset of the current bounding box. Let's compare the original SW position adn the current
-    const [offsetLat, offsetLng] = getOffsetFromOriginBoundingBox();
 
-    // apply that offset to all segments
-    cocoMapSetup.segments?.forEach( segm => {
-      updateValuesCoordsSegmentsWithOffset();
-    } );
+    // apply the displacement of the moving boundign box to all segments, as we drag
+    updateValuesCoordsSegmentsWithOffset();
 
-    // repaint all segments
+    // repaint all segments with a new style while dragging
     setupSegments(false);
     cocoMapSetup.segments?.forEach( segm => {
       segm.setOptions({ strokeColor: 'white', strokeWeight: 1, strokeOpacity: 1});
@@ -129,25 +125,15 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
   });
 
   google.maps.event.addListener(window.cocoMovingBoundingBoxPolygon, 'dragend', () => {
-    console.log('Finished dragging the Moving Bounding Box.');
+
     // Update the values of the segments based on the new position of the bounding box
+    // (not really needed as they where updated in the 'drag', but we update the style)
     setupSegments();
 
-    // save the new value in the input. It will be user to calculate offset in the next field
+    // save the new value in the input. It will be used to calculate offset in the next field
     const SW = window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest();
     cocoMapSetup.inputElement.value = `${SW.lat()},${SW.lng()}`;
   });
-
-
-  // on page load, we paint the bounding box, and if the input had a value
-  //  we initialize the Moving Bounding Box to that value
-  // updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
-
-
-  // Create the segments and the bounding box to drag them
-  // setupSegmentsAndDraggableBoundingBox();
-
-
 
 
 } );
@@ -155,7 +141,7 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
 
 /** ================ ================ ================ ================
  *
- *
+ *  End of applying listeners handlers
  *
  *  ================ ================ ================ ================ */
 

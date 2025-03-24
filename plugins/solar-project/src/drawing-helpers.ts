@@ -29,8 +29,9 @@ export const MARKER_DOT = {
     width: '1px',
     height: '1px',
     transform: 'translate(0px, 3.5px)',
-    border: '3px solid white',
+    border: '1px solid white',
     'border-radius': '50%',
+    display: 'none', // We hide it so it's not visible, activate it for debug purposes.
   },
 }
 
@@ -76,15 +77,15 @@ export const paintASunForSegment = async(
   }
 
   // paintAMarker is a function defined by coco plugin
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return await window.paintAMarker(
+  const sunMarker = await window.paintAMarker(
     gmap,
     new google.maps.LatLng(seg.data.center.latitude, seg.data.center.longitude),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
     `${(window as any).cocoAssetsDir}${icon}`,
     MARKER_CENTERED_OPTIONS
   );
+
+  sunMarker!.content!.style.display = 'none'; // not visible but we can activate for debug purposes
+  return sunMarker;
 };
 
 

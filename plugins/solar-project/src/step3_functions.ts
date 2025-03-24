@@ -1,5 +1,6 @@
 // RENAME TO step 4 TODO:
-import { updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion } from './setup-drag-all-segments-interaction';
+import { createNotification } from './notification-api';
+import { updateValuesCoordsSegmentsFromDBOffset } from './setup-drag-all-segments-interaction';
 import { loadSavedRectanglesFromTextArea } from './setup-rectangle-interactive';
 import setupSegments from './setup-segments-interactive-functions';
 import { CocoMapSetup } from './types';
@@ -18,20 +19,25 @@ export const getStep3CocoMapSetup = function() : CocoMapSetup | null {
 document.addEventListener("solarMapReady", (event: Event) => {
 
   // setup and validations
-  const customEvent = event as CustomEvent<CocoMapSetup>;
   const cocoMapSetup = getStep3CocoMapSetup();
   if ( ! window.cocoIsStepSelectRectangle || ! cocoMapSetup
-    || ( cocoMapSetup.inputElement.id !== customEvent.detail.inputElement.id )
-  ) {
-    return;
-  }
+    || ( cocoMapSetup.inputElement.id !== (event as CustomEvent<CocoMapSetup>).detail.inputElement.id )
+  ) return;
 
-  console.log(' Exectued cocoMap for field', window.cocoMapSetup);
   // this also paints the bounding box. It is needed as reference of the offset for all segments.
-  updateValuesCoordsSegmentsWithOffsetAsPerFormCompletion();
+  updateValuesCoordsSegmentsFromDBOffset();
   window.cocoMovingBoundingBoxPolygon?.setVisible(false);
 
+  // paint paint paint! and make them interactive
   setupSegments();
 
+  // if this in not the first time we load this page
   loadSavedRectanglesFromTextArea();
+
+  // notification
+  if (window.cocoSavedRectangles.length) {
+    createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles.length.toString()] );
+  } else {
+    createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments.length.toString()] );
+  }
 });

@@ -5,6 +5,13 @@ const PRESET_MSG: Record<string, string> = {
   STEP1_SELECT_ROOF: 'Please select a roof in the map where you want to install your solar panels.',
   STEP1_ROOF_SELECTED: 'Good. You have selected the roof. Now, click on the next button.',
   STEP2_DRAGGABLE_BOUNDING_BOX: 'We have detected %s segments in your roof. There might be a small displacement with the satellite image, please adjust it by dragging the segments',
+  STEP2_RETURNING: 'Check that the red squares are the most aligned possible to the shape of the roof',
+  STEP3_EDIT_OR_SELECT: 'You have setup the sola panel for %s of the roofs. You can keep on editing or submit the fotm by clicking NEXT',
+  STEP3_SELECT_SEGMENT: 'There are %s segments on this building. Please start by selecting one of them to create your solar panel installation',
+  STEP3_SEGMENT_SELECTED: 'Good you have selected one of the segments of %s square meters. Now click again on the segment to start designing the rectangle of your solar panel installation',
+  STEP3_SEGMENT_SELECTED_WITH_RECTANGLE: 'You can remove the individual solar panels by clicking on the button Edit Solar Panels and selecting the panels that you want to remove',
+  STEP3_CLICK_ON_SOLAR_PANEL: 'When you finish editing the solar panels, you can click on Save to apply the changes.',
+  STEP3_START_EDIT_PANELS: 'Pass the button over the solar panels. You can remove some of them by clicking it over',
 };
 
 /**
@@ -35,7 +42,7 @@ export const createNotification = (message: string, placeholders: string[] = [])
   const notificationDiv = document.createElement('div');
   notificationDiv.classList.add('coco-solar-notification');
   notificationDiv.textContent = message;
-  (parentConteiner?? document.body).appendChild(notificationDiv);
+  (parentConteiner?.parentNode ?? document.body).insertBefore(notificationDiv, parentConteiner);
   window.cocoNotifications.container = notificationDiv;
 
   // retrieve the message:
@@ -56,7 +63,7 @@ export const createNotification = (message: string, placeholders: string[] = [])
 };
 
 
-export const removeNotification = (messageKey: string | null) => {
+export const removeNotification = (messageKey?: string | null) => {
   if (window.cocoNotifications?.container) {
     if (!messageKey || window.cocoNotifications.container.dataset.messageId === messageKey) {
       console.log('Removing notification', messageKey);
@@ -65,4 +72,5 @@ export const removeNotification = (messageKey: string | null) => {
       window.cocoNotifications = {};
     }
   }
+  // TODO: remove only if the message key is given.
 }

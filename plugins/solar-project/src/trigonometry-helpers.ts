@@ -447,7 +447,7 @@ export const getPolygonCenterCoords = function(polygon: google.maps.Polygon) : g
 export const getPolygonCenterBySWNE = function(swNE: boxBySWNE) : google.maps.LatLng {
 
   const midLat = swNE.sw.latitude + (swNE.ne.latitude - swNE.sw.latitude ) / 2;
-  const midLng = swNE.ne.longitude + (swNE.ne.longitude - swNE.sw.longitude) / 2;
+  const midLng = swNE.sw.longitude + (swNE.ne.longitude - swNE.sw.longitude) / 2;
 
   return new google.maps.LatLng(midLat, midLng);
 }
@@ -639,3 +639,28 @@ export const getRectangleSideDimensionsByPolygonPath = function( polygon: google
   return [side1_length, side2_length];
 }
 
+
+/**
+ * Converts a distance in meters to the equivalent change in latitude degrees.
+ * @param meters - The distance in meters.
+ * @param lat - The starting latitude.
+ * @returns The latitude degrees corresponding to the given meters.
+ */
+export function metersToLatDegrees(meters: number, lat: number): number {
+  const origin = new google.maps.LatLng(lat, 0);
+  const destination = google.maps.geometry.spherical.computeOffset(origin, meters, 0); // Move north
+  return destination.lat() - origin.lat();
+}
+
+/**
+ * Converts a distance in meters to the equivalent change in longitude degrees.
+ * @param meters - The distance in meters.
+ * @param lat - The starting latitude (important for accuracy).
+ * @param lng - The starting longitude.
+ * @returns The longitude degrees corresponding to the given meters.
+ */
+export function metersToLngDegrees(meters: number, lat: number, lng: number): number {
+  const origin = new google.maps.LatLng(lat, lng);
+  const destination = google.maps.geometry.spherical.computeOffset(origin, meters, 90); // Move east
+  return destination.lng() - origin.lng();
+}

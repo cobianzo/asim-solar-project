@@ -4,9 +4,10 @@ import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
-import { DELETED_PANEL_OPTIONS, EDITABLE_PANEL_OPTIONS, isSolarPanelDeactivated, HIGHLIGHTED_PANEL_OPTIONS, paintSolarPanelsForSavedRectangle, activateSolarPanel, deactivateSolarPanel, PANEL_OPTIONS } from './setup-solar-panels';
+import { DELETED_PANEL_OPTIONS, EDITABLE_PANEL_OPTIONS, isSolarPanelDeactivated, HIGHLIGHTED_PANEL_OPTIONS, paintSolarPanelsForSavedRectangle, activateSolarPanel, deactivateSolarPanel, PANEL_OPTIONS, startEditSolarPanelsMode, exitEditSolarPanelsMode } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
 import { showVariableAsString } from './debug';
+import { createNotification, removeNotification } from './notification-api';
 
 function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: MouseEvent) => void, attrs: Record<string, any> = {}) {
   if (attrs.id) {
@@ -30,6 +31,12 @@ function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: M
 }
 
 export const createUnselectSegmentButton = ( gmap : google.maps.Map, text: string = 'Unselect' ) => {
+  const segmentHasRect = getSavedRectangleBySegment(window.cocoDrawingRectangle.selectedSegment!);
+  if (segmentHasRect)
+    createNotification('STEP3_SEGMENT_SELECTED_WITH_RECTANGLE', [window.cocoDrawingRectangle.selectedSegment?.data?.stats.areaMeters2.toString()!]);
+  else {
+    createNotification('STEP3_SEGMENT_SELECTED', [window.cocoDrawingRectangle.selectedSegment?.data?.stats.areaMeters2.toString()!]);
+  }
   return createBtn( gmap, text, handlerClickUnselectButton, {id: 'delete-rectangle-btn'} );
 }
 
@@ -164,6 +171,11 @@ const handlerClickUnselectButton = function(e: MouseEvent) {
     const popupInfoDebug = document.getElementById('popup-info');
     if (popupInfoDebug) popupInfoDebug.remove();
 
+    // notification
+    const notification_const = window.cocoSavedRectangles.length? 'STEP3_EDIT_OR_SELECT' : 'STEP3_SELECT_SEGMENT';
+    const param = window.cocoSavedRectangles.length? window.cocoSavedRectangles.length : window.cocoBuildingSegments.length;
+    createNotification(notification_const, [param.toString()] );
+
 
 }
 
@@ -225,6 +237,8 @@ export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
    * Important part. Save the state of the rectangles and panels in a field of GF
    */
   saveSavedRectanglesInTextArea();
+
+  removeNotification();
 }
 
 export const createButtonActivateDeactivateSolarPanels = function(gmap: google.maps.Map, savedRectangle: SavedRectangle) {
@@ -240,78 +254,4 @@ const handlerClickActivateDeactivateSolarPanels = function(e: MouseEvent) {
   } else {
     startEditSolarPanelsMode();
   }
-}
-
-export const startEditSolarPanelsMode = function() {
-
-  // the button gets the class active
-  const btn = document.getElementById('activate-deactivate-solar-panels-btn');
-  if (btn) {
-    btn.classList.add('active');
-  }
-
-  // change the style of the rectangle polygon and the solar panels
-  const currentSegment = window.cocoDrawingRectangle.selectedSegment;
-  const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
-  if (currentSavedRectangle) {
-    // the rectangle becomes inactive
-    currentSavedRectangle.polygon?.setOptions(FADED_RECTANGLE_OPTIONS);
-
-    // while every tile of a solar panel becomes interactive
-    currentSavedRectangle.solarPanelsPolygons.forEach( (row,i) => {
-      row.forEach( (sp,j) => {
-        const options = isSolarPanelDeactivated(currentSavedRectangle, sp)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
-        sp.setOptions(options);
-
-        // reset the listeners just in case. To assign them again
-        ['click', 'mouseover', 'mouseout'].forEach(evName => google.maps.event.clearListeners(sp, evName));
-
-        // add an event listener to each solar panel
-        sp.addListener('mouseover', function(this: google.maps.Polygon, e: MouseEvent) {
-          sp.setOptions(HIGHLIGHTED_PANEL_OPTIONS);
-        });
-        sp.addListener('mouseout', function(this: google.maps.Polygon, e: MouseEvent) {
-          const polygonClicked = this;
-          const options = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
-          sp.setOptions(options);
-        });
-        sp.addListener('click', function(this: google.maps.Polygon, e: MouseEvent) {
-          const polygonClicked = this;
-          let isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
-          if (isDeactivated) {
-            activateSolarPanel(currentSavedRectangle, polygonClicked);
-          } else {
-            deactivateSolarPanel(currentSavedRectangle, polygonClicked);
-          }
-          isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
-          sp.setOptions(isDeactivated? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS);
-          console.log('click on solar panel',this.getPath());
-        });
-      });
-    } );
-  }
-}
-
-export const exitEditSolarPanelsMode = function() {
-  const btn = document.getElementById('activate-deactivate-solar-panels-btn');
-  if (btn) {
-    btn.classList.remove('active');
-  }
-  // set the style of the rectangle to normal
-  const currentSegment = window.cocoDrawingRectangle.selectedSegment;
-  const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
-  if (currentSavedRectangle) {
-    currentSavedRectangle.polygon?.setOptions(SELECTED_RECTANGLE_OPTIONS);
-  }
-
-  // deactivate listeners for all solar panels from all rectangles in the map
-  window.cocoSavedRectangles?.forEach( savedR => {
-    // get all solar panels and reset listeners
-    const {solarPanelsPolygons} = savedR;
-    solarPanelsPolygons.forEach( row => row.forEach( (polyg) => {
-      ['click', 'mouseover', 'mouseout'].forEach(evName => google.maps.event.clearListeners(polyg, evName));
-      const options = isSolarPanelDeactivated(savedR, polyg) ? DELETED_PANEL_OPTIONS : PANEL_OPTIONS;
-      polyg.setOptions(options);
-    }));
-  })
 }
