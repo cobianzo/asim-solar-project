@@ -1,6 +1,8 @@
 // types
-import { boxBySWNE, ExtendedSegment } from './types';
+import { boxBySWNE, ExtendedSegment, RoofSegmentStats } from './types';
 import {
+  convertStringCoordsInLatLng,
+  convertStringLatLngToArrayLatLng,
   getPolygonCenterCoords,
 } from './trigonometry-helpers';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
@@ -9,6 +11,7 @@ import { getSavedRectangleBySegment } from './setup-rectangle-interactive';
 import { rawHandler } from '@wordpress/blocks';
 import { getCurrentStepCocoMap } from '.';
 import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
+import { createNotification, removeNotification } from './notification-api';
 
 export const MARKER_CENTERED_OPTIONS = {
   style: {
@@ -29,9 +32,10 @@ export const MARKER_DOT = {
     width: '1px',
     height: '1px',
     transform: 'translate(0px, 3.5px)',
-    border: '1px solid white',
+    opacity: '0.6',
+    border: '3px solid white',
     'border-radius': '50%',
-    display: 'none', // We hide it so it's not visible, activate it for debug purposes.
+    // display: 'none', // We hide it so it's not visible, activate it for debug purposes.
   },
 }
 
@@ -177,8 +181,37 @@ export const paintBoundingBoxAsRectangle = (
   return rectangle ?? null;
 }
 
-export const paintSegment = function( gmap: google.maps.Map, stringCoords: string, options: google.maps.PolygonOptions = {} ) {
-  return window.paintAPoygonInMap( gmap, stringCoords, { ...SEGMENT_DEFAULT, ...options} )
+export const paintSegment = function( gmap: google.maps.Map, stringCoords: string, segmentData: RoofSegmentStats, options: google.maps.PolygonOptions = {} ) {
+
+  // paint the segment
+  const pol = window.paintAPoygonInMap( gmap, stringCoords, { ...SEGMENT_DEFAULT, ...options} )
+
+  // paint the line for the lower side of the roof
+  if (pol.lowRoofLine) {
+    pol.lowRoofLine.setMap(null);
+  }
+
+  // calculate the weight of the line depending on the pitch degrees
+  const pitch = segmentData?.pitchDegrees;
+  const weight = Math.min(15, Math.max(1, pitch ? pitch/6 : 1));
+
+  const path = convertStringLatLngToArrayLatLng(stringCoords);
+  const linePath = segmentData.isPortrait ? [path[0], path[1]] : [path[1], path[2]];
+
+  pol.lowRoofLine = new google.maps.Polyline({
+    path: linePath,
+    strokeColor: "#FFA500",
+    strokeOpacity: 1,
+    strokeWeight: weight, // we'll show it on hover and selected
+    visible: false, // hidden bu default, we show it on hover and selected
+    map: gmap,
+  });
+
+  // now the marker for the first vertex
+  window.paintAMarker( gmap, pol.getPath().getArray()[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
+  .then(m => addAssociatedMarker(m, pol as unknown as AssociatedMarkersParent))
+
+  return pol;
 }
 
 export const highlightSegment = function(roofSegment: ExtendedSegment, extraParams = {}) {
@@ -188,6 +221,17 @@ export const highlightSegment = function(roofSegment: ExtendedSegment, extraPara
     roofSegment.sunMarker.content.style.border = '1px solid orange';
     roofSegment.sunMarker.content.style.borderRadius = '50%';
   }
+  // highlight the line associated to the roof
+  if (roofSegment.lowRoofLine) {
+    roofSegment.lowRoofLine.setVisible(true);
+  }
+
+  const notificationId = getSavedRectangleBySegment(roofSegment) ? 'STEP3_HOVERING_SEGMENT_WITH_RECTANGLE' : 'STEP3_HOVERING_SEGMENT';
+  createNotification(notificationId, [
+    (roofSegment.indexInMap! + 1).toString(),
+    roofSegment.data?.stats.areaMeters2.toFixed(2).toString()!,
+    roofSegment.data!.pitchDegrees.toString()
+  ]);
 }
 export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
   // check if the segment has a rectangle. The style is different thena
@@ -200,6 +244,11 @@ export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
   if (roofSegment.sunMarker?.content) {
     roofSegment.sunMarker.content.style.border = 'none'
   }
+  if (roofSegment.lowRoofLine) {
+    roofSegment.lowRoofLine.setVisible(false);
+  }
+
+  removeNotification();
 }
 export const fadeSegment =function(roofSegment: ExtendedSegment) {
   roofSegment.setOptions({ fillOpacity: 0.1, strokeOpacity: 0 });
@@ -269,15 +318,10 @@ export const paintCenterOfUsersRectangleInMap = (gmap: google.maps.Map) => {
   // calculate center coords:
   const polygonCenterCoords = getPolygonCenterCoords(window.cocoDrawingRectangle.polygon);
 
-  console.log('center polygon is ', polygonCenterCoords?.lat(), polygonCenterCoords?.lng());
+  console.log('center rectangle painted by the user is ', polygonCenterCoords?.lat(), polygonCenterCoords?.lng());
   const markerOptions = { ...MARKER_DOT, style: { ...MARKER_DOT.style, 'border-color': 'darkturquoise'} };
   if (polygonCenterCoords) {
     window.paintAMarker( gmap, polygonCenterCoords, `${window.cocoAssetsDir}${'pixel.png'}`, markerOptions)
       .then(marker => addAssociatedMarker(marker, window.cocoDrawingRectangle as AssociatedMarkersParent));
   }
-
-  // Not important also we paint the first vertex as a reference.
-  const vertex = window.cocoDrawingRectangle.polygon.getPath().getArray();
-  window.paintAMarker( gmap, vertex[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
-      .then(marker => addAssociatedMarker(marker, window.cocoDrawingRectangle as AssociatedMarkersParent) );
 }

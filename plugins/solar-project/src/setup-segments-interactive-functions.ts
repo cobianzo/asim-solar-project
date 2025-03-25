@@ -119,10 +119,10 @@ const setupSegments = ( paintSunMarkers = true ) => {
   const roofSegments = window.cocoBuildingSegments;
 
   if ( roofSegments.length ) {
-    roofSegments.forEach((element : RoofSegmentStats, i: number) => {
-      console.log( 'Calculos par segment ', i, element);
+    roofSegments.forEach((segmentItem : RoofSegmentStats, i: number) => {
+      console.log( 'Calculos par segment ', i, segmentItem);
 
-      const {center, azimuthDegrees, boundingBox: {sw, ne}} = element;
+      const {center, azimuthDegrees, boundingBox: {sw, ne}} = segmentItem;
 
       // Early exit if any required property is undefined
       if (!center || azimuthDegrees === undefined || !sw || !ne) {
@@ -170,21 +170,31 @@ const setupSegments = ( paintSunMarkers = true ) => {
         return null;
       }
 
-      // add extra data to the segment so we can manipulate it better.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const segment = paintSegment(theMap, rectangleToPaint);
+      /**
+       * PAINT THE SEGMENT POLYGON (inclined rectangle)
+       */
+      const segment = paintSegment(theMap, rectangleToPaint, {...segmentItem, ...{isPortrait} });
+      if (segment) {
+        // paint a line for the side from vertex 1 to 2, which is the lower side of the roof
 
-      segment.data = element; // to access to the solar API data of the segment
+        // const [ , v1, v2, ] = segment.getPath().getArray();
+        // new google.maps.Polyline({
+        //   path: [v1, v2],
+        //   strokeColor: "#FFA500",
+        //   strokeOpacity: 1,
+        //   strokeWeight: 5, // we'll show it on hover and selected
+        //   map: theMap,
+        // });
+      }
+
+      // add extra data to the segment so we can manipulate it better.
+      segment.data = segmentItem; // to access to the solar API data of the segment
       segment.indexInMap = i;
 
       if (paintSunMarkers) {
         paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
           addAssociatedMarker(sunMarker, segment as unknown as AssociatedMarkersParent);
         });
-        // now the marker for the first vertex
-        window.paintAMarker( theMap, segment.getPath().getArray()[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
-          .then(m => addAssociatedMarker(m, segment as unknown as AssociatedMarkersParent))
       }
 
       segment.realRotationAngle = realAngleRotation;
@@ -316,7 +326,7 @@ function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   } else {
 
     // this makes that the user starts painting the rectangle at the same time that he selects the segment
-    // handlerFirstClickDrawRectangleOverSegment(e);
+    // handlerFirstClickDrawRectangleOverSegment(e); // currently removed.
     // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
     google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
 
@@ -364,10 +374,11 @@ export const addAssociatedMarker = (marker: AdvancedMarkerElement, parent: Assoc
  * created asyncronously. (e.g. when creating markers on every mousemove)
  * @param parent
  */
-export const cleanupAssociatedMarkers = ( parent: AssociatedMarkersParent) => {
-  parent.associatedMarkers ||= [];
-  deleteMarkersCompletely(parent.associatedMarkers);
-  parent.associatedMarkers = [];
+export const cleanupAssociatedMarkers = ( parent: AssociatedMarkersParent, overwritingPropForAssociatedMarkers?: string) => {
+  const prop = overwritingPropForAssociatedMarkers || 'associatedMarkers';
+  parent[prop] ||= [];
+  deleteMarkersCompletely(parent[prop]);
+  parent[prop] = [];
 };
 
 

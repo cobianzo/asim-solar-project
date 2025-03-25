@@ -32,6 +32,8 @@ export interface RoofSegmentStats {
   },
   boundingBox: boxBySWNE;
   planeHeightAtCenterMeters: number;
+  // extra added for my own convenience (used in paint·Segment)
+  isPortrait?: boolean;
 }
 
 // to a polygone which is a rectangle of the one roof segment, we bind more data:
@@ -42,6 +44,14 @@ export interface ExtendedSegment extends google.maps.Polygon {
   realRotationAngle?: number; // in case we have rotated the data.azimuthDegrees I think I can delete it.
   map: google.maps.Map;
   isPortrait?: boolean;
+  lowRoofLine: google.maps.Polyline;
+}
+
+// when clicking in the map
+export interface MapMouseEvent {
+  domEvent: MouseEvent;
+  latLng: google.maps.LatLng;
+  pixel: google.maps.Point;
 }
 
 // object with many properties saving the info of the rectangle that the user is painting in step 2
@@ -67,7 +77,7 @@ export interface CocoDrawingRectangleInfo {
   tempRotatedCoords?: string | null;
 
   // handlers to resize
-  handlers?: Array<AdvancedMarkerElement>; // Array gets keys 0 and 2.
+  rectangleAssociatedMarkers?: Array<AdvancedMarkerElement>; // Array gets keys 0 and 2.
   draggingHandler?: AdvancedMarkerElement;
 }
 

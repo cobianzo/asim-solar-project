@@ -1,6 +1,6 @@
 // We can refactor by using `rotateRectanglePolygon`, currently not in use.
 
-import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
+import { paintResizeHandlersInUsersRectangle } from "./setup-resize-rectangle-interaction";
 import { convertPointsArrayToLatLngString, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, latLngToPoint, convertPolygonPathToPoints, rotateRectangle, getInclinationByPolygonPath } from "./trigonometry-helpers";
 
 const rectangleRotationInteractionSetup = function() {
@@ -87,7 +87,7 @@ const rectangleRotationInteractionSetup = function() {
       window.cocoDrawingRectangle.currentInclinationAfterRotation = getInclinationByPolygonPath( window.cocoDrawingRectangle.polygon );
 
       // update the handler of the rectangle
-      paintResizeHandlersInPolygon();
+      paintResizeHandlersInUsersRectangle();
 
       // save the new value in the input
       // @TODO: this is now step 3!

@@ -36,11 +36,16 @@ abstract class API {
 	public static function get_google_api_response( string $base_endpoint, string $method, array $data = array() ) : array | bool {
 		$api_url         = $base_endpoint . $method;
 		$transient_key   = '_google_api_' . md5( $api_url . wp_json_encode( $data ) );
+		if ( isset( $_GET['solar-cache-clear'] ) ) {
+			delete_transient( $transient_key );
+		}
 		$cached_response = get_transient( $transient_key );
 
 		// debug prints
-		// echo $api_url . '<br><br>';
+		// echo '<br><br>API url : ' . $api_url . '<br><br>';
 		// echo json_encode( $data, JSON_PRETTY_PRINT );
+		// echo '<br>API: ' . self::get_google_api();
+
 		if ( false !== $cached_response ) {
 			$cached_response['cached'] = true;
 			return $cached_response;

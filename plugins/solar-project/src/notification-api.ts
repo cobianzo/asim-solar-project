@@ -8,10 +8,14 @@ const PRESET_MSG: Record<string, string> = {
   STEP2_RETURNING: 'Check that the red squares are the most aligned possible to the shape of the roof',
   STEP3_EDIT_OR_SELECT: 'You have setup the sola panel for %s of the roofs. You can keep on editing or submit the fotm by clicking NEXT',
   STEP3_SELECT_SEGMENT: 'There are %s segments on this building. Please start by selecting one of them to create your solar panel installation',
-  STEP3_SEGMENT_SELECTED: 'Good you have selected one of the segments of %s square meters. Now click again on the segment to start designing the rectangle of your solar panel installation',
+  STEP3_SEGMENT_SELECTED: 'Good. You have selected one of the segments of %s square meters. Now click again on the segment to start designing the rectangle of your solar panel installation',
   STEP3_SEGMENT_SELECTED_WITH_RECTANGLE: 'You can remove the individual solar panels by clicking on the button Edit Solar Panels and selecting the panels that you want to remove',
   STEP3_CLICK_ON_SOLAR_PANEL: 'When you finish editing the solar panels, you can click on Save to apply the changes.',
   STEP3_START_EDIT_PANELS: 'Pass the button over the solar panels. You can remove some of them by clicking it over',
+  STEP3_HOVERING_SEGMENT: 'This is the roof segment %s with an area of %s square meters and a tilt of %s degrees.',
+  STEP3_HOVERING_SEGMENT_WITH_RECTANGLE: 'Click to edit or delete the solar panel rectangle.',
+  STEP3_FIRST_VERTEX_RECTANGLE: 'You have just selected the first vertex of the rectangle where your panels will be placed. <br> Now choose the size of the rectangle and click the mouse when ready. You can always resize the rectangle later.',
+  STEP3_SECOND_VERTEX_RECTANGLE: 'The rectangle has been updated. Now you can click on Save to apply the changes.',
 };
 
 /**
@@ -59,7 +63,7 @@ export const createNotification = (message: string, placeholders: string[] = [])
   }
 
 
-  notificationDiv.textContent = messageText;
+  notificationDiv.innerHTML = messageText;
 };
 
 

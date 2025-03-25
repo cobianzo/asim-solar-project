@@ -1,10 +1,11 @@
 import { MARKER_CENTERED_OPTIONS } from "./drawing-helpers";
 import { handlerMouseMoveSecondVertexRectangle, handlerSecondClickDrawRectangle } from "./setup-rectangle-interactive";
+import { cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
 import { latLngToPoint, convertPolygonPathToPoints } from "./trigonometry-helpers";
 
 
 
-export const paintResizeHandlersInPolygon = function() {
+export const paintResizeHandlersInUsersRectangle = function() {
   if (!window.cocoDrawingRectangle.polygon)  {
     return;
   }
@@ -31,17 +32,17 @@ export const paintResizeHandlerInPolygon = function( gmap: google.maps.Map | nul
       marker.content.classList.add(`handler-resize`);
       marker.content.dataset.handlerVertexIndex = indexVertex.toString();
     }
-    window.cocoDrawingRectangle.handlers = window.cocoDrawingRectangle.handlers || [];
-    window.cocoDrawingRectangle.handlers[indexVertex] = marker;
+    window.cocoDrawingRectangle.rectangleAssociatedMarkers ||= [];
+    window.cocoDrawingRectangle.rectangleAssociatedMarkers[indexVertex] = marker;
     window.cocoDrawingRectangle.draggingHandler = marker;
 
-    // apply listeners when clicked on the vertex, to drag
-    (marker as AdvancedMarkerElement).content!.addEventListener("mousedown", startDrag);
+    // apply listeners when clicked on the vertex, to resize
+    (marker as AdvancedMarkerElement).content!.addEventListener("mousedown", startResize);
   });
 }
 
 // dragging handlers
-const startDrag = function(e: MouseEvent) {
+const startResize = function(e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
 
@@ -60,18 +61,6 @@ const startDrag = function(e: MouseEvent) {
 }
 
 export const destroyHandlersInRectanglePolygon = function() {
-
   delete window.cocoDrawingRectangle.draggingHandler;
-
-  if (window.cocoDrawingRectangle.handlers) {
-    Object.keys(window.cocoDrawingRectangle.handlers).forEach(key => {
-      // @ts-ignore
-      const handler = window.cocoDrawingRectangle.handlers[key];
-      if (handler) {
-        google.maps.event.clearInstanceListeners(handler);
-        handler.map = null;
-      }
-    });
-    window.cocoDrawingRectangle.handlers = [];
-  }
+  cleanupAssociatedMarkers(window.cocoDrawingRectangle as AssociatedMarkersParent, 'rectangleAssociatedMarkers');
 }

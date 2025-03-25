@@ -35,7 +35,7 @@ document.addEventListener("solarMapReady", (event: Event) => {
   loadSavedRectanglesFromTextArea();
 
   // notification
-  if (window.cocoSavedRectangles.length) {
+  if (window.cocoSavedRectangles?.length) {
     createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles.length.toString()] );
   } else {
     createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments.length.toString()] );

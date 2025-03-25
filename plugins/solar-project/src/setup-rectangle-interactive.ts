@@ -11,17 +11,18 @@
  *
  */
 import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsersRectangleInMap, paintRectangleInMap } from "./drawing-helpers";
-import { paintResizeHandlersInPolygon } from "./setup-resize-rectangle-interaction";
+import { paintResizeHandlersInUsersRectangle } from "./setup-resize-rectangle-interaction";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
 import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
-import { ExtendedSegment, LoadedSavedRectangeData, SavedRectangle } from "./types";
+import { ExtendedSegment, LoadedSavedRectangeData, MapMouseEvent, SavedRectangle } from "./types";
 import { createSaveSegmentButton, handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
 import { addAssociatedMarker, cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
 import { cleanupSolarPanelsForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
 import { showVariableAsString } from "./debug";
 import { getMostCommonUnit } from "@wordpress/components/build-types/border-box-control/utils";
 import { getCurrentStepCocoMap } from ".";
+import { createNotification, removeNotification } from "./notification-api";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeWeight: 2,
@@ -253,15 +254,22 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 
   window.cocoDrawingRectangle.tempFirstClickPoint = latLngToPoint(segm.map, { latitude: latLng.lat, longitude: latLng.lng });
 
-  segm.setOptions({ fillOpacity: 0.1 });
-  segm.setOptions({ clickable: false });
-  segm.setVisible(false);
+  segm.setOptions({
+    fillOpacity: 0.1,
+    clickable: false,
+    visible: false,
+  });
 
   // paint the arrow marking the first vertex
   window.paintAMarker(segm.map, e.latLng!, `${window.cocoAssetsDir}vertex-sw-white.png`, MARKER_LEFT_BOTTOM_OPTIONS)
     .then(m => addAssociatedMarker(m, window.cocoDrawingRectangle as AssociatedMarkersParent))
 
-  // Now setup the listeners
+
+  createNotification('STEP3_FIRST_VERTEX_RECTANGLE');
+
+
+
+  // Now setup the listeners for editing the existing rectangle
   google.maps.event.clearListeners(segm, 'click');
   segm.map.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
   segm.map.addListener('click', (e: google.maps.MapMouseEvent) => {
@@ -299,14 +307,13 @@ export const handlerSecondClickDrawRectangle = function () {
   paintCenterOfUsersRectangleInMap(segm.map);
 
   // assign the event listeners that allow the user to rotate the rectangle on the map
-  rectangleRotationInteractionSetup(); // currently deactivated
-  paintResizeHandlersInPolygon(); // TODO: apply after rotation.
+  // rectangleRotationInteractionSetup(); // currently deactivated
+  paintResizeHandlersInUsersRectangle();
 
   // Clear the listeners for mousedown, click, and mousemove on segm.map
-  window.google.maps.event.clearListeners(segm.map, 'mousedown');
-  window.google.maps.event.clearListeners(segm.map, 'click');
-  window.google.maps.event.clearListeners(segm.map, 'mousemove');
-  window.google.maps.event.clearListeners(segm.map, 'mouseup');
+  ['mousedown', 'click', 'mousemove', 'mouseup'].forEach(eventName => {
+    google.maps.event.clearListeners(segm.map, eventName);
+  });
 
   // make the polygon draggable
   if (window.cocoDrawingRectangle.polygon) {
@@ -315,19 +322,12 @@ export const handlerSecondClickDrawRectangle = function () {
     // Add event listener to handle drag end
     window.cocoDrawingRectangle.polygon.addListener('dragend', () => {
       console.log('%cRectangle dragged', 'color: green; font-weight: bold;');
-      // Update the rectangle coordinates after dragging
-      const newPath = window.cocoDrawingRectangle.polygon!.getPath();
-      let updatedCoords: string = '';
-      newPath.forEach((latLng) => {
-        updatedCoords += (updatedCoords.length ? ' ' : '') + latLng.lat + ',' + latLng.lng;
-      });
-      console.log('Updated rectangle coordinates:', updatedCoords);
 
       // Repaint the rectangle with all the accessories
       delete window.cocoDrawingRectangle.tempFirstClickPoint;
       paintCenterOfUsersRectangleInMap(segm.map);
       rectangleRotationInteractionSetup();
-      paintResizeHandlersInPolygon(); // TODO: apply after rotation.
+      paintResizeHandlersInUsersRectangle(); // TODO: apply after rotation.
       // The rectangle has been updated. We need to update the saved rectangle if it exists.
       const savedRectangle = getSavedRectangleBySegment(segm);
       if (savedRectangle) {
@@ -341,11 +341,36 @@ export const handlerSecondClickDrawRectangle = function () {
   if (savedRectangle) {
     savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
   }
+
+
+  createNotification('STEP3_SECOND_VERTEX_RECTANGLE');
 }
 
-export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.MapMouseEvent) => {
+  /**
+   * Fairly complex.
+   * Paints the rectangle of the user while it is being created, as the user drags the mouse.
+   * It calculates the coordinates of the rectangle given the two points that the user is dragging.
+   * It takes into account the inclination of the parent segment.
+   * Potentially it could  into account if the rectangle has been rotated (but this option is deactivated).
+   * @param clickEvent The google maps event that has triggered this function.
+   * @returns an object with the calculated coordinates of the rectangle, axis lines and vertex points.
+   */
+export const handlerMouseMoveSecondVertexRectangle = (clickEvent: MapMouseEvent) => {
 
   const gmap = window.cocoDrawingRectangle.selectedSegment?.map;
+
+  if (clickEvent?.pixel && window.cocoDrawingRectangle.tempFirstClickPoint) {
+    // wait for the rectangle to be bin enough to calculate the inclination
+    // otherwise we can't calculate the inclination with warranties.
+    // while this early exit happens, the user will see an arrow where he clicked first.
+    const distancePixels = Math.sqrt(
+      Math.pow(clickEvent.pixel.x - window.cocoDrawingRectangle.tempFirstClickPoint.x, 2) +
+      Math.pow(clickEvent.pixel.y - window.cocoDrawingRectangle.tempFirstClickPoint.y, 2)
+    );
+    const minPixels = 5;
+    if (distancePixels < minPixels) return;
+  }
+
 
   // When we execute this handler the first time, as the rectangle polygon doesnt exist,
   // then we take the inclination of the parent segment.
@@ -416,15 +441,14 @@ export const handlerMouseMoveSecondVertexRectangle = (clickEvent: google.maps.Ma
     const {
       axisLinesDefinedByPointsFirst,
       axisLinesDefinedByPointsSecond,
-      rectanglePolygonCoords,
+      rectanglePolygonCoords, // the only one we need
       vertexPoints
     } = success;
 
 
-
     // if the polygon is drawn, we remove it and repaint it and update the params of the rectangle
     paintRectangleInMap(gmap, window.cocoDrawingRectangle.selectedSegment, rectanglePolygonCoords);
-    console.log('Rectangle painted, ', success);
+
   }
 
   return success;
