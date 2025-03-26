@@ -38,9 +38,8 @@ class Gravity_Hooks {
 		add_filter( 'coco_gravity_form_map_field_default_lat', array( __CLASS__, 'set_default_lat' ), 10, 2 );
 		add_filter( 'coco_gravity_form_map_field_default_lng', array( __CLASS__, 'set_default_lng' ), 10, 2 );
 
-		// JS to draw rectangles and polygons and markers: both work but I have deactivated, info not needed.
-		// add_action( 'coco_gravity_form_script_after_map_created', [ __CLASS__, 'js_script_to_print_bounding_boxes_areas' ], 10, 3 );
-
+		// Step 4, custom HTML there in combination with step4·functions.ts
+		add_filter('gform_field_content', [ __CLASS__, 'step4_power_calculations_html' ], 10, 5 );
 	}
 
 	public static function form_top_message( $form, $form_id ) {
@@ -157,6 +156,16 @@ class Gravity_Hooks {
 		return $lng;
 	}
 
+	public static function step4_power_calculations_html($field_content, $field, $value, $lead_id, $form_id) {
+    if ($field->adminLabel == 'power-calculations') {
+        $html_before = '<div class="my-html-before">This is HTML before the field.</div>';
+        $html_after = '<div class="my-html-after">This is HTML after the field.</div>';
+
+        return $html_before . $field_content . $html_after;
+    }
+
+    return $field_content;
+	}
 }
 
 Gravity_Hooks::init();

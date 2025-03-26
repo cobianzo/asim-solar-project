@@ -1,5 +1,7 @@
 # TODO NEXT
 
+fix bug when unselecting segment. The low roof line stays there still.
+Create step 4: calculations.
 Imprve position of buttons, closer to the segment
   Btn Delete in Red.
   Btn Unselect in Blue
@@ -7,6 +9,7 @@ Imprve position of buttons, closer to the segment
   When resizing Save changes to Apply changes.
 When dragging and redimensioning the rect, hide the solar panels
 Show in DB the data from the rectangles and solar panels
+Update the sizes of the panels. Make the options definitive.
 Fix form back and fw.
 
 # What
@@ -36,6 +39,7 @@ Fix form back and fw.
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
     - The map in step 3 must have the adminLabel === 'map-rectangle'
     - below the map in step 3 we need a gf textarea with adminLabel and class === 'saved-rectangles'
+  - The step 4 needs to have any field with class and adminLabel === 'power-calculations'
 
 # Develop
 

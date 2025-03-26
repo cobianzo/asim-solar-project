@@ -25,7 +25,7 @@ declare global {
     step3CocoMapInputId: string;
 
     cocoBuildingProfile: Array<string>;
-    gf_current_page: number;
+    gf_current_page: string;
 
     cocoMaps: { [key: string]: CocoMapSetup }; // @TODO:
     cocoMapSetup?: CocoMapSetup;
@@ -60,3 +60,4 @@ export const getCurrentStepCocoMap = function(): CocoMapSetup | null {
 import './step1_functions';
 import './step2_functions';
 import './step3_functions';
+import './step4_functions';
