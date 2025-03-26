@@ -1,15 +1,18 @@
-import { contextConnect } from '@wordpress/components/build-types/context';
 import { resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
-import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
+import { getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
-import { DELETED_PANEL_OPTIONS, EDITABLE_PANEL_OPTIONS, isSolarPanelDeactivated, HIGHLIGHTED_PANEL_OPTIONS, paintSolarPanelsForSavedRectangle, activateSolarPanel, deactivateSolarPanel, PANEL_OPTIONS, startEditSolarPanelsMode, exitEditSolarPanelsMode } from './setup-solar-panels';
+import { paintSolarPanelsForSavedRectangle, startEditSolarPanelsMode, exitEditSolarPanelsMode } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
-import { showVariableAsString } from './debug';
 import { createNotification, removeNotification } from './notification-api';
+import { debug } from 'geotiff/dist-node/logging';
 
 function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: MouseEvent) => void, attrs: Record<string, any> = {}) {
+
+  if (!gmap) {
+    return;
+  }
   if (attrs.id) {
     const existingBtn = document.getElementById(attrs.id);
     existingBtn?.remove();
@@ -60,7 +63,9 @@ export const createSaveSegmentButton = ( gmap : google.maps.Map ) => {
  * @returns
  */
 export const createOrientationRadio = ( gmap: google.maps.Map ) => {
-
+  if (!gmap){
+    return;
+  }
   // helper fn create a single radio button. We'll call it twice
   function createRadioButton(parentDiv: HTMLElement, value: string, labelText: string) {
     const label = document.createElement('label');

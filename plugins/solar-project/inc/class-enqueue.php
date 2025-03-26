@@ -15,6 +15,8 @@ class Enqueue {
 			wp_register_style( 'coco-solar-project', plugins_url( 'src/style.css', __DIR__ ), [], null );
 			wp_enqueue_style( 'coco-solar-project' );
 		} );
+
+
 	}
 
 	/**
@@ -71,6 +73,7 @@ class Enqueue {
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url() . "'; \n" .
+				"window.cocoNotificationsUrl = '" . plugins_url( '/assets/notifications', __DIR__ ) . "'; \n" .
 				// step 1
 				"window.step1CocoMapInputId = 'input_{$coco_maproofselect_instance->formId}_{$coco_maproofselect_instance->id}'; \n" .
 				// step 2

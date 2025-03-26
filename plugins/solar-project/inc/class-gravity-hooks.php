@@ -21,13 +21,17 @@ class Gravity_Hooks {
 
 	public static function init() {
 
+		//
+		// hook to inject html code before the form is rendered
+		add_filter( 'gform_get_form_filter', array( __CLASS__, 'form_top_message' ), 10, 2 );
+
 		// hook for the backend, edit form: adds the option 'Developer' to the Interaction Type
 		add_action( 'coco_gf_map_field_interaction_type_extra_options', function () {
 			echo '<option value="developer">' . esc_html( 'Developer', 'coco-gravity-forms-map-addon' ) . '</option>';
 		} );
 
 		// Gravity_Hooks who applied in the page 2 of the form, on the coco-map field with polygon interaction
-		add_action( 'coco_gravity_form_map_field_previous_to_field', array( __CLASS__, 'form_top_message' ), 10, 3 );
+		add_action( 'coco_gravity_form_map_field_previous_to_field', array( __CLASS__, 'coco_field_top_message' ), 10, 3 );
 
 		// there is another hook called `coco_gravity_form_map_field_value`
 		add_filter( 'coco_gravity_form_map_field_default_zoom', array( __CLASS__, 'set_default_zoom' ), 10, 2 );
@@ -39,7 +43,29 @@ class Gravity_Hooks {
 
 	}
 
-	public static function form_top_message( $field_instance, $form, $value ) {
+	public static function form_top_message( $form, $form_id ) {
+		?>
+		<div class="popup-info hidden" id="popup-generic"
+			onclick="window.closeNotificationPopup(); return false ">
+			<div class="popup-generic-content"></div>
+		</div>
+		<?php
+		return $form;
+	}
+
+	/**
+	 * Creates HTML before the coco-map field, from the step 2 onwards.
+	 *
+	 * This function captures the map field instance from the form, checks if a value is selected,
+	 * and then retrieves and displays solar building data, including roof segment statistics.
+	 * It also provides interactive buttons to show detailed building profiles and solar API responses
+	 * in popover modals.
+	 *
+	 * @param object $field_instance The field instance object containing form field details.
+	 * @param array  $form           The form array containing form information and fields.
+	 * @param mixed  $value          The current value of the field in the form.
+	 */
+	public static function coco_field_top_message( $field_instance, $form, $value ) {
 		$coco_map_entry = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
 		if ( empty( $coco_map_entry->value ) ) {
 			return;
@@ -106,6 +132,7 @@ class Gravity_Hooks {
 
 		<button onClick="window.debug.showAllJSGlobalVarsInPopup(event); return false;">Mostra JS variables</button>
 		<?php
+
 	}
 
 	public static function set_default_zoom( $zoom, $form ) {

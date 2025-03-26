@@ -17,8 +17,8 @@ import { getStep3CocoMapSetup } from "./step3_functions";
 import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, LoadedSavedRectangeData, MapMouseEvent, SavedRectangle } from "./types";
 import { createSaveSegmentButton, handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
-import { addAssociatedMarker, cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
-import { cleanupSolarPanelsForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
+import { addAssociatedMarker, cleanupAssociatedMarkers, handlerClickSelectSegment } from "./setup-segments-interactive-functions";
+import { cleanupSolarPanelsForSavedRectangle, exitEditSolarPanelsMode, setupSolarPanels } from "./setup-solar-panels";
 import { showVariableAsString } from "./debug";
 import { getMostCommonUnit } from "@wordpress/components/build-types/border-box-control/utils";
 import { getCurrentStepCocoMap } from ".";
@@ -286,6 +286,12 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
     window.cocoDrawingRectangle.inclinationWhenCreated = degreesInc == null? 0 : degreesInc;
     window.cocoDrawingRectangle.currentInclinationAfterRotation = window.cocoDrawingRectangle.inclinationWhenCreated;
 
+    // Chapuza: hacemos que el usuario salve los cambios automaticamente.
+    setTimeout(() => {
+      const btn = document.getElementById('save-rectangle-btn');
+      if (btn) btn.click();
+    }, 500);
+
   });
 
 }
@@ -344,6 +350,16 @@ export const handlerSecondClickDrawRectangle = function () {
 
 
   createNotification('STEP3_SECOND_VERTEX_RECTANGLE');
+
+  // now we found out that it's a better use experience if
+  const editedSegment = window.cocoDrawingRectangle.selectedSegment;
+  if (editedSegment) {
+    // handlerClickSaveRectangleButton(null);
+    const btn = document.getElementById('delete-rectangle-btn');
+    // if (btn) btn.click();
+    // handlerClickSelectSegment.call(editedSegment, new Event('click'));
+  }
+
 }
 
   /**

@@ -16,6 +16,7 @@ declare global {
 
 
     cocoAssetsDir: string;
+    cocoNotificationsUrl: string;
     step1CocoMapInputId: string;
     step2CocoMapInputId: string;
     step2RotationInserted: SelectRotationPortraitSegmentsOptions;
@@ -39,7 +40,7 @@ declare global {
     // this fn is exposed by the external plugin coco-map0-field
     paintAPoygonInMap: (gMap: google.maps.Map, coordinatesAsString: string, extraparams?: object) => ExtendedSegment;
     paintAMarker: (gMap: google.maps.Map|null, position: google.maps.LatLng, markerIcon?: string, extraOptions?: object) => Promise<AdvancedMarkerElement>;
-
+    closeNotificationPopup: () => void;
 
     debug: Record<string, any>; // /TODELETE, for debugging testing in console, use it wit window.debug
   }

@@ -1,3 +1,5 @@
+// WordPress dependencies
+import apiFetch from '@wordpress/api-fetch';
 import { getCurrentStepCocoMap } from ".";
 
 
@@ -78,3 +80,52 @@ export const removeNotification = (messageKey?: string | null) => {
   }
   // TODO: remove only if the message key is given.
 }
+
+export const openNotificationPopup = (filename: string, placeholders: Record<string, string | number> = {}) => {
+  //cleanup
+  closeNotificationPopup();
+
+  // init
+  const parentDiv = document.getElementById('popup-generic');
+  const contentContainer = parentDiv?.querySelector('.popup-generic-content');
+  if (!parentDiv || !contentContainer) return;
+
+  console.log(
+    `>> showing notification notifications/${filename}`,
+    placeholders
+  );
+  // retrieve the message
+  const path = `coco-solar/v1/notifications/${filename}`;
+  apiFetch({ path })
+        .then((html) => {
+          // handle the error of an html 40x response
+          if (html.includes('<title>40')) {
+            console.error("Error: Received a 40x error response");
+            return;
+          }
+
+          // Replacement placeholders in the HTML, handlevars syntax
+          Object.keys(placeholders).forEach(key => {
+            const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+            const value = typeof placeholders[key] === 'number' ? String(placeholders[key]) : placeholders[key];
+            html = html.replace(regex, value);
+          });
+
+          // show the message
+          contentContainer.innerHTML = html as string;
+          parentDiv.classList.remove('hidden');
+          parentDiv.classList.add('show');
+        })
+        .catch(error => console.error("Error loading the notification "+ filename +":", error));
+}
+
+export const closeNotificationPopup = function() {
+  const parentDiv = document.getElementById('popup-generic');
+  const contentContainer = parentDiv?.querySelector('.popup-generic-content');
+
+  if (!parentDiv || ! contentContainer) return;
+  parentDiv.classList.add('hidden');
+  parentDiv.classList.remove('show');
+  contentContainer.innerHTML = '';
+}
+window.closeNotificationPopup = closeNotificationPopup;

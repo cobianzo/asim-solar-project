@@ -1,5 +1,4 @@
 {
-  "$schema": "./schemas/wp-env.json",
   "core": null,
   "plugins": [
     ".",
@@ -24,5 +23,13 @@
 			"phpVersion": "8.2",
 			"port": 8889
 		}
-	}
+	},
+  "hooks": {
+    "wp-env": {
+      "start": [
+        "wp option update permalink_structure '/%postname%/'",
+        "wp rewrite flush"
+      ]
+    }
+  }
 }

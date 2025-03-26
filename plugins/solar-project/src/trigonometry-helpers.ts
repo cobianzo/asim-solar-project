@@ -171,7 +171,6 @@ export const convertStringCoordsInLatLng = function(
   // }
 }
 
-
 /**
  * google.maps.polygon ==> '34.43243,11.423423 34.5567,12.432423 ...'
  * @param polygon
@@ -639,6 +638,47 @@ export const getRectangleSideDimensionsByPolygonPath = function( polygon: google
   return [side1_length, side2_length];
 }
 
+
+export const getCardinalOrientationFromPolygon = function( poly: google.maps.Polygon ) {
+  const [v0, v1] = poly.getPath().getArray();
+  return convertLineIntoCardinalOrientation(v0, v1);
+}
+export const getCardinalOrientationFromAngle = function(angle: number) : string {
+  // Normalize the angle to be within 0-360 degrees
+  const normalizedAngle: number = (angle % 360 + 360) % 360;
+  if (normalizedAngle >= 337.5 || normalizedAngle < 22.5) {
+    return 'North';
+  } else if (normalizedAngle >= 22.5 && normalizedAngle < 67.5) {
+    return 'Northeast';
+  } else if (normalizedAngle >= 67.5 && normalizedAngle < 112.5) {
+    return 'East';
+  } else if (normalizedAngle >= 112.5 && normalizedAngle < 157.5) {
+    return 'Southeast';
+  } else if (normalizedAngle >= 157.5 && normalizedAngle < 202.5) {
+    return 'South';
+  } else if (normalizedAngle >= 202.5 && normalizedAngle < 247.5) {
+    return 'Southwest';
+  } else if (normalizedAngle >= 247.5 && normalizedAngle < 292.5) {
+    return 'West';
+  } else {
+    return 'Northwest';
+  }
+}
+const convertLineIntoCardinalOrientation = function(v0: google.maps.LatLng, v1: google.maps.LatLng) : string {
+
+
+  const [lat0, lng0, lat1, lng1] = [v0.lat(), v0.lng(), v1.lat(), v1.lng()];
+
+  const deltaLat = lat1 - lat0;
+  const deltaLng = lng1 - lng0;
+
+  if (deltaLat === 0 && deltaLng === 0) {
+      return 'Undefined'; // hadnle this differently
+  }
+
+  const angle = (Math.atan2(deltaLng, deltaLat) * 180) / Math.PI;
+  return getCardinalOrientationFromAngle(angle);
+}
 
 /**
  * Converts a distance in meters to the equivalent change in latitude degrees.

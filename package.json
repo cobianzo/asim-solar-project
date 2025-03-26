@@ -32,6 +32,7 @@
     "playwright": "^1.51.0"
   },
   "dependencies": {
+    "@wordpress/api-fetch": "^7.20.0",
     "@wordpress/env": "^4.9.0",
     "browser-sync": "^3.0.3"
   }

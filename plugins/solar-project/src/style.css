@@ -19,17 +19,29 @@ body {
     position: fixed;
     background: #ffffffee;
     padding: 10px;
-    top: 35px;
+    top: 55px;
     border: 5px solid #000000aa;
+    border-radius: 1rem;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.75);
-    left: 0;
-    max-height: 80vh;
+    left: 1rem;
+    max-height: calc( 100vh - 80px );
     overflow: auto;
     font-size: 1rem;
     z-index: 9999;
+    opacity: 0; /* Inicialmente oculto */
+    visibility: visible;
+    transition: opacity 0.3s ease-in-out; /* Transición para la opacidad */
+
+    .popup-generic-content {
+      padding: 0 1rem;
+      font-size: 1rem;
+    }
+  }
+  .show {
+    opacity: 1;
   }
   .hidden {
-    display: none;
+    visibility: hidden;
   }
 
   /* radio buttons for rotation of portrait segments*/
@@ -75,6 +87,8 @@ gmp-advanced-marker .handler-resize {
   border-radius: 50%;
   background-color: #FFFFFFAA;
   transition: border-color 0.1s ease-in-out;
+  anchor-name: --handler-resize;
+
   &:hover {
     border-color: #ffcccc;
     background-color: #FFFFFFFF;

@@ -268,7 +268,7 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
     cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
 }
 
-function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
+export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
 
   // init vars
   const segm: ExtendedSegment = this;

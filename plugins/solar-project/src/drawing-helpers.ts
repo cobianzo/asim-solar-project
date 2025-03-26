@@ -3,6 +3,8 @@ import { boxBySWNE, ExtendedSegment, RoofSegmentStats } from './types';
 import {
   convertStringCoordsInLatLng,
   convertStringLatLngToArrayLatLng,
+  getCardinalOrientationFromAngle,
+  getCardinalOrientationFromPolygon,
   getPolygonCenterCoords,
 } from './trigonometry-helpers';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
@@ -11,7 +13,7 @@ import { getSavedRectangleBySegment } from './setup-rectangle-interactive';
 import { rawHandler } from '@wordpress/blocks';
 import { getCurrentStepCocoMap } from '.';
 import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
-import { createNotification, removeNotification } from './notification-api';
+import { closeNotificationPopup, createNotification, openNotificationPopup, removeNotification } from './notification-api';
 
 export const MARKER_CENTERED_OPTIONS = {
   style: {
@@ -226,12 +228,22 @@ export const highlightSegment = function(roofSegment: ExtendedSegment, extraPara
     roofSegment.lowRoofLine.setVisible(true);
   }
 
+  // notifications
   const notificationId = getSavedRectangleBySegment(roofSegment) ? 'STEP3_HOVERING_SEGMENT_WITH_RECTANGLE' : 'STEP3_HOVERING_SEGMENT';
   createNotification(notificationId, [
     (roofSegment.indexInMap! + 1).toString(),
     roofSegment.data?.stats.areaMeters2.toFixed(2).toString()!,
     roofSegment.data!.pitchDegrees.toString()
   ]);
+
+
+
+
+  openNotificationPopup( 'segmentInfo', {...roofSegment,
+    ...{
+      indexInMap: roofSegment.indexInMap! + 1,
+      orientation: getCardinalOrientationFromAngle(roofSegment.data?.azimuthDegrees!)
+    }} as unknown as Record<string, string>);
 }
 export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
   // check if the segment has a rectangle. The style is different thena
@@ -249,6 +261,7 @@ export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
   }
 
   removeNotification();
+  closeNotificationPopup();
 }
 export const fadeSegment =function(roofSegment: ExtendedSegment) {
   roofSegment.setOptions({ fillOpacity: 0.1, strokeOpacity: 0 });
