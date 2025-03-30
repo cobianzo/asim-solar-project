@@ -27,17 +27,20 @@ export const paintResizeHandlerInPolygon = function( gmap: google.maps.Map | nul
   window.paintAMarker(gmap, coords, `${(window as any).cocoAssetsDir}${'target.png'}`, MARKER_CENTERED_OPTIONS)
     .then(marker => {
     // we save the marker for future access.
-    if (marker.content) {
-      marker.content.title = "Resize";
-      marker.content.classList.add(`handler-resize`);
-      marker.content.dataset.handlerVertexIndex = indexVertex.toString();
-    }
-    window.cocoDrawingRectangle.rectangleAssociatedMarkers ||= [];
-    window.cocoDrawingRectangle.rectangleAssociatedMarkers[indexVertex] = marker;
-    window.cocoDrawingRectangle.draggingHandler = marker;
+    if (marker) {
 
-    // apply listeners when clicked on the vertex, to resize
-    (marker as AdvancedMarkerElement).content!.addEventListener("mousedown", startResize);
+      if (marker.content) {
+        marker.content.title = "Resize";
+        marker.content.classList.add(`handler-resize`);
+        marker.content.dataset.handlerVertexIndex = indexVertex.toString();
+        marker.content.id = Math.random().toString(36).substr(2, 5);
+      }
+      window.cocoDrawingRectangle.rectangleAssociatedMarkers ||= [];
+      window.cocoDrawingRectangle.rectangleAssociatedMarkers.push(marker);
+      window.cocoDrawingRectangle.draggingHandler = marker;
+      // apply listeners when clicked on the vertex, to resize
+      (marker as AdvancedMarkerElement).content!.addEventListener("mousedown", startResize);
+    } else alert('error inmarker');
   });
 }
 

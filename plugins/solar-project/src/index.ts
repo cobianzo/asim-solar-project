@@ -25,6 +25,7 @@ declare global {
     step3CocoMapInputId: string;
 
     cocoBuildingProfile: Array<string>;
+    cocoSolarPotential: Record<'maxSunshineHoursPerYear', number>;
     gf_current_page: string;
 
     cocoMaps: { [key: string]: CocoMapSetup }; // @TODO:

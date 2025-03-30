@@ -73,7 +73,7 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
 
   // calculate the fatorfacto to scale to get a rectangle 10x15m
   // let dimensionsPanel = [ 1.134, 1.172 ]; // meters
-  let dimensionsPanel = [ 2, 1 ]; // meters
+  let dimensionsPanel = getCurrentPanelsDimensions(); // meters
 
   if ( 'horizontal' == savedRectangle.panelOrientation ) {
     const [width, height] = dimensionsPanel;
@@ -241,6 +241,78 @@ export function activateSolarPanel(savedRect: SavedRectangle, polygon: google.ma
     savedRect.deactivatedSolarPanels.delete(id);
   }
 }
+
+/**
+ * Small helpers
+ * * ============= ============= ============= ============= ============= ============= *
+ */
+export const getCurrentPanelsDimensions = function() : [number,number] {
+  return [ 2, 1 ]; // in meters
+}
+
+export const getCurrentPanelsNominalPower = function() : number {
+  return 400; // in Watios
+}
+
+export const getCurrentPanelsSystemEfficiency = function(savedRect: SavedRectangle) : number {
+  // electric system efficiency * hours of sun / ideal hours of sun,
+
+  // electric system efficiency depends on the inversor.
+  // ideal hours of sun is something we still dont know
+  return 0.7; // %
+}
+
+export const getAnnualGeneratedPower = function(savedRect: SavedRectangle) : number {
+// Energıˊa Anual (kWh) = Potencia Total (kW)×Horas de Sol al An˜o×Eficiencia del Sistema
+  const panelsPower = numberOfPanelsInRectangle(savedRect) * getCurrentPanelsNominalPower() / 1000; // in kW
+  const hours_of_sun = window.cocoSolarPotential.maxSunshineHoursPerYear
+  const finalEfficiency = getCurrentPanelsSystemEfficiency(savedRect);
+  const powerInKW = panelsPower * hours_of_sun * finalEfficiency;
+  return parseInt(powerInKW.toFixed(0));
+}
+
+/**
+ * Uses API from EU
+ * @param savedRect
+ * @returns
+ */
+export const numberOfPanelsInRectangle = function(savedRect: SavedRectangle) : number {
+  let countPanels = 0;
+  savedRect.solarPanelsPolygons.forEach( row => {
+    row.forEach( panel => {
+      const isDeactivated = isSolarPanelDeactivated(savedRect, panel);
+      if (!isDeactivated) {
+        countPanels++;
+      }
+    })
+  });
+  return countPanels;
+}
+
+async function getIdealSunHours(lat: number, lon: number) {
+  const url = `https://re.jrc.ec.europa.eu/api/v5_2/seriescalc?lat=${lat}&lon=${lon}&outputformat=json`;
+
+  try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      // Extraer la irradiación solar promedio mensual en inclinación óptima
+      const monthlyData = data.outputs.monthly;
+
+      // Sumar las horas de sol estimadas a partir de G(i)
+      let totalHours = 0;
+      monthlyData.forEach(month => {
+          const irradiance = month["G(i)"]; // kWh/m² por mes
+          totalHours += (irradiance * 1000) / 100; // Conversión a horas de sol
+      });
+
+      console.log(`Horas de sol ideales al año: ${totalHours.toFixed(2)} h`);
+      return totalHours;
+  } catch (error) {
+      console.error("Error obteniendo datos de PVGIS:", error);
+  }
+}
+
 
 /**
  * Handlers for individual solar panels

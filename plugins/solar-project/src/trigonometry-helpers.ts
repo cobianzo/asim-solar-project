@@ -229,11 +229,6 @@ export const rotateRectangle = (
     return new google.maps.Point(newX, newY);
   });
 
-  // show for debuggint in a human reading stuff
-  console.log('rotateRectangle from the center', center.x, center.y);
-  console.log('From', vertices.map(point => `${point.x.toFixed()},${point.y.toFixed()}` ).join('  ') );
-  console.log('To   ', newVertex.map(point => `${point.x.toFixed()},${point.y.toFixed()}` ).join('  ') );
-
   return newVertex;
 };
 
@@ -643,26 +638,38 @@ export const getCardinalOrientationFromPolygon = function( poly: google.maps.Pol
   const [v0, v1] = poly.getPath().getArray();
   return convertLineIntoCardinalOrientation(v0, v1);
 }
-export const getCardinalOrientationFromAngle = function(angle: number) : string {
+export const getCardinalOrientationFromAngle = function(angle: number) : [string, string?] {
   // Normalize the angle to be within 0-360 degrees
-  const normalizedAngle: number = (angle % 360 + 360) % 360;
-  if (normalizedAngle >= 337.5 || normalizedAngle < 22.5) {
-    return 'North';
-  } else if (normalizedAngle >= 22.5 && normalizedAngle < 67.5) {
-    return 'Northeast';
-  } else if (normalizedAngle >= 67.5 && normalizedAngle < 112.5) {
-    return 'East';
-  } else if (normalizedAngle >= 112.5 && normalizedAngle < 157.5) {
-    return 'Southeast';
-  } else if (normalizedAngle >= 157.5 && normalizedAngle < 202.5) {
-    return 'South';
-  } else if (normalizedAngle >= 202.5 && normalizedAngle < 247.5) {
-    return 'Southwest';
-  } else if (normalizedAngle >= 247.5 && normalizedAngle < 292.5) {
-    return 'West';
-  } else {
-    return 'Northwest';
-  }
+  const cardinales = {};
+  const amplitude = 45;
+  const extramargin = 15;
+  cardinales.North = { min: 337.5, max: 22.5};
+  cardinales.East = { min: cardinales.North.max + amplitude, max: cardinales.North.max + amplitude * 2};
+  cardinales.South = { min: cardinales.East.max + amplitude, max: cardinales.East.max + amplitude * 2};
+  cardinales.West = { min: cardinales.South.max + amplitude, max: cardinales.South.max + amplitude * 2};
+
+  cardinales.Northeast = { min: cardinales.North.max - extramargin , max: cardinales.North.max + amplitude + extramargin};
+  cardinales.Southeast = { min: cardinales.East.max - extramargin , max: cardinales.East.max + amplitude + extramargin};
+  cardinales.Southwest = { min: cardinales.South.max - extramargin , max: cardinales.South.max + amplitude + extramargin};
+  cardinales.Northwest = { min: cardinales.West.max - extramargin , max: cardinales.West.max + amplitude + extramargin};
+
+  const cardinalPoints = [];
+  Object.keys(cardinales).forEach( cardinalName => {
+    // particular case of north where max is lower than min
+    const cardinalBoundaries = cardinales[cardinalName];
+    if (cardinalBoundaries.max < cardinalBoundaries.min) {
+      if (angle >= cardinalBoundaries.min && angle <= 360 || angle < cardinalBoundaries.max)
+        cardinalPoints.push(cardinalName);
+    }
+    // regular case
+    if (angle >= cardinalBoundaries.min && angle < cardinalBoundaries.max) {
+      cardinalPoints.push(cardinalName);
+    }
+  })
+
+  // sanitize, Ensure the array has max two items
+  cardinalPoints.splice(2);
+  return cardinalPoints as [string, string?];
 }
 const convertLineIntoCardinalOrientation = function(v0: google.maps.LatLng, v1: google.maps.LatLng) : string {
 

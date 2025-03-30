@@ -36,6 +36,10 @@ body {
       padding: 0 1rem;
       font-size: 1rem;
     }
+
+    .visible-no {
+      display: none;
+    }
   }
   .show {
     opacity: 1;

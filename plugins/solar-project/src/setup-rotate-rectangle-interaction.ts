@@ -1,3 +1,4 @@
+// TODELETE
 // We can refactor by using `rotateRectanglePolygon`, currently not in use.
 
 import { paintResizeHandlersInUsersRectangle } from "./setup-resize-rectangle-interaction";

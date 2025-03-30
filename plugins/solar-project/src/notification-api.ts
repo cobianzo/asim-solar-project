@@ -81,6 +81,11 @@ export const removeNotification = (messageKey?: string | null) => {
   // TODO: remove only if the message key is given.
 }
 
+
+
+
+// Now the notifications more complex. The ones that load an html in a popup
+
 export const openNotificationPopup = (filename: string, placeholders: Record<string, string | number> = {}) => {
   //cleanup
   closeNotificationPopup();

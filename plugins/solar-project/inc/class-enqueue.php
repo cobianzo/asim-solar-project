@@ -105,8 +105,11 @@ class Enqueue {
 						])
 					), $stats );
 
+					$solar_potential = $solar_building_data['solarPotential'];
+					unset($solar_potential['roofSegmentStats']);
 					wp_add_inline_script( 'coco-solar-functions',
 						'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
+						'window.cocoSolarPotential = ' .  wp_json_encode( $solar_potential ) . "; \n" .
 						'window.cocoOriginalBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
 						'window.cocoOriginalBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
 					);

@@ -6,13 +6,12 @@
  */
 
 // types
-import { ExtendedSegment, RoofSegmentStats, SelectRotationPortraitSegmentsOptions } from './types';
+import { ExtendedSegment, RoofSegmentStats } from './types';
 
 
 // internal dependencies, trigonometrical functions
 import {
   orthopedicRegtanglePoints,
-  latLngToPoint,
   rotateRectangle,
   convertPointsArrayToLatLngString,
 } from './trigonometry-helpers';
@@ -102,6 +101,9 @@ const setupSegments = ( paintSunMarkers = true ) => {
     segments.forEach( (segment: ExtendedSegment) => {
       deactivateInteractivityOnSegment(segment);
       cleanupAssociatedMarkers( segment as unknown as AssociatedMarkersParent );
+      if (segment.lowRoofLine) {
+        segment.lowRoofLine.setMap(null);
+      }
       segment.setMap(null);
     } );
     cocoMapSetup.segments = [];
@@ -269,14 +271,11 @@ const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Eve
 }
 
 export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
-
-  // init vars
   const segm: ExtendedSegment = this;
-  const cocoMapSetup = getStep3CocoMapSetup();
-  if ( ! cocoMapSetup ) {
-    console.error(`:Not found the coco-map of step 3 Early exit`, cocoMapSetup);
-    return;
-  }
+  selectSegment(segm);
+}
+
+export const selectSegment = function(segm: ExtendedSegment) {
 
   // unhighlight all segments
   const allSegments = window.cocoMaps[window.step3CocoMapInputId].segments;
@@ -288,19 +287,19 @@ export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   } );
   highlightSegment(segm, { fillColor: 'green', fillOpacity: 0.5, strokeWeight: 5, draggableCursor: 'crosshair'  }); // green
 
-  // Debugging: show popoover info
-  const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
-  if (popoverInfo) {
-    createPopup(popoverInfo);
-  }
+  // Debugging: show popoover info. It stopped working
+  // const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
+  // if (popoverInfo) {
+  //   createPopup(popoverInfo);
+  // }
 
-  window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
+  window.cocoDrawingRectangle ||= {};
   window.cocoDrawingRectangle.selectedSegment = segm;
   delete window.cocoDrawingRectangle.hoveredSegment;
 
   ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
     google.maps.event.clearListeners(segm, eventName);
-    google.maps.event.clearListeners(segm.map, eventName);
+    if (segm.map) google.maps.event.clearListeners(segm.map, eventName);
   });
 
 
@@ -318,7 +317,6 @@ export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   // NOTE: we could allow having more than one rectangle per segment. For that we would not
   // select the rectangle just yet, but add a click event for the rectangles of this segment first.
   if (rectangleInfo?.polygon) {
-
     // we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
     window.cocoDrawingRectangle.polygon = rectangleInfo.polygon;
     handlerSecondClickDrawRectangle();
@@ -327,7 +325,8 @@ export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
 
     // this makes that the user starts painting the rectangle at the same time that he selects the segment
     // handlerFirstClickDrawRectangleOverSegment(e); // currently removed.
-    // this, on the other hand, amkes that the user needs to click again on the segment to start painting the rectangle
+
+    // this, on the other hand, makes that the user needs to click again on the segment to start painting the rectangle
     google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
 
   }
@@ -345,7 +344,6 @@ export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
   if (sr) {
     createButtonActivateDeactivateSolarPanels(segm.map, sr);
   }
-
 }
 
 /** Add the three handlers to the segment  */

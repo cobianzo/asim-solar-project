@@ -1,4 +1,4 @@
-import { resetSegmentVisibility } from './drawing-helpers';
+import { paintSegment, resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
@@ -7,6 +7,10 @@ import { paintSolarPanelsForSavedRectangle, startEditSolarPanelsMode, exitEditSo
 import { getCurrentStepCocoMap } from '.';
 import { createNotification, removeNotification } from './notification-api';
 import { debug } from 'geotiff/dist-node/logging';
+import { getStep3CocoMapSetup } from './step3_functions';
+
+
+const DEFAULT_PANELS_ORIENTATION = 'vertical';
 
 function createBtn( gmap: google.maps.Map, text: string, eventOnClick: (event: MouseEvent) => void, attrs: Record<string, any> = {}) {
 
@@ -75,7 +79,7 @@ export const createOrientationRadio = ( gmap: google.maps.Map ) => {
     radio.type = 'radio';
     radio.name = 'panels-orientation';
     radio.value = value;
-    radio.checked = value === 'vertical';
+    radio.checked = value === DEFAULT_PANELS_ORIENTATION;
     radio.addEventListener('change', (e) => {
       const target = e.target as HTMLInputElement;
       console.log(target.value);
@@ -109,14 +113,19 @@ export const createOrientationRadio = ( gmap: google.maps.Map ) => {
   return parentDiv;
 }
 
+const getPanelsOrientationByRadioButton = () => {
+  const selectedRadio = document.querySelector('input[name="panels-orientation"]:checked') as HTMLInputElement;
+  return selectedRadio?.value || DEFAULT_PANELS_ORIENTATION;
+}
+
 const syncOrientationRadioButton = ( syncDirection: 'panelsToRadio' | 'radioToPanels' ) => {
 
   // sync value in the panelOrientation globa var ===> sync the selected Radio button
   if ( syncDirection === 'panelsToRadio' ) {
-    let orientation = 'vertical'; // Default to vertical
+    let orientation = DEFAULT_PANELS_ORIENTATION; // Default to vertical
     if (window.cocoDrawingRectangle?.selectedSegment) {
       const currentRectangle = getSavedRectangleBySegment(window.cocoDrawingRectangle?.selectedSegment);
-      orientation = currentRectangle?.panelOrientation || 'vertical';
+      orientation = currentRectangle?.panelOrientation || DEFAULT_PANELS_ORIENTATION;
     }
 
     // set the selected radio button
@@ -129,17 +138,14 @@ const syncOrientationRadioButton = ( syncDirection: 'panelsToRadio' | 'radioToPa
   }
   // sync the selected Radio button ==> update solar panels
   if ( syncDirection === 'radioToPanels' ) {
-    const selectedRadio = document.querySelector('input[name="panels-orientation"]:checked') as HTMLInputElement;
-    const selectedValue = selectedRadio?.value || null;
-
     if (window.cocoDrawingRectangle?.selectedSegment) {
       const currentRectangle = getSavedRectangleBySegment(window.cocoDrawingRectangle.selectedSegment);
       if (currentRectangle) {
-        currentRectangle.panelOrientation = selectedValue as SolarPanelsOrientation;
+        currentRectangle.panelOrientation = getPanelsOrientationByRadioButton() as SolarPanelsOrientation;
       }
     }
 
-    // TODO: replaint the solar panels with the new orientation
+    // repaint the solar panels with the new orientation
     const currentSegment = window.cocoDrawingRectangle.selectedSegment;
     const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
     if (currentSavedRectangle) {
@@ -172,6 +178,11 @@ const handlerClickUnselectButton = function(e: MouseEvent) {
 
     exitFromEditRectangle();
 
+    const cocoMapSetup = getStep3CocoMapSetup();
+    if (cocoMapSetup?.segments) cocoMapSetup?.segments.forEach(seg => {
+      seg.lowRoofLine.setVisible(false);
+    });
+
     // debug action, remove the info of the segment
     const popupInfoDebug = document.getElementById('popup-info');
     if (popupInfoDebug) popupInfoDebug.remove();
@@ -187,7 +198,8 @@ const handlerClickUnselectButton = function(e: MouseEvent) {
 // saves the current rectangle whose path is defined in window.cocoDrawingRectangle.polygon
 export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
 
-  e?.preventDefault();
+  if (e)
+    e.preventDefault();
 
   if ( !window.cocoDrawingRectangle?.polygon) {
     console.error('There is no rectangle to save');
@@ -199,7 +211,6 @@ export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
   }
 
   const pathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon);
-  const selectedRadio = document.querySelector('input[name="panels-orientation"]:checked') as HTMLInputElement;
 
   // check if the rectangle exists
   const existingRectangle = getSavedRectangleBySegment(window.cocoDrawingRectangle.selectedSegment);
@@ -210,11 +221,11 @@ export const handlerClickSaveRectangleButton = function(e :MouseEvent | null) {
     tempPathAsString: pathAsString,
     segmentIndex: window.cocoDrawingRectangle.selectedSegment?.indexInMap,
     solarPanelsPolygons: [],
-    panelOrientation: ( selectedRadio?.value as SolarPanelsOrientation ) ?? null,
+    panelOrientation: ( getPanelsOrientationByRadioButton() as SolarPanelsOrientation ),
     deactivatedSolarPanels: new Set(),
   };
   if (existingRectangle) {
-    // update the existing rectangle
+    // update the existing rectangle by segment
     const indexInSavedRectanglesArray = window.cocoSavedRectangles.findIndex( r => r.segmentIndex === existingRectangle.segmentIndex );
     savedRectangle = { ...savedRectangle, ...existingRectangle };
     window.cocoSavedRectangles[indexInSavedRectanglesArray] = savedRectangle;

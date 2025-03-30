@@ -9,7 +9,7 @@ import {
   paintBoundingBoxAsRectangle,
   paintPolygonsByArrayOfStrings,
  } from './drawing-helpers';
-import {getMovingBoundingBoxOffsetFromOrigin, getOffsetFromValueInDB, updateMovingBoundingBoxFromDBOffset, updateValuesCoordsSegmentsFromDBOffset, updateValuesCoordsSegmentsWithOffset} from './setup-drag-all-segments-interaction';
+import {getMovingBoundingBoxOffsetFromOrigin, getOffsetFromValueInDB, handlerBoundingBoxHover, handlerBoundingBoxMouseOut, updateMovingBoundingBoxFromDBOffset, updateValuesCoordsSegmentsFromDBOffset, updateValuesCoordsSegmentsWithOffset} from './setup-drag-all-segments-interaction';
 import setupSegments from './setup-segments-interactive-functions';
 import { createNotification } from './notification-api';
 
@@ -47,7 +47,12 @@ document.addEventListener("solarMapReady" as keyof DocumentEventMap, (event: Eve
    * =======
    */
   // Paint Moving Bounding box according t sw ne values
+  // And add hover listeners to the Moving Bounding Box
   window.cocoMovingBoundingBoxPolygon = paintBoundingBoxAsRectangle(window.cocoOriginalBoundingBox);
+  if (window.cocoMovingBoundingBoxPolygon) {
+    google.maps.event.addListener(window.cocoMovingBoundingBoxPolygon, 'mouseover', handlerBoundingBoxHover);
+    google.maps.event.addListener(window.cocoMovingBoundingBoxPolygon, 'mouseout', handlerBoundingBoxMouseOut);
+  }
 
   /**
    * Particular case for pageload:

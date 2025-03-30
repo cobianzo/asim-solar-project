@@ -14,6 +14,7 @@ import { rawHandler } from '@wordpress/blocks';
 import { getCurrentStepCocoMap } from '.';
 import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
 import { closeNotificationPopup, createNotification, openNotificationPopup, removeNotification } from './notification-api';
+import { getAnnualGeneratedPower, getCurrentPanelsDimensions, getCurrentPanelsSystemEfficiency, numberOfPanelsInRectangle } from './setup-solar-panels';
 
 export const MARKER_CENTERED_OPTIONS = {
   style: {
@@ -188,11 +189,6 @@ export const paintSegment = function( gmap: google.maps.Map, stringCoords: strin
   // paint the segment
   const pol = window.paintAPoygonInMap( gmap, stringCoords, { ...SEGMENT_DEFAULT, ...options} )
 
-  // paint the line for the lower side of the roof
-  if (pol.lowRoofLine) {
-    pol.lowRoofLine.setMap(null);
-  }
-
   // calculate the weight of the line depending on the pitch degrees
   const pitch = segmentData?.pitchDegrees;
   const weight = Math.min(15, Math.max(1, pitch ? pitch/6 : 1));
@@ -200,14 +196,16 @@ export const paintSegment = function( gmap: google.maps.Map, stringCoords: strin
   const path = convertStringLatLngToArrayLatLng(stringCoords);
   const linePath = segmentData.isPortrait ? [path[0], path[1]] : [path[1], path[2]];
 
-  pol.lowRoofLine = new google.maps.Polyline({
+  if (pol.lowRoofLine) pol.lowRoofLine.setMap(null);
+  const line = new google.maps.Polyline({
     path: linePath,
     strokeColor: "#FFA500",
     strokeOpacity: 1,
     strokeWeight: weight, // we'll show it on hover and selected
-    visible: false, // hidden bu default, we show it on hover and selected
+    visible: true, // hidden bu default, we show it on hover and selected
     map: gmap,
   });
+  pol.lowRoofLine = line;
 
   // now the marker for the first vertex
   window.paintAMarker( gmap, pol.getPath().getArray()[0], `${window.cocoAssetsDir}${'pixel.png'}`, MARKER_DOT)
@@ -228,22 +226,43 @@ export const highlightSegment = function(roofSegment: ExtendedSegment, extraPara
     roofSegment.lowRoofLine.setVisible(true);
   }
 
+  const hasRectangle = getSavedRectangleBySegment(roofSegment);
   // notifications
-  const notificationId = getSavedRectangleBySegment(roofSegment) ? 'STEP3_HOVERING_SEGMENT_WITH_RECTANGLE' : 'STEP3_HOVERING_SEGMENT';
+  const notificationId = hasRectangle ? 'STEP3_HOVERING_SEGMENT_WITH_RECTANGLE' : 'STEP3_HOVERING_SEGMENT';
   createNotification(notificationId, [
     (roofSegment.indexInMap! + 1).toString(),
     roofSegment.data?.stats.areaMeters2.toFixed(2).toString()!,
     roofSegment.data!.pitchDegrees.toString()
   ]);
 
-
-
-
-  openNotificationPopup( 'segmentInfo', {...roofSegment,
+  let numberOfSolarPanels, annualPower, panelDimansions, systemEfficiency;
+  let percentilesHoursPerYear: Record<string, number> = {};
+  roofSegment.data?.stats.sunshineQuantiles.forEach( (perc, i) => {
+    percentilesHoursPerYear[`percentil_${i}`] = perc;
+  } )
+  if (hasRectangle) {
+    numberOfSolarPanels = numberOfPanelsInRectangle(hasRectangle);
+    annualPower = getAnnualGeneratedPower(hasRectangle);
+    panelDimansions = getCurrentPanelsDimensions().join('m x ') + 'm';
+    systemEfficiency = getCurrentPanelsSystemEfficiency(hasRectangle);
+  }
+  // popup on the top left.
+  openNotificationPopup( 'segmentInfo', {...roofSegment.data,
     ...{
       indexInMap: roofSegment.indexInMap! + 1,
-      orientation: getCardinalOrientationFromAngle(roofSegment.data?.azimuthDegrees!)
-    }} as unknown as Record<string, string>);
+      orientation: getCardinalOrientationFromAngle(roofSegment.data?.azimuthDegrees!).join(', '),
+      pitchDegrees: roofSegment.data!.pitchDegrees.toFixed(1),
+      azimuthDegrees: roofSegment.data!.azimuthDegrees.toFixed(1),
+      areaMeters2: roofSegment.data!.stats.areaMeters2.toFixed(0),
+      showRectangleInfo: hasRectangle? 'yes' : 'no',
+      numberOfSolarPanels,
+      annualPower,
+      panelDimansions,
+      systemEfficiency,
+      maxSunshineHoursPerYear: window.cocoSolarPotential.maxSunshineHoursPerYear.toFixed(0),
+    },
+    ...percentilesHoursPerYear // access with percentil_0
+  } as unknown as Record<string, string>);
 }
 export const resetSegmentVisibility = function(roofSegment: ExtendedSegment) {
   // check if the segment has a rectangle. The style is different thena

@@ -62,10 +62,6 @@ export interface CocoDrawingRectangleInfo {
   // the creation of the rectangle polygon (and the resizing)
   tempFirstClickPoint?: google.maps.Point | null;  // to save the first click while creating the rect
 
-  // not in use until we reactivate the rotation tool TODO:
-  inclinationWhenCreated?: number;
-  currentInclinationAfterRotation?: number;
-
   // the polygon (the inclined rectangle).
   polygon?: google.maps.Polygon;
   associatedMarkers?: Array<AdvancedMarkerElement>; // store markers to delete when we clean the rectangle

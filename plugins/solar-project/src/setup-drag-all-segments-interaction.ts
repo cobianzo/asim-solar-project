@@ -17,11 +17,18 @@ export const MOVING_BOUNDINGBOX_OPTIONS: google.maps.RectangleOptions =  {
   draggable: true,   // We can drag it
   clickable: true,
   zIndex: 9999,
-  strokeColor: "#FF0000",
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: "#FF0000",
-  fillOpacity: 0.35,
+  strokeColor: "white",
+  strokeOpacity: 0.2,
+  strokeWeight: 1,
+  fillColor: "yellow",
+  fillOpacity: 0.1,
+}
+
+export const MOVING_BOUNDINGBOX_HOVER: google.maps.RectangleOptions =  {
+  ...{MOVING_BOUNDINGBOX_OPTIONS},
+  strokeOpacity: 0.1,
+  strokeColor: "red",
+  fillOpacity: 0.3,
 }
 
 // updates the single source of truth for the position of the segments
@@ -118,4 +125,16 @@ export const getOffsetFromValueInDB = function(): [number, number] {
     currentLng! - window.cocoOriginalBoundingBox.sw.longitude,
   ];
   return [offsetLat, offsetLng];
+}
+
+export const handlerBoundingBoxHover = function() {
+  if ( window.cocoMovingBoundingBoxPolygon ) {
+    window.cocoMovingBoundingBoxPolygon.setOptions(MOVING_BOUNDINGBOX_HOVER);
+  }
+}
+
+export const handlerBoundingBoxMouseOut = function() {
+  if ( window.cocoMovingBoundingBoxPolygon ) {
+    window.cocoMovingBoundingBoxPolygon.setOptions(MOVING_BOUNDINGBOX_OPTIONS);
+  }
 }
