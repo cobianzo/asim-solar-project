@@ -307,6 +307,7 @@ export const paintRectangleInMap = (
     removeRectangleInMap(gmap, false);
   }
 
+
   window.cocoDrawingRectangle.polygon = window.paintAPoygonInMap(
     gmap,
     rectangleAsStringOfCoords,

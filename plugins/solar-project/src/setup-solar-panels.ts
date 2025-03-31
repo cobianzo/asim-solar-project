@@ -1,4 +1,5 @@
 // WIP
+import { getCurrentStepCocoMap } from ".";
 import { createButtonActivateDeactivateSolarPanels, createOrientationRadio } from "./buttons-unselect-save-rectangle";
 import { createNotification, removeNotification } from "./notification-api";
 import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, SELECTED_RECTANGLE_OPTIONS } from "./setup-rectangle-interactive";
@@ -51,14 +52,18 @@ export const setupSolarPanels = function() {
 
 
 export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedRectangle) {
+  const cocoSetp = getCurrentStepCocoMap();
   const { polygon } = savedRectangle;
   if (!polygon) {
+    alert('not po');
     return;
   }
-  const map = polygon.getMap();
+  const map = cocoSetp!.map;
   if (!map) {
+    alert('not mapppp');
     return;
   }
+  polygon.setMap(cocoSetp!.map);
 
   // delete all the polygons first.
   const existingSolarPanels = savedRectangle.solarPanelsPolygons;
@@ -66,7 +71,6 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
     cleanupSolarPanelsForSavedRectangle(savedRectangle);
   }
   // end of cleanup
-
 
   console.log('%c TITLE: solar panels for saved rectangle ', 'font-size:2rem;color:blue',savedRectangle);
   const [lengthSideY, lengthSideX] = getRectangleSideDimensionsByPolygonPath(polygon);
@@ -105,13 +109,14 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
   // const maxPanelsInY = Math.abs(Math.floor((latNorth - latSouth) / latLengthPanel));
   // const maxPanelsInX = Math.abs(Math.floor((lngEast - lngWest) / lngLengthPanel));
 
+  let todel = 0;
   for ( let i = 0; i < maxPanelsInY; i++ ) {
     for ( let j = 0; j < maxPanelsInX; j++) {
       // Paint the solar panel and apply the style depending on it is deselected or not
       paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
+      todel++;
     }
   }
-
 }
 
 
@@ -381,6 +386,7 @@ export const exitEditSolarPanelsMode = function() {
   const currentSegment = window.cocoDrawingRectangle.selectedSegment;
   const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
   if (currentSavedRectangle) {
+    alert('assign color yello in exit');
     currentSavedRectangle.polygon?.setOptions(SELECTED_RECTANGLE_OPTIONS);
   }
 

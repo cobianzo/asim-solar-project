@@ -14,6 +14,7 @@ import {
   orthopedicRegtanglePoints,
   rotateRectangle,
   convertPointsArrayToLatLngString,
+  convertPolygonPathToStringLatLng,
 } from './trigonometry-helpers';
 
 // internal dependencies, paiting on the map
@@ -26,6 +27,7 @@ import {
   paintSegment,
   MARKER_DOT,
   deleteMarkersCompletely,
+  paintRectangleInMap,
  } from './drawing-helpers';
 
 import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
@@ -34,6 +36,7 @@ import { getStep3CocoMapSetup } from './step3_functions';
 import { createButtonActivateDeactivateSolarPanels, createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
 import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getSavedRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
 import { getRotationTypePortraitSelected } from './command-rotate-portrait-segments';
+import { activateInteractionWithRectangleResizeHandler, paintResizeHandlersInUsersRectangle } from './setup-resize-rectangle-interaction';
 
 // colours of the polygons
 export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
@@ -318,8 +321,12 @@ export const selectSegment = function(segm: ExtendedSegment) {
   // select the rectangle just yet, but add a click event for the rectangles of this segment first.
   if (rectangleInfo?.polygon) {
     // we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
-    window.cocoDrawingRectangle.polygon = rectangleInfo.polygon;
-    handlerSecondClickDrawRectangle();
+    // we recreate the rectangle to set up everything in place.
+    const pathString = convertPolygonPathToStringLatLng(rectangleInfo?.polygon);
+    paintRectangleInMap(rectangleInfo?.polygon?.getMap()!, segm, pathString);
+
+    paintResizeHandlersInUsersRectangle();
+    activateInteractionWithRectangleResizeHandler(segm);
 
   } else {
 

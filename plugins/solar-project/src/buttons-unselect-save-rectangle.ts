@@ -1,7 +1,7 @@
 import { paintSegment, resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
-import { getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea, SELECTED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive';
+import { getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
 import { paintSolarPanelsForSavedRectangle, startEditSolarPanelsMode, exitEditSolarPanelsMode } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
