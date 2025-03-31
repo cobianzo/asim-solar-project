@@ -386,7 +386,6 @@ export const exitEditSolarPanelsMode = function() {
   const currentSegment = window.cocoDrawingRectangle.selectedSegment;
   const currentSavedRectangle = getSavedRectangleBySegment(currentSegment!);
   if (currentSavedRectangle) {
-    alert('assign color yello in exit');
     currentSavedRectangle.polygon?.setOptions(SELECTED_RECTANGLE_OPTIONS);
   }
 

@@ -1,10 +1,11 @@
 import { ExtendedSegment } from "./types";
 import * as trigo from './trigonometry-helpers';
-import { getSavedRectangleBySegment } from "./setup-rectangle-interactive";
+import { getSavedRectangleBySegment, removeSavedRectangleBySegmentIndex } from "./setup-rectangle-interactive";
 import * as notification from './notification-api';
 import { getCurrentStepCocoMap } from ".";
 import { getMovingBoundingBoxOffsetFromOrigin } from "./setup-drag-all-segments-interaction";
 import { cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
+import { removeRectangleInMap } from "./drawing-helpers";
 
 /** ====== ====== ====== ====== ======
  *   EXPOSE FUNCIONS IN CONSOLE
@@ -23,6 +24,13 @@ window.debug.getSavedRectangleBySegmentIndex =  function(i: number) {
 }
 window.debug.cleanupAssociatedMarkers = function(s) {
   cleanupAssociatedMarkers(s);
+}
+window.debug.removeRectangleInMap = function(clearAll = false) {
+  const coco = getCurrentStepCocoMap();
+  removeRectangleInMap(coco!.map, clearAll);
+}
+window.debug.removeSavedRectangleBySegmentIndex = function(n) {
+  removeSavedRectangleBySegmentIndex(n)
 }
 
 /**

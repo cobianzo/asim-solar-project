@@ -10,20 +10,16 @@
  * The created rectangles are in window.cocoSavedRectangles
  *
  */
-import { MARKER_CENTERED_OPTIONS, MARKER_LEFT_BOTTOM_OPTIONS, paintCenterOfUsersRectangleInMap, paintRectangleInMap } from "./drawing-helpers";
+import { MARKER_LEFT_BOTTOM_OPTIONS, paintRectangleInMap } from "./drawing-helpers";
 import { activateInteractionWithRectangleResizeHandler, paintResizeHandlersInUsersRectangle } from "./setup-resize-rectangle-interaction";
-import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
 import { getStep3CocoMapSetup } from "./step3_functions";
-import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToPoints, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, getRectangleSideDimensionsByPolygonPath, latLngToPoint } from "./trigonometry-helpers";
+import { calculatePathRectangleByOppositePointsAndInclination, convertPolygonPathToStringLatLng, convertStringLatLngToArrayLatLng, getInclinationByPolygonPath, getInclinationByRectanglePoints, getRectangleSideDimensionsByPolygonPath, latLngToPoint } from "./trigonometry-helpers";
 import { ExtendedSegment, LoadedSavedRectangeData, MapMouseEvent, SavedRectangle } from "./types";
-import { createSaveSegmentButton, handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
-import { addAssociatedMarker, cleanupAssociatedMarkers, handlerClickSelectSegment, selectSegment } from "./setup-segments-interactive-functions";
-import { cleanupSolarPanelsForSavedRectangle, exitEditSolarPanelsMode, paintSolarPanelsForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
-import { showVariableAsString } from "./debug";
-import { getMostCommonUnit } from "@wordpress/components/build-types/border-box-control/utils";
+import { handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
+import { addAssociatedMarker, selectSegment } from "./setup-segments-interactive-functions";
+import { cleanupSolarPanelsForSavedRectangle, setupSolarPanels } from "./setup-solar-panels";
 import { getCurrentStepCocoMap } from ".";
-import { createNotification, removeNotification } from "./notification-api";
-import getStep2CocoMapSetup from "./step2_functions";
+import { createNotification } from "./notification-api";
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
   strokeWeight: 2,
@@ -107,6 +103,7 @@ export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number
     window.cocoSavedRectangles = [];
     return;
   }
+
   const indexInArray = window.cocoSavedRectangles.findIndex( sr => sr.segmentIndex === segmentIndex );
   if (typeof indexInArray === 'number' && indexInArray >= 0) {
     // delete all the polygons for the solar panels
@@ -114,6 +111,8 @@ export const removeSavedRectangleBySegmentIndex = function( segmentIndex: number
   }
   window.cocoSavedRectangles = window.cocoSavedRectangles.filter( r => r.segmentIndex !== segmentIndex)
 }
+
+
 
 export const highlightSavedRectangle = function(segm: ExtendedSegment) {
   const rectangle = getSavedRectangleBySegment(segm);
@@ -277,18 +276,6 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 
     handlerSecondClickDrawRectangle(); // this is also used when we edit an existing rectangle
 
-    // createSaveSegmentButton(segm.map);
-    handlerClickSaveRectangleButton(null); // save the rectangle the user just painted. It unselects the segment
-    segm.setMap(theMap); // we need to reassign because clearListeners removed it.
-    const cocoSetupMap = getStep3CocoMapSetup();
-
-    const theSegment = cocoSetupMap?.segments?.find( s => s.indexInMap === segm.indexInMap );
-    if (theSegment) {
-      console.log('TODEEEDEDEEELL', theSegment.map, theSegment.indexInMap);
-      selectSegment(theSegment);
-    } else alert('no segment found');
-    // selectSegment(segm); // so we reselect it, which is what the user expects.
-
   });
 
 }
@@ -301,6 +288,7 @@ export const handlerSecondClickDrawRectangle = function () {
     console.error('Segment not found:', segm);
     return;
   }
+  const map = segm.getMap();
 
   // save the data path of coordenates in the input elment as text
   // [... ] TODO:
@@ -314,6 +302,7 @@ export const handlerSecondClickDrawRectangle = function () {
   paintResizeHandlersInUsersRectangle();
   activateInteractionWithRectangleResizeHandler(segm);
 
+
   // The rectangle has been updated. We need to update the saved rectangle if it exists.
   const savedRectangle = getSavedRectangleBySegment(segm);
   if (savedRectangle) {
@@ -322,6 +311,12 @@ export const handlerSecondClickDrawRectangle = function () {
 
   createNotification('STEP3_SECOND_VERTEX_RECTANGLE');
 
+  handlerClickSaveRectangleButton(null); // save the rectangle the user just painted. It unselects the segment
+  const cocoSetupMap = getStep3CocoMapSetup();
+  const theSegment = cocoSetupMap?.segments?.find( s => s.indexInMap === segm.indexInMap );
+  if (theSegment) {
+    selectSegment(theSegment);
+  }
 }
 
 /**

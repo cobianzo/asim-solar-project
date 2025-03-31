@@ -25,16 +25,15 @@ import {
   fadeSegment,
   removeRectangleInMap,
   paintSegment,
-  MARKER_DOT,
   deleteMarkersCompletely,
   paintRectangleInMap,
  } from './drawing-helpers';
 
-import { createPopup, highlightSegmentInfo, resetSegmentsInfo } from './debug';
+import { highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup } from './step3_functions';
 import { createButtonActivateDeactivateSolarPanels, createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
-import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getSavedRectangleBySegment, handlerSecondClickDrawRectangle, RECTANGLE_OPTIONS, FADED_RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive'
+import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getSavedRectangleBySegment, FADED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive'
 import { getRotationTypePortraitSelected } from './command-rotate-portrait-segments';
 import { activateInteractionWithRectangleResizeHandler, paintResizeHandlersInUsersRectangle } from './setup-resize-rectangle-interaction';
 

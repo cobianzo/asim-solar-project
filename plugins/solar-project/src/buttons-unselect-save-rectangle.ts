@@ -1,4 +1,4 @@
-import { paintSegment, resetSegmentVisibility } from './drawing-helpers';
+import { paintSegment, removeRectangleInMap, resetSegmentVisibility } from './drawing-helpers';
 import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea } from './setup-rectangle-interactive';
@@ -169,16 +169,26 @@ const exitFromEditRectangle = function() {
 const handlerClickUnselectButton = function(e: MouseEvent) {
 
     e.preventDefault();
+    const cocoMapSetup = getStep3CocoMapSetup();
 
-    // If the segment had a rectangle, we delete the rectangle
 
+    if (window.cocoDrawingRectangle.polygon) {
+      window.cocoDrawingRectangle.polygon.setMap(null);
+    }
 
+    const segm = window.cocoDrawingRectangle.selectedSegment!;
+    const sr = getSavedRectangleBySegment(segm);
+    if (sr?.polygon) {
+      sr.polygon.setMap(null)
+    }
+
+    // The rectangle drawing has been removed.
     removeSavedRectangleBySegmentIndex(window.cocoDrawingRectangle.selectedSegment!.indexInMap!);
 
 
     exitFromEditRectangle();
 
-    const cocoMapSetup = getStep3CocoMapSetup();
+
     if (cocoMapSetup?.segments) cocoMapSetup?.segments.forEach(seg => {
       seg.lowRoofLine.setVisible(false);
     });

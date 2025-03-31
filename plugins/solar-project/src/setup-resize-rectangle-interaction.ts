@@ -1,7 +1,9 @@
+import { handlerClickSaveRectangleButton } from "./buttons-unselect-save-rectangle";
 import { MARKER_CENTERED_OPTIONS, paintCenterOfUsersRectangleInMap } from "./drawing-helpers";
 import { getSavedRectangleBySegment, handlerMouseMoveSecondVertexRectangle, handlerSecondClickDrawRectangle, SELECTED_RECTANGLE_OPTIONS } from "./setup-rectangle-interactive";
 import rectangleRotationInteractionSetup from "./setup-rotate-rectangle-interaction";
-import { cleanupAssociatedMarkers } from "./setup-segments-interactive-functions";
+import { cleanupAssociatedMarkers, selectSegment } from "./setup-segments-interactive-functions";
+import { getStep3CocoMapSetup } from "./step3_functions";
 import { latLngToPoint, convertPolygonPathToPoints, convertPolygonPathToStringLatLng } from "./trigonometry-helpers";
 import { ExtendedSegment } from "./types";
 
@@ -35,6 +37,7 @@ export const activateInteractionWithRectangleResizeHandler = function(segment: E
       });
     }
 
+    // the rectangle is draggable
     window.cocoDrawingRectangle.polygon.setOptions(SELECTED_RECTANGLE_OPTIONS);
 
     // Add event listener to handle drag end
@@ -46,10 +49,20 @@ export const activateInteractionWithRectangleResizeHandler = function(segment: E
       paintCenterOfUsersRectangleInMap(segment.map);
       rectangleRotationInteractionSetup();
       paintResizeHandlersInUsersRectangle(); // TODO: apply after rotation.
+      activateInteractionWithRectangleResizeHandler(segment);
+
       // The rectangle has been updated. We need to update the saved rectangle if it exists.
+      // This will save the new position of the rectangle and repaint the solar panels.
       const savedRectangle = getSavedRectangleBySegment(segment);
       if (savedRectangle) {
         savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
+      }
+
+      handlerClickSaveRectangleButton(null); // save the rectangle the user just painted. It unselects the segment
+      const cocoSetupMap = getStep3CocoMapSetup();
+      const theSegment = cocoSetupMap?.segments?.find( s => s.indexInMap === segment.indexInMap );
+      if (theSegment) {
+        selectSegment(theSegment);
       }
     });
   }
@@ -99,7 +112,7 @@ const startResize = function(e: MouseEvent) {
   // now we keep on listeneing the movement of the mouse
   window.cocoDrawingRectangle.draggingHandler?.map?.addListener('mousemove', handlerMouseMoveSecondVertexRectangle);
   window.cocoDrawingRectangle.draggingHandler?.map?.addListener('mouseup', (e: google.maps.MapMouseEvent) => {
-    console.log('%cMOUSEUP - we fix the rectangle', 'color: green; font-weight: bold;');
+    console.log('%cMOUSEUP - End resize, we fix the rectangle', 'color: green; font-weight: bold;');
     handlerSecondClickDrawRectangle();
   });
 }
