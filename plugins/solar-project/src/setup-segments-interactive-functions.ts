@@ -385,5 +385,14 @@ export const cleanupAssociatedMarkers = ( parent: AssociatedMarkersParent, overw
   parent[prop] = [];
 };
 
+export const getSegmentByIndex = function(index: number) : ExtendedSegment | null{
+  const cocoSetupMap = getCurrentStepCocoMap();
+  if (!cocoSetupMap?.segments) {
+    console.error('not found segments source of truth info', cocoSetupMap);
+    return null;
+  }
+  const segment = cocoSetupMap.segments[index];
+  return segment?? null;
+}
 
 export default setupSegments;

@@ -3,6 +3,7 @@ import { createNotification } from './notification-api';
 import { updateValuesCoordsSegmentsFromDBOffset } from './setup-drag-all-segments-interaction';
 import { loadSavedRectanglesFromTextArea } from './setup-rectangle-interactive';
 import setupSegments from './setup-segments-interactive-functions';
+import { applyListenersToPanelModelsDropdown, loadModelPanelParametersInInputs } from './setup-solar-panels';
 import { CocoMapSetup } from './types';
 
 /**
@@ -40,4 +41,8 @@ document.addEventListener("solarMapReady", (event: Event) => {
   } else {
     createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments.length.toString()] );
   }
+
+  // Sync inputs on page load
+  loadModelPanelParametersInInputs();
+  applyListenersToPanelModelsDropdown();
 });

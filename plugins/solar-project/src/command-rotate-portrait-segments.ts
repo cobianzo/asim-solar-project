@@ -6,8 +6,8 @@
  * Here the functions that handle that behaviour.
  */
 
-import { createDraggableBoundingBoxForMovingAllSegments } from "./setup-drag-all-segments-interaction";
 import setupSegments from "./setup-segments-interactive-functions";
+import { exitEditSolarPanelsMode } from "./setup-solar-panels";
 import { SelectRotationPortraitSegmentsOptions } from "./types";
 
 /**
@@ -35,10 +35,8 @@ export const getRotationTypePortraitSelected = ( fallback = 'no-extra-rotation')
 export const applyRotationPortraitSegmentsByRadioSelected = ( createBoundingBoxAfterCreatingSegments: Boolean = true ): SelectRotationPortraitSegmentsOptions => {
   const valorSeleccionado = getRotationTypePortraitSelected();
   console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
+
   setupSegments( false );
-  // if (createBoundingBoxAfterCreatingSegments) {
-  //   console.log(`and now the bouding box`);
-  //   createDraggableBoundingBoxForMovingAllSegments();
-  // }
+
   return valorSeleccionado;
 }

@@ -1,10 +1,12 @@
 // WIP
+import apiFetch from "@wordpress/api-fetch";
 import { getCurrentStepCocoMap } from ".";
 import { createButtonActivateDeactivateSolarPanels, createOrientationRadio } from "./buttons-unselect-save-rectangle";
 import { createNotification, removeNotification } from "./notification-api";
 import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, SELECTED_RECTANGLE_OPTIONS } from "./setup-rectangle-interactive";
 import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, metersToLatDegrees, metersToLngDegrees, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
-import { SavedRectangle, SolarPanelsOrientation } from "./types"
+import { ExtendedSegment, SavedRectangle, SolarPanelsOrientation } from "./types"
+import { getSegmentByIndex } from "./setup-segments-interactive-functions";
 
 export const PANEL_OPTIONS: google.maps.PolygonOptions = {
   strokeColor: 'black',
@@ -21,7 +23,7 @@ export const EDITABLE_PANEL_OPTIONS: google.maps.PolygonOptions = {
   ...PANEL_OPTIONS,
   strokeColor: 'red',
   strokeWeight: 3,
-  fillOpacity: 0.9,
+  fillOpacity: 0.5,
   clickable: true,
   zIndex: 9999
 }
@@ -33,9 +35,8 @@ export const HIGHLIGHTED_PANEL_OPTIONS: google.maps.PolygonOptions = {
 };
 
 export const DELETED_PANEL_OPTIONS: google.maps.PolygonOptions = {
-  ...PANEL_OPTIONS,
   fillColor: 'gray',
-  fillOpacity: 0.1,
+  fillOpacity: 0.2,
   clickable: true,
 }
 
@@ -101,20 +102,14 @@ export const paintSolarPanelsForSavedRectangle = function(savedRectangle: SavedR
   // both of these solutions work the same, i think
   const latLengthPanel = (latNorth - latSouth) * factorY;
   const lngLengthPanel = (lngEast - lngWest) * factorX;
-  // const latLengthPanel = 1 * metersToLatDegrees( dimensionsPanel[1], latSouth);
-  // const lngLengthPanel = -1 * metersToLngDegrees( dimensionsPanel[0], latSouth, lngWest);
 
   const maxPanelsInY = Math.floor(1 / factorY);
   const maxPanelsInX = Math.floor(1 / factorX);
-  // const maxPanelsInY = Math.abs(Math.floor((latNorth - latSouth) / latLengthPanel));
-  // const maxPanelsInX = Math.abs(Math.floor((lngEast - lngWest) / lngLengthPanel));
 
-  let todel = 0;
   for ( let i = 0; i < maxPanelsInY; i++ ) {
     for ( let j = 0; j < maxPanelsInX; j++) {
       // Paint the solar panel and apply the style depending on it is deselected or not
       paintASolarPanel( savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel );
-      todel++;
     }
   }
 }
@@ -251,33 +246,64 @@ export function activateSolarPanel(savedRect: SavedRectangle, polygon: google.ma
  * Small helpers
  * * ============= ============= ============= ============= ============= ============= *
  */
+export const getCurrentPanelsModel = function() : string {
+  const model = document.querySelector('.panel-model-dropdown select option:checked');
+  return model?.textContent ?? '-';
+}
+
+export const getCurrentQuantilScenario = function() : {scenarioName: string, scenarioIndex: number} {
+  const scenarioEl = document.querySelector('.panel-quantiles input:checked');
+  const scenarioName = scenarioEl?.parentElement?.textContent ? scenarioEl.parentElement.textContent.trim() : '';
+  const scenarioIndex = (scenarioEl as HTMLInputElement).value;
+  return {scenarioName, scenarioIndex: parseInt(scenarioIndex) };
+}
+
+export const getCurrentHoursPerYear = function(segment: ExtendedSegment) : number {
+  const segmentQuantiles = segment.data?.stats.sunshineQuantiles;
+  const scenario = getCurrentQuantilScenario();
+  let hoursPerYear = segmentQuantiles? segmentQuantiles[scenario.scenarioIndex] : window.cocoSolarPotential.maxSunshineHoursPerYear;
+  return hoursPerYear;
+}
+
 export const getCurrentPanelsDimensions = function() : [number,number] {
-  return [ 2, 1 ]; // in meters
+  const inputLength = document.querySelector('.panel-length input');
+  const inputHeight = document.querySelector('.panel-height input');
+  const [length, height] = [(inputLength as HTMLInputElement).value, (inputHeight as HTMLInputElement).value]
+  return [ parseFloat(length?? '1'), parseFloat(height?? '1.5') ]; // in meters
 }
 
 export const getCurrentPanelsNominalPower = function() : number {
-  return 400; // in Watios
+  const inputPower = document.querySelector('.panel-nominal-power input');
+  const power = (inputPower as HTMLInputElement).value ?? '400';
+  return parseInt(power); // in Watios
 }
 
-export const getCurrentPanelsSystemEfficiency = function(savedRect: SavedRectangle) : number {
+export const getCurrentPanelsSystemEfficiency = function() : number {
   // electric system efficiency * hours of sun / ideal hours of sun,
-
+  const inputEfficiency = document.querySelector('.panel-efficiency input');
+  const efficiency = parseFloat((inputEfficiency as HTMLInputElement).value);
   // electric system efficiency depends on the inversor.
   // ideal hours of sun is something we still dont know
-  return 0.7; // %
+  return efficiency?? 0.8; // %
 }
 
 export const getAnnualGeneratedPower = function(savedRect: SavedRectangle) : number {
 // Energıˊa Anual (kWh) = Potencia Total (kW)×Horas de Sol al An˜o×Eficiencia del Sistema
-  const panelsPower = numberOfPanelsInRectangle(savedRect) * getCurrentPanelsNominalPower() / 1000; // in kW
-  const hours_of_sun = window.cocoSolarPotential.maxSunshineHoursPerYear
-  const finalEfficiency = getCurrentPanelsSystemEfficiency(savedRect);
-  const powerInKW = panelsPower * hours_of_sun * finalEfficiency;
+  const segment = getSegmentByIndex(savedRect.segmentIndex!);
+  if (!savedRect || !segment) {
+    console.error('No saved Rectagnle info or no segmeent', savedRect, segment);
+    return 0;
+  }
+  const numberOfPanels = numberOfPanelsInRectangle(savedRect);
+  const panelPower =  getCurrentPanelsNominalPower() / 1000; // in kW
+  const hours_of_sun = getCurrentHoursPerYear(segment);
+  const finalEfficiency = getCurrentPanelsSystemEfficiency();
+  const powerInKW = numberOfPanels * panelPower * hours_of_sun * finalEfficiency;
   return parseInt(powerInKW.toFixed(0));
 }
 
 /**
- * Uses API from EU
+ * Counts the activated panels in a rectangle drawn by the user.
  * @param savedRect
  * @returns
  */
@@ -293,6 +319,48 @@ export const numberOfPanelsInRectangle = function(savedRect: SavedRectangle) : n
   });
   return countPanels;
 }
+
+/**
+ * On every change of the dropdown .panel-model-dropdown select, we load the
+ * attributes of that Model Panel from WordPress Db into our inputs.
+ * @returns
+ */
+export const loadModelPanelParametersInInputs = function() {
+
+  // get the ID of the panel selected in the dropdown.
+  const dropdown = document.querySelector('.panel-model-dropdown select');
+
+  const inputLength = document.querySelector('.panel-length input');
+  const inputHeight = document.querySelector('.panel-height input');
+  const inputPower = document.querySelector('.panel-nominal-power input');
+  if (!dropdown) {
+    console.error('We cant find the dropdown panel-model-dropdown in gravity forms ');
+    return;
+  }
+  const postId = (dropdown as HTMLSelectElement).value;
+
+  apiFetch({ path: `/wp/v2/panel/${postId}` }).then(
+    data => {
+      const typedData = data as { custom_fields?: { length: string; height: string; nominal_power: string } };
+      if (!typedData.custom_fields) {
+        console.error('custom_fields not found', data);
+        return;
+      }
+      const { length, height, nominal_power } = typedData.custom_fields;
+      (inputLength as HTMLInputElement).value = length;
+      (inputHeight as HTMLInputElement).value = height;
+      (inputPower as HTMLInputElement).value = nominal_power;
+    }
+  );
+}
+
+export const applyListenersToPanelModelsDropdown = function() {
+  const dropdown = document.querySelector('.panel-model-dropdown select');
+  dropdown?.addEventListener('change', (e) => {
+    loadModelPanelParametersInInputs();
+  });
+}
+
 
 async function getIdealSunHours(lat: number, lon: number) {
   const url = `https://re.jrc.ec.europa.eu/api/v5_2/seriescalc?lat=${lat}&lon=${lon}&outputformat=json`;
@@ -324,7 +392,7 @@ async function getIdealSunHours(lat: number, lon: number) {
  * * ============= ============= ============= ============= ============= ============= *
  */
 
-export const startEditSolarPanelsMode = function() {
+export const enterEditSolarPanelsMode = function() {
 
   // the button gets the class active
   const btn = document.getElementById('activate-deactivate-solar-panels-btn');
@@ -342,7 +410,9 @@ export const startEditSolarPanelsMode = function() {
     // while every tile of a solar panel becomes interactive
     currentSavedRectangle.solarPanelsPolygons.forEach( (row,i) => {
       row.forEach( (sp,j) => {
-        const options = isSolarPanelDeactivated(currentSavedRectangle, sp)? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS;
+        const options = isSolarPanelDeactivated(currentSavedRectangle, sp)?
+          {...EDITABLE_PANEL_OPTIONS, ...DELETED_PANEL_OPTIONS }
+          : EDITABLE_PANEL_OPTIONS;
         sp.setOptions(options);
 
         // reset the listeners just in case. To assign them again
@@ -350,6 +420,7 @@ export const startEditSolarPanelsMode = function() {
 
         // add an event listener to each solar panel
         sp.addListener('mouseover', function(this: google.maps.Polygon, e: MouseEvent) {
+          console.log('HOVERRERE');
           sp.setOptions(HIGHLIGHTED_PANEL_OPTIONS);
         });
         sp.addListener('mouseout', function(this: google.maps.Polygon, e: MouseEvent) {
@@ -381,6 +452,8 @@ export const exitEditSolarPanelsMode = function() {
   const btn = document.getElementById('activate-deactivate-solar-panels-btn');
   if (btn) {
     btn.classList.remove('active');
+  } else {
+    console.error('nt found button activate-deactivate-solar-panels-btn', btn);
   }
   // set the style of the rectangle to normal
   const currentSegment = window.cocoDrawingRectangle.selectedSegment;

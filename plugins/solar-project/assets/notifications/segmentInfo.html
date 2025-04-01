@@ -21,9 +21,20 @@
 <div class="visible-{{showRectangleInfo}}">
   <h4>Rectangle with solar panels</h4>
   <ul>
+    <li>Panel model: <b>{{panelsModel}}</b> </li>
     <li>Panel dimensions: <b>{{panelDimansions}}</b> </li>
     <li>Number of panels: <b>{{numberOfSolarPanels}}</b> </li>
-    <li>Annual Power: <b>{{annualPower}} kW</b> <br>
-    <small>At an efficiency of {{systemEfficiency}} and in the case of {{maxSunshineHoursPerYear}} hours per year</small></li>
+    <li>
+      Annual Power: <b>{{annualPower}} kW</b>
+      <ul>
+        <li>
+          <small>At an efficiency of <b>{{systemEfficiency}}</b></small>
+        </li>
+        <li>
+          <small>Scenario {{scenarioName}}: <b>{{hoursPerYear}}</b> hours per year</small>
+        </li>
+      </ul>
+
+  </li>
   </ul>
 </div>

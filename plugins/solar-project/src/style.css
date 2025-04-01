@@ -130,6 +130,12 @@ body .coco-solar-notification {
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.75);
 }
 
+body .coco-btn-danger{
+  background-color: var(--gf-color-danger) !important;
+}
+body .coco-btn-success{
+  background-color: var(--gf-color-success) !important;
+}
 
 body #coco-orientation-panels-radiobtns {
   display: flex;
@@ -157,3 +163,19 @@ body #activate-deactivate-solar-panels-btn {
     color: var(--gf-local-bg-color);
   }
 }
+
+body .gform-theme--framework fieldset.gfield--type-choice.panel-quantiles {
+
+  .gfield_radio {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+
+    & > div.gchoice {
+      display: flex;
+      flex-direction: column;
+      place-items: center;
+    }
+  }
+}
+

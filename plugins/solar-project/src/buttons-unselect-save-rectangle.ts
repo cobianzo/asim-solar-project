@@ -3,7 +3,7 @@ import setupSegments from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { getSavedRectangleBySegment, paintSavedRectangle, RECTANGLE_OPTIONS, removeSavedRectangleBySegmentIndex, saveSavedRectanglesInTextArea } from './setup-rectangle-interactive';
 import { SavedRectangle, SolarPanelsOrientation } from './types';
-import { paintSolarPanelsForSavedRectangle, startEditSolarPanelsMode, exitEditSolarPanelsMode } from './setup-solar-panels';
+import { paintSolarPanelsForSavedRectangle, enterEditSolarPanelsMode, exitEditSolarPanelsMode } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
 import { createNotification, removeNotification } from './notification-api';
 import { debug } from 'geotiff/dist-node/logging';
@@ -44,7 +44,9 @@ export const createUnselectSegmentButton = ( gmap : google.maps.Map, text: strin
   else {
     createNotification('STEP3_SEGMENT_SELECTED', [window.cocoDrawingRectangle.selectedSegment?.data?.stats.areaMeters2.toString()!]);
   }
-  return createBtn( gmap, text, handlerClickUnselectButton, {id: 'delete-rectangle-btn'} );
+  const unselectBtn = createBtn( gmap, text, handlerClickUnselectButton, {id: 'delete-rectangle-btn'} );
+  unselectBtn?.classList.add('coco-btn-danger');
+  return unselectBtn;
 }
 
 export const convertUnselectButtonIntoDelete = () => {
@@ -55,6 +57,7 @@ export const convertUnselectButtonIntoDelete = () => {
 export const createSaveSegmentButton = ( gmap : google.maps.Map ) => {
   convertUnselectButtonIntoDelete();
   const saveButtonEl = createBtn( gmap, 'Save', handlerClickSaveRectangleButton, {id: 'save-rectangle-btn'} );
+  saveButtonEl?.classList.add('coco-btn-success');
   createOrientationRadio( gmap );
   return saveButtonEl;
 }
@@ -151,6 +154,7 @@ const syncOrientationRadioButton = ( syncDirection: 'panelsToRadio' | 'radioToPa
     if (currentSavedRectangle) {
       paintSolarPanelsForSavedRectangle(currentSavedRectangle) ;
     }
+    exitEditSolarPanelsMode();
   }
 }
 
@@ -278,6 +282,6 @@ const handlerClickActivateDeactivateSolarPanels = function(e: MouseEvent) {
   if (btn?.classList.contains('active')) {
     exitEditSolarPanelsMode();
   } else {
-    startEditSolarPanelsMode();
+    enterEditSolarPanelsMode();
   }
 }

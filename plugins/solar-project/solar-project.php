@@ -3,7 +3,7 @@
  * Plugin Name: Solar Project
  * Plugin URI: http://example.com/plugin
  * Description: Complementary code together with coco-gravity-form-map-field, to create the Solar Project experience
- * Version: 3.0.5
+ * Version: 3.0.7
  * Author: Your Name
  * Author URI: http://example.com
  * License: GPL2
@@ -20,12 +20,17 @@ class Solar_Project {
 	public function __construct() {
 			// Initialization code here
 			require_once 'inc/class-helpers.php';
+
 			require_once 'inc/class-enqueue.php';
 			require_once 'inc/class-gravity-hooks.php';
 			require_once 'inc/class-notifications.php';
+
 			require_once 'inc/api/class-API.php';
 			require_once 'inc/api/class-google-maps-api.php';
 			require_once 'inc/api/class-solar-api.php';
+
+			require_once 'inc/class-model-panel.php';
+			require_once 'inc/class-gravity-model-panel.php';
 
 			add_action( 'init', array( $this, 'init_plugin' ) );
 	}

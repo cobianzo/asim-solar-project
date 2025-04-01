@@ -12,7 +12,9 @@ class Enqueue {
 
 		// Styles
 		add_action( 'wp_enqueue_scripts', function () {
-			wp_register_style( 'coco-solar-project', plugins_url( 'src/style.css', __DIR__ ), [], null );
+			$asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+			$version = $asset_file['version'] ?? null;
+			wp_register_style( 'coco-solar-project', plugins_url( 'src/style.css', __DIR__ ), [], $version);
 			wp_enqueue_style( 'coco-solar-project' );
 		} );
 

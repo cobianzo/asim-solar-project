@@ -14,7 +14,7 @@ import { rawHandler } from '@wordpress/blocks';
 import { getCurrentStepCocoMap } from '.';
 import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
 import { closeNotificationPopup, createNotification, openNotificationPopup, removeNotification } from './notification-api';
-import { getAnnualGeneratedPower, getCurrentPanelsDimensions, getCurrentPanelsSystemEfficiency, numberOfPanelsInRectangle } from './setup-solar-panels';
+import { getAnnualGeneratedPower, getCurrentHoursPerYear, getCurrentPanelsDimensions, getCurrentPanelsModel, getCurrentPanelsSystemEfficiency, getCurrentQuantilScenario, numberOfPanelsInRectangle } from './setup-solar-panels';
 
 export const MARKER_CENTERED_OPTIONS = {
   style: {
@@ -235,16 +235,21 @@ export const highlightSegment = function(roofSegment: ExtendedSegment, extraPara
     roofSegment.data!.pitchDegrees.toString()
   ]);
 
-  let numberOfSolarPanels, annualPower, panelDimansions, systemEfficiency;
+  let numberOfSolarPanels, annualPower, panelDimansions, systemEfficiency, panelsModel, scenarioName, hoursPerYear;
   let percentilesHoursPerYear: Record<string, number> = {};
   roofSegment.data?.stats.sunshineQuantiles.forEach( (perc, i) => {
-    percentilesHoursPerYear[`percentil_${i}`] = perc;
+    percentilesHoursPerYear[`percentil_${i}`] = parseInt(perc.toString());
   } )
   if (hasRectangle) {
     numberOfSolarPanels = numberOfPanelsInRectangle(hasRectangle);
     annualPower = getAnnualGeneratedPower(hasRectangle);
     panelDimansions = getCurrentPanelsDimensions().join('m x ') + 'm';
-    systemEfficiency = getCurrentPanelsSystemEfficiency(hasRectangle);
+    systemEfficiency = getCurrentPanelsSystemEfficiency();
+    panelsModel = getCurrentPanelsModel();
+
+    const scenario = getCurrentQuantilScenario();
+    scenarioName = scenario.scenarioName;
+    hoursPerYear = getCurrentHoursPerYear(roofSegment);
   }
   // popup on the top left.
   openNotificationPopup( 'segmentInfo', {...roofSegment.data,
@@ -260,6 +265,9 @@ export const highlightSegment = function(roofSegment: ExtendedSegment, extraPara
       panelDimansions,
       systemEfficiency,
       maxSunshineHoursPerYear: window.cocoSolarPotential.maxSunshineHoursPerYear.toFixed(0),
+      panelsModel,
+      scenarioName,
+      hoursPerYear: hoursPerYear?.toFixed(0)
     },
     ...percentilesHoursPerYear // access with percentil_0
   } as unknown as Record<string, string>);

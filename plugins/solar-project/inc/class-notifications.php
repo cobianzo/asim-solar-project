@@ -19,6 +19,7 @@ class Notifications {
       \register_rest_route( 'coco-solar/v1', '/notifications/(?P<notificationName>[a-zA-Z0-9-]+)', array(
         'methods' => 'GET',
         'callback' => [ get_called_class(), 'get_notification_html' ],
+        'permission_callback' => '__return_true',
       ) );
     } );
   }
