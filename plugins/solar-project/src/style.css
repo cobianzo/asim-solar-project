@@ -179,3 +179,44 @@ body .gform-theme--framework fieldset.gfield--type-choice.panel-quantiles {
   }
 }
 
+
+/*
+  ======= Step 4 == report
+*/
+
+body .report-intro {
+  padding: 2rem;
+  background: lightgray;
+  border-radius: 5px;
+  margin: 1rem 0;
+  box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.2);
+}
+
+body .report-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    padding: 1rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f8f8f8;
+  }
+  .total-energy {
+    font-weight: bold;
+    color: #007bff;
+  }
+}

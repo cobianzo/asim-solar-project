@@ -20,6 +20,7 @@ import {
 	calculatePathRectangleByOppositePointsAndInclination,
 	convertPolygonPathToStringLatLng,
 	convertStringLatLngToArrayLatLng,
+	getCardinalOrientationFromAngle,
 	getInclinationByPolygonPath,
 	getInclinationByRectanglePoints,
 	getRectangleSideDimensionsByPolygonPath,
@@ -27,8 +28,8 @@ import {
 } from './trigonometry-helpers';
 import { ExtendedSegment, LoadedSavedRectangeData, MapMouseEvent, SavedRectangle } from './types';
 import { handlerClickSaveRectangleButton } from './buttons-unselect-save-rectangle';
-import { addAssociatedMarker, selectSegment } from './setup-segments-interactive-functions';
-import { cleanupSolarPanelsForSavedRectangle, setupSolarPanels } from './setup-solar-panels';
+import { addAssociatedMarker, getSegmentByIndex, selectSegment } from './setup-segments-interactive-functions';
+import { cleanupSolarPanelsForSavedRectangle, numberOfPanelsInRectangle, setupSolarPanels } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
 import { createNotification } from './notification-api';
 
@@ -132,7 +133,7 @@ export const unhighlightSavedRectangle = function (segm: ExtendedSegment) {
 
 export const saveSavedRectanglesInTextArea = function () {
 	const dataToSave = window.cocoSavedRectangles
-		.map((savedR) => {
+		.map((savedR: SavedRectangle) => {
 			// 1. save the shape of the rectangle
 			const rectData = {};
 			if (!savedR.polygon) return null;
@@ -146,6 +147,15 @@ export const saveSavedRectanglesInTextArea = function () {
 
 			// 4. associated segment
 			rectData.indexSegment = savedR.segmentIndex;
+
+      // This info is needed in step 4, but not needed here in step 3.
+      // ==========
+      const theSegm = getSegmentByIndex(savedR.segmentIndex!);
+      if (theSegm) {
+        rectData.orientation = getCardinalOrientationFromAngle(theSegm.data?.azimuthDegrees!).join(', ')
+      }
+      rectData.numberPanels = numberOfPanelsInRectangle(savedR);
+      // ==========
 
 			return rectData;
 		})

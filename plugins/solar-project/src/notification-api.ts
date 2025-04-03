@@ -153,7 +153,7 @@ export const openNotificationPopup = (filename: string, placeholders: Record<str
 // Special notificaion with all the info about the segment and its rectangle
 export const createPanelNotificationPopup = function (segment: ExtendedSegment | null = null) {
 	if (!segment) {
-		segment = window.cocoDrawingRectangle.selectedSegment ?? null;
+		segment = window.cocoDrawingRectangle?.selectedSegment ?? null;
 	}
 	if (!segment) {
 		return;

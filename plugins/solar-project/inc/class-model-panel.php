@@ -135,6 +135,20 @@ class Model_Panel {
 			'nominal_power' => get_post_meta( $object['id'], 'nominal_power', true ) ?: '400',
 		);
 	}
+
+	public static function calculate_power_energy( $values = [
+		'number_panels' => 0,
+		'panel_power' => 0,
+		'hours_sun' => 0,
+		'final_efficiency' => 0,
+	] ) {
+		$roof_energy = $values['number_panels']
+			* $values['panel_power']
+			* $values['hours_sun']
+			* $values['final_efficiency'];
+
+		return $roof_energy;
+	}
 }
 
 Model_Panel::init();

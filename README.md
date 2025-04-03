@@ -1,14 +1,11 @@
 # TODO NEXT
 
-Create step 4: calculations.
+Bugs: when changing length, height, power, we deactivate the Model.
 Save data in form submitted
 Add Save form in every step.
 Add all PHP CS to all files.
 Refactor code and sort it out better.
 Add Playwright testing
-Add JS linting and apply to the whole project.
-Imprve position of buttons, closer to the segment
-  Btn Save use name 'Finish' in green
 When dragging and redimensioning the rect, hide the solar panels
 Show in DB the data from the rectangles and solar panels
 Fix form back and fw.

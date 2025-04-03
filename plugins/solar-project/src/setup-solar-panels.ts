@@ -351,9 +351,10 @@ export const loadModelPanelParametersInInputs = function () {
 	}
 	const postId = (dropdown as HTMLSelectElement).value;
 
+  // Data from WordPress for the CPT `panel`.
 	apiFetch({ path: `/wp/v2/panel/${postId}` }).then((data) => {
 		const typedData = data as { custom_fields?: { length: string; height: string; nominal_power: string } };
-		let [length, height, nominal_power] = [1.5, 2.2, 450];
+		let [length, height, nominal_power] = [1.5, 2.2, 450]; // default, but it will be overwritten.
 		if (!typedData?.custom_fields) {
 			console.warn('custom_fields not found. Set to default', data, [length, height, nominal_power]);
 		}
