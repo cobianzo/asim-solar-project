@@ -107,9 +107,13 @@ s0 = debug.rotateRectangle(s0, 45); // paints the segment, and the paints the se
 
 The rotateRectangle has been overwritten to paint a preview of the result in an overlay. You can do it with any other function to see the result or print in the screen any info, for example, the result of getInclinationByRectanglePoints(points) of the segment before and anfter the rotation.
 
+# EsList 
+
+I set `npm run eslint` to format all the typescript FILEs in `solar-panel` plugin
+
 # PHPCS
 
-composer run-script lint plugins/solar-project/solar-project.php
+`composer run-script lint plugins/solar-project/solar-project.php`
 para el plugin coco- ... you need to enter the project and see its README.
 
 # Terminology:

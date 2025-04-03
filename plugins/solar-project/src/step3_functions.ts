@@ -12,37 +12,39 @@ import { CocoMapSetup } from './types';
  *
  * @returns {CocoMapSetup | null}
  */
-export const getStep3CocoMapSetup = function() : CocoMapSetup | null {
-  const cocoMapSetup = window.cocoMaps[window.step3CocoMapInputId];
-  return cocoMapSetup ?? null;
-}
+export const getStep3CocoMapSetup = function (): CocoMapSetup | null {
+	const cocoMapSetup = window.cocoMaps[window.step3CocoMapInputId];
+	return cocoMapSetup ?? null;
+};
 
-document.addEventListener("solarMapReady", (event: Event) => {
+document.addEventListener('solarMapReady', (event: Event) => {
+	// setup and validations
+	const cocoMapSetup = getStep3CocoMapSetup();
+	if (
+		!window.cocoIsStepSelectRectangle ||
+		!cocoMapSetup ||
+		cocoMapSetup.inputElement.id !== (event as CustomEvent<CocoMapSetup>).detail.inputElement.id
+	)
+		return;
 
-  // setup and validations
-  const cocoMapSetup = getStep3CocoMapSetup();
-  if ( ! window.cocoIsStepSelectRectangle || ! cocoMapSetup
-    || ( cocoMapSetup.inputElement.id !== (event as CustomEvent<CocoMapSetup>).detail.inputElement.id )
-  ) return;
+	// this also paints the bounding box. It is needed as reference of the offset for all segments.
+	updateValuesCoordsSegmentsFromDBOffset();
+	window.cocoMovingBoundingBoxPolygon?.setVisible(false);
 
-  // this also paints the bounding box. It is needed as reference of the offset for all segments.
-  updateValuesCoordsSegmentsFromDBOffset();
-  window.cocoMovingBoundingBoxPolygon?.setVisible(false);
+	// paint paint paint! and make them interactive
+	setupSegments();
 
-  // paint paint paint! and make them interactive
-  setupSegments();
+	// if this in not the first time we load this page
+	loadSavedRectanglesFromTextArea();
 
-  // if this in not the first time we load this page
-  loadSavedRectanglesFromTextArea();
+	// notification
+	if (window.cocoSavedRectangles?.length) {
+		createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles.length.toString()]);
+	} else {
+		createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments.length.toString()]);
+	}
 
-  // notification
-  if (window.cocoSavedRectangles?.length) {
-    createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles.length.toString()] );
-  } else {
-    createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments.length.toString()] );
-  }
-
-  // Sync inputs on page load
-  loadModelPanelParametersInInputs();
-  applyListenersToPanelModelsDropdown();
+	// Sync inputs on page load
+	loadModelPanelParametersInInputs();
+	applyListenersToPanelModelsDropdown();
 });

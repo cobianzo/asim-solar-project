@@ -6,37 +6,41 @@
  * Here the functions that handle that behaviour.
  */
 
-import setupSegments from "./setup-segments-interactive-functions";
-import { exitEditSolarPanelsMode } from "./setup-solar-panels";
-import { SelectRotationPortraitSegmentsOptions } from "./types";
+import setupSegments from './setup-segments-interactive-functions';
+import { exitEditSolarPanelsMode } from './setup-solar-panels';
+import { SelectRotationPortraitSegmentsOptions } from './types';
 
 /**
  * The code flow of this feature: applying on page load
  * the rotation or not for the segments which are portrait.
  */
 document.addEventListener('DOMContentLoaded', () => {
-  const inputOptions = document.querySelectorAll('.segment-rotation input');
-  inputOptions?.forEach((radio) => {
-    radio.addEventListener('change', (event) => {
-      applyRotationPortraitSegmentsByRadioSelected();
-    });
-  });
+	const inputOptions = document.querySelectorAll('.segment-rotation input');
+	inputOptions?.forEach((radio) => {
+		radio.addEventListener('change', (event) => {
+			applyRotationPortraitSegmentsByRadioSelected();
+		});
+	});
 });
 
-export const getRotationTypePortraitSelected = ( fallback = 'no-extra-rotation'): SelectRotationPortraitSegmentsOptions => {
-  const radioParent = document.querySelector('.segment-rotation');
-  const selected = radioParent?.querySelector('input:checked');
-  if (selected) {
-    return ((selected as HTMLInputElement).value as SelectRotationPortraitSegmentsOptions);
-  }
-  return fallback as SelectRotationPortraitSegmentsOptions ;
-}
+export const getRotationTypePortraitSelected = (
+	fallback = 'no-extra-rotation'
+): SelectRotationPortraitSegmentsOptions => {
+	const radioParent = document.querySelector('.segment-rotation');
+	const selected = radioParent?.querySelector('input:checked');
+	if (selected) {
+		return (selected as HTMLInputElement).value as SelectRotationPortraitSegmentsOptions;
+	}
+	return fallback as SelectRotationPortraitSegmentsOptions;
+};
 
-export const applyRotationPortraitSegmentsByRadioSelected = ( createBoundingBoxAfterCreatingSegments: Boolean = true ): SelectRotationPortraitSegmentsOptions => {
-  const valorSeleccionado = getRotationTypePortraitSelected();
-  console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
+export const applyRotationPortraitSegmentsByRadioSelected = (
+	createBoundingBoxAfterCreatingSegments: Boolean = true
+): SelectRotationPortraitSegmentsOptions => {
+	const valorSeleccionado = getRotationTypePortraitSelected();
+	console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
 
-  setupSegments( false );
+	setupSegments(false);
 
-  return valorSeleccionado;
-}
+	return valorSeleccionado;
+};

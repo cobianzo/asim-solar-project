@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "esnext",
-    "lib": ["dom", "esnext"],
-    "jsx": "react-jsx",
-    "strict": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "outDir": "./build"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "dist", "*.js"]
+	"compilerOptions": {
+		"target": "es5",
+		"module": "esnext",
+		"lib": ["dom", "esnext"],
+		"jsx": "react-jsx",
+		"strict": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"sourceMap": true,
+		"declaration": true,
+		"allowSyntheticDefaultImports": true,
+		"outDir": "./build"
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "build", "dist", "*.js"]
 }

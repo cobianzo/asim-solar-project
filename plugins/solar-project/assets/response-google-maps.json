@@ -1,1632 +1,1148 @@
 {
-  "plus_code": {
-      "compound_code": "VF3X+MFX Rome, Metropolitan City of Rome Capital, Italy",
-      "global_code": "8FHJVF3X+MFX"
-  },
-  "results": [
-      {
-          "address_components": [
-              {
-                  "long_name": "98",
-                  "short_name": "98",
-                  "types": [
-                      "street_number"
-                  ]
-              },
-              {
-                  "long_name": "Viale Carlo Tommaso Odescalchi",
-                  "short_name": "Viale Carlo Tommaso Odescalchi",
-                  "types": [
-                      "route"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "buildings": [
-              {
-                  "building_outlines": [
-                      {
-                          "display_polygon": {
-                              "coordinates": [
-                                  [
-                                      [
-                                          12.498754364698,
-                                          41.854050368240401
-                                      ],
-                                      [
-                                          12.498880548427801,
-                                          41.854328807354598
-                                      ],
-                                      [
-                                          12.4986390318409,
-                                          41.854388709951898
-                                      ],
-                                      [
-                                          12.498515823576,
-                                          41.854110241529298
-                                      ],
-                                      [
-                                          12.498565526894099,
-                                          41.854097748508998
-                                      ],
-                                      [
-                                          12.498548375746701,
-                                          41.854060071863998
-                                      ],
-                                      [
-                                          12.4986120800216,
-                                          41.854043498175898
-                                      ],
-                                      [
-                                          12.4986351815806,
-                                          41.8540375191008
-                                      ],
-                                      [
-                                          12.498651457681801,
-                                          41.854076187978698
-                                      ],
-                                      [
-                                          12.498754364698,
-                                          41.854050368240401
-                                      ]
-                                  ]
-                              ],
-                              "type": "Polygon"
-                          }
-                      }
-                  ],
-                  "place_id": "ChIJey-W5G6KJRMRecjkbR8jWTw"
-              }
-          ],
-          "formatted_address": "Viale Carlo Tommaso Odescalchi, 98, 00147 Roma RM, Italy",
-          "geometry": {
-              "location": {
-                  "lat": 41.854212599999997,
-                  "lng": 12.498692999999999
-              },
-              "location_type": "ROOFTOP",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.8555615802915,
-                      "lng": 12.500041980291501
-                  },
-                  "southwest": {
-                      "lat": 41.852863619708501,
-                      "lng": 12.4973440197085
-                  }
-              }
-          },
-          "navigation_points": [
-              {
-                  "location": {
-                      "latitude": 41.853878000000002,
-                      "longitude": 12.498849999999999
-                  }
-              }
-          ],
-          "place_id": "ChIJ8apIfLGLJRMR-CCK0mdLG2w",
-          "plus_code": {
-              "compound_code": "VF3X+MF Rome, Metropolitan City of Rome Capital, Italy",
-              "global_code": "8FHJVF3X+MF"
-          },
-          "types": [
-              "establishment",
-              "health",
-              "point_of_interest"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "98",
-                  "short_name": "98",
-                  "types": [
-                      "street_number"
-                  ]
-              },
-              {
-                  "long_name": "Viale Carlo Tommaso Odescalchi",
-                  "short_name": "Viale Carlo Tommaso Odescalchi",
-                  "types": [
-                      "route"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "buildings": [
-              {
-                  "building_outlines": [
-                      {
-                          "display_polygon": {
-                              "coordinates": [
-                                  [
-                                      [
-                                          12.498754364698,
-                                          41.854050368240401
-                                      ],
-                                      [
-                                          12.498880548427801,
-                                          41.854328807354598
-                                      ],
-                                      [
-                                          12.4986390318409,
-                                          41.854388709951898
-                                      ],
-                                      [
-                                          12.498515823576,
-                                          41.854110241529298
-                                      ],
-                                      [
-                                          12.498565526894099,
-                                          41.854097748508998
-                                      ],
-                                      [
-                                          12.498548375746701,
-                                          41.854060071863998
-                                      ],
-                                      [
-                                          12.4986120800216,
-                                          41.854043498175898
-                                      ],
-                                      [
-                                          12.4986351815806,
-                                          41.8540375191008
-                                      ],
-                                      [
-                                          12.498651457681801,
-                                          41.854076187978698
-                                      ],
-                                      [
-                                          12.498754364698,
-                                          41.854050368240401
-                                      ]
-                                  ]
-                              ],
-                              "type": "Polygon"
-                          }
-                      }
-                  ],
-                  "place_id": "ChIJey-W5G6KJRMRecjkbR8jWTw"
-              }
-          ],
-          "formatted_address": "Viale Carlo Tommaso Odescalchi, 98, 00147 Roma RM, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 41.854388700000001,
-                      "lng": 12.4988805
-                  },
-                  "southwest": {
-                      "lat": 41.854037499999997,
-                      "lng": 12.4985158
-                  }
-              },
-              "location": {
-                  "lat": 41.854212599999997,
-                  "lng": 12.498692999999999
-              },
-              "location_type": "ROOFTOP",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.855562080291492,
-                      "lng": 12.500047130291501
-                  },
-                  "southwest": {
-                      "lat": 41.852864119708492,
-                      "lng": 12.4973491697085
-                  }
-              }
-          },
-          "navigation_points": [
-              {
-                  "location": {
-                      "latitude": 41.853878000000002,
-                      "longitude": 12.498849999999999
-                  }
-              }
-          ],
-          "place_id": "ChIJey-W5G6KJRMRecjkbR8jWTw",
-          "types": [
-              "premise",
-              "street_address"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "1000",
-                  "short_name": "1000",
-                  "types": [
-                      "street_number"
-                  ]
-              },
-              {
-                  "long_name": "Viale Carlo Tommaso Odescalchi",
-                  "short_name": "Viale Carlo Tommaso Odescalchi",
-                  "types": [
-                      "route"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "formatted_address": "Viale Carlo Tommaso Odescalchi, 1000, 00147 Roma RM, Italy",
-          "geometry": {
-              "location": {
-                  "lat": 41.853882400000003,
-                  "lng": 12.498715900000001
-              },
-              "location_type": "ROOFTOP",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.855231380291492,
-                      "lng": 12.5000648802915
-                  },
-                  "southwest": {
-                      "lat": 41.8525334197085,
-                      "lng": 12.497366919708501
-                  }
-              }
-          },
-          "navigation_points": [
-              {
-                  "location": {
-                      "latitude": 41.8538481,
-                      "longitude": 12.4987315
-                  }
-              }
-          ],
-          "place_id": "ChIJT6Dp5m6KJRMR1y14ftns54s",
-          "plus_code": {
-              "compound_code": "VF3X+HF Rome, Metropolitan City of Rome Capital, Italy",
-              "global_code": "8FHJVF3X+HF"
-          },
-          "types": [
-              "street_address"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Tor Marancia\/Mantegna",
-                  "short_name": "Tor Marancia\/Mantegna",
-                  "types": [
-                      "establishment",
-                      "point_of_interest",
-                      "transit_station"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "formatted_address": "Tor Marancia\/Mantegna, 00147 Roma RM, Italy",
-          "geometry": {
-              "location": {
-                  "lat": 41.853877999999987,
-                  "lng": 12.497977000000001
-              },
-              "location_type": "GEOMETRIC_CENTER",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.855226980291498,
-                      "lng": 12.4993259802915
-                  },
-                  "southwest": {
-                      "lat": 41.852529019708498,
-                      "lng": 12.496628019708499
-                  }
-              }
-          },
-          "navigation_points": [
-              {
-                  "location": {
-                      "latitude": 41.853867000000001,
-                      "longitude": 12.497907700000001
-                  }
-              }
-          ],
-          "place_id": "ChIJmyAjH2-KJRMRvs22YpDbkHg",
-          "plus_code": {
-              "compound_code": "VF3X+H5 Rome, Metropolitan City of Rome Capital, Italy",
-              "global_code": "8FHJVF3X+H5"
-          },
-          "types": [
-              "establishment",
-              "point_of_interest",
-              "transit_station"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "75",
-                  "short_name": "75",
-                  "types": [
-                      "street_number"
-                  ]
-              },
-              {
-                  "long_name": "Viale Carlo Tommaso Odescalchi",
-                  "short_name": "Viale Carlo Tommaso Odescalchi",
-                  "types": [
-                      "route"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "buildings": [
-              {
-                  "building_outlines": [
-                      {
-                          "display_polygon": {
-                              "coordinates": [
-                                  [
-                                      [
-                                          12.499857470733,
-                                          41.8537692269826
-                                      ],
-                                      [
-                                          12.4999817305289,
-                                          41.853865276361397
-                                      ],
-                                      [
-                                          12.5002085487587,
-                                          41.854083952591999
-                                      ],
-                                      [
-                                          12.5002783794618,
-                                          41.854177636867099
-                                      ],
-                                      [
-                                          12.5003536356558,
-                                          41.8541451574931
-                                      ],
-                                      [
-                                          12.500536350900701,
-                                          41.854392430363497
-                                      ],
-                                      [
-                                          12.500633834153801,
-                                          41.854620575915199
-                                      ],
-                                      [
-                                          12.500515349133501,
-                                          41.854649158803802
-                                      ],
-                                      [
-                                          12.500427841812,
-                                          41.854466646314499
-                                      ],
-                                      [
-                                          12.500344534904199,
-                                          41.854336673471302
-                                      ],
-                                      [
-                                          12.5002612280571,
-                                          41.854368248142499
-                                      ],
-                                      [
-                                          12.5001268171379,
-                                          41.8541877668059
-                                      ],
-                                      [
-                                          12.4999726298069,
-                                          41.854019467024997
-                                      ],
-                                      [
-                                          12.4999185505313,
-                                          41.854054241442299
-                                      ],
-                                      [
-                                          12.4996985584022,
-                                          41.853869451298301
-                                      ],
-                                      [
-                                          12.499533345816999,
-                                          41.853771344032999
-                                      ],
-                                      [
-                                          12.499496243023501,
-                                          41.853813057095003
-                                      ],
-                                      [
-                                          12.4993779341966,
-                                          41.853754872437598
-                                      ],
-                                      [
-                                          12.4992594504794,
-                                          41.853712234740001
-                                      ],
-                                      [
-                                          12.499284652323301,
-                                          41.853666756393601
-                                      ],
-                                      [
-                                          12.4991791196392,
-                                          41.853631351462703
-                                      ],
-                                      [
-                                          12.499225848029599,
-                                          41.8535342300178
-                                      ],
-                                      [
-                                          12.4994796167757,
-                                          41.8536300470942
-                                      ],
-                                      [
-                                          12.4995450717023,
-                                          41.853559827992697
-                                      ],
-                                      [
-                                          12.4995548724433,
-                                          41.853503355191997
-                                      ],
-                                      [
-                                          12.4995532973241,
-                                          41.853488448686299
-                                      ],
-                                      [
-                                          12.499514794418801,
-                                          41.853362195926302
-                                      ],
-                                      [
-                                          12.499503943602299,
-                                          41.853363988644702
-                                      ],
-                                      [
-                                          12.4994360385164,
-                                          41.853142730084002
-                                      ],
-                                      [
-                                          12.499591100189299,
-                                          41.853117434230199
-                                      ],
-                                      [
-                                          12.499659180380799,
-                                          41.853337329652902
-                                      ],
-                                      [
-                                          12.4996978583484,
-                                          41.853462219321699
-                                      ],
-                                      [
-                                          12.4996051012537,
-                                          41.853479157781301
-                                      ],
-                                      [
-                                          12.4996103516532,
-                                          41.853534420254398
-                                      ],
-                                      [
-                                          12.499592850322299,
-                                          41.853574720427403
-                                      ],
-                                      [
-                                          12.4995279204078,
-                                          41.853651451196498
-                                      ],
-                                      [
-                                          12.499760863210399,
-                                          41.853793756490099
-                                      ],
-                                      [
-                                          12.499795865926499,
-                                          41.853820955717097
-                                      ],
-                                      [
-                                          12.499857470733,
-                                          41.8537692269826
-                                      ]
-                                  ]
-                              ],
-                              "type": "Polygon"
-                          }
-                      }
-                  ],
-                  "place_id": "ChIJ49clx26KJRMR4LmOtEk7DRc"
-              }
-          ],
-          "entrances": [
-              {
-                  "building_place_id": "ChIJ49clx26KJRMR4LmOtEk7DRc",
-                  "location": {
-                      "lat": 41.853695599999988,
-                      "lng": 12.4992687
-                  }
-              },
-              {
-                  "building_place_id": "ChIJ49clx26KJRMR4LmOtEk7DRc",
-                  "location": {
-                      "lat": 41.853768799999997,
-                      "lng": 12.4994061
-                  }
-              }
-          ],
-          "formatted_address": "Viale Carlo Tommaso Odescalchi, 75, 00147 Roma RM, Italy",
-          "geometry": {
-              "location": {
-                  "lat": 41.853625899999997,
-                  "lng": 12.4991889
-              },
-              "location_type": "ROOFTOP",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.8549748802915,
-                      "lng": 12.5005378802915
-                  },
-                  "southwest": {
-                      "lat": 41.852276919708501,
-                      "lng": 12.4978399197085
-                  }
-              }
-          },
-          "navigation_points": [
-              {
-                  "location": {
-                      "latitude": 41.853718899999997,
-                      "longitude": 12.4992544
-                  }
-              }
-          ],
-          "place_id": "ChIJEcaR6W6KJRMRx50Ewx9zZPE",
-          "types": [
-              "street_address",
-              "subpremise"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "98",
-                  "short_name": "98",
-                  "types": [
-                      "street_number"
-                  ]
-              },
-              {
-                  "long_name": "Viale Carlo Tommaso Odescalchi",
-                  "short_name": "Viale Carlo Tommaso Odescalchi",
-                  "types": [
-                      "route"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "formatted_address": "Viale Carlo Tommaso Odescalchi, 98, 00147 Roma RM, Italy",
-          "geometry": {
-              "location": {
-                  "lat": 41.853818599999997,
-                  "lng": 12.4988779
-              },
-              "location_type": "RANGE_INTERPOLATED",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.8551675802915,
-                      "lng": 12.5002268802915
-                  },
-                  "southwest": {
-                      "lat": 41.852469619708501,
-                      "lng": 12.4975289197085
-                  }
-              }
-          },
-          "place_id": "EjhWaWFsZSBDYXJsbyBUb21tYXNvIE9kZXNjYWxjaGksIDk4LCAwMDE0NyBSb21hIFJNLCBJdGFseSIaEhgKFAoSCc-5Re5uiiUTEWkMLDE3BBnVEGI",
-          "types": [
-              "street_address"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "VF3X+MF",
-                  "short_name": "VF3X+MF",
-                  "types": [
-                      "plus_code"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "VF3X+MF Rome, Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 41.85425,
-                      "lng": 12.498749999999999
-                  },
-                  "southwest": {
-                      "lat": 41.854125000000003,
-                      "lng": 12.498625000000001
-                  }
-              },
-              "location": {
-                  "lat": 41.8542457,
-                  "lng": 12.4987207
-              },
-              "location_type": "GEOMETRIC_CENTER",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.855536480291498,
-                      "lng": 12.5000364802915
-                  },
-                  "southwest": {
-                      "lat": 41.852838519708499,
-                      "lng": 12.497338519708499
-                  }
-              }
-          },
-          "place_id": "GhIJ0x9Q7FftREARLK3QUVj_KEA",
-          "plus_code": {
-              "compound_code": "VF3X+MF Rome, Metropolitan City of Rome Capital, Italy",
-              "global_code": "8FHJVF3X+MF"
-          },
-          "types": [
-              "plus_code"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Viale Carlo Tommaso Odescalchi",
-                  "short_name": "Viale Carlo Tommaso Odescalchi",
-                  "types": [
-                      "route"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Roma",
-                  "short_name": "Roma",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Citt\u00e0 metropolitana di Roma Capitale",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              }
-          ],
-          "formatted_address": "Viale Carlo Tommaso Odescalchi, 00147 Roma RM, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 41.8545552,
-                      "lng": 12.499924
-                  },
-                  "southwest": {
-                      "lat": 41.853731699999997,
-                      "lng": 12.498533500000001
-                  }
-              },
-              "location": {
-                  "lat": 41.853993099999997,
-                  "lng": 12.4993926
-              },
-              "location_type": "GEOMETRIC_CENTER",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.855492430291513,
-                      "lng": 12.5005777302915
-                  },
-                  "southwest": {
-                      "lat": 41.852794469708513,
-                      "lng": 12.497879769708501
-                  }
-              }
-          },
-          "place_id": "ChIJz7lF7m6KJRMRaAwsMTcEGdU",
-          "types": [
-              "route"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "00147",
-                  "short_name": "00147",
-                  "types": [
-                      "postal_code"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "00147 Rome, Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 41.869219899999997,
-                      "lng": 12.5161351
-                  },
-                  "southwest": {
-                      "lat": 41.840343999999988,
-                      "lng": 12.484326899999999
-                  }
-              },
-              "location": {
-                  "lat": 41.852188900000002,
-                  "lng": 12.5011247
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.869219899999997,
-                      "lng": 12.5161351
-                  },
-                  "southwest": {
-                      "lat": 41.840343999999988,
-                      "lng": 12.484326899999999
-                  }
-              }
-          },
-          "place_id": "ChIJaQiDk3GKJRMR8KRbGp5PCRw",
-          "types": [
-              "postal_code"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Ardeatino",
-                  "short_name": "Ardeatino",
-                  "types": [
-                      "neighborhood",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Ardeatino, Rome, Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 41.873251799999998,
-                      "lng": 12.540464399999999
-                  },
-                  "southwest": {
-                      "lat": 41.825113899999998,
-                      "lng": 12.4789668
-                  }
-              },
-              "location": {
-                  "lat": 41.848446000000003,
-                  "lng": 12.489148399999999
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.873251799999998,
-                      "lng": 12.540464399999999
-                  },
-                  "southwest": {
-                      "lat": 41.825113899999998,
-                      "lng": 12.4789668
-                  }
-              }
-          },
-          "place_id": "ChIJB13PWtlhLxMRt9MCC6EavBk",
-          "types": [
-              "neighborhood",
-              "political"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Municipio VIII",
-                  "short_name": "Municipio VIII",
-                  "types": [
-                      "political",
-                      "sublocality",
-                      "sublocality_level_1"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Municipio VIII, Rome, Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 41.887278899999998,
-                      "lng": 12.599316399999999
-                  },
-                  "southwest": {
-                      "lat": 41.788549600000003,
-                      "lng": 12.4705169
-                  }
-              },
-              "location": {
-                  "lat": 41.859832300000001,
-                  "lng": 12.498293
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 41.887278899999998,
-                      "lng": 12.599316399999999
-                  },
-                  "southwest": {
-                      "lat": 41.788549600000003,
-                      "lng": 12.4705169
-                  }
-              }
-          },
-          "place_id": "ChIJByu4A8JhLxMRWNrAd84QFak",
-          "types": [
-              "political",
-              "sublocality",
-              "sublocality_level_1"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "locality",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Rome, Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 42.050546199999999,
-                      "lng": 12.7302888
-                  },
-                  "southwest": {
-                      "lat": 41.769596,
-                      "lng": 12.341707
-                  }
-              },
-              "location": {
-                  "lat": 41.896706799999997,
-                  "lng": 12.4822025
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 42.050546199999999,
-                      "lng": 12.7302888
-                  },
-                  "southwest": {
-                      "lat": 41.769596,
-                      "lng": 12.341707
-                  }
-              }
-          },
-          "place_id": "ChIJu46S-ZZhLxMROG5lkwZ3D7k",
-          "types": [
-              "locality",
-              "political"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Rome",
-                  "short_name": "Rome",
-                  "types": [
-                      "administrative_area_level_3",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Rome, Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 42.140969299999988,
-                      "lng": 12.8558381
-                  },
-                  "southwest": {
-                      "lat": 41.655406200000002,
-                      "lng": 12.234155100000001
-                  }
-              },
-              "location": {
-                  "lat": 41.896706799999997,
-                  "lng": 12.4822027
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 42.140969299999988,
-                      "lng": 12.8558381
-                  },
-                  "southwest": {
-                      "lat": 41.655406200000002,
-                      "lng": 12.234155100000001
-                  }
-              }
-          },
-          "place_id": "ChIJXxbwqK9hLxMR1Rw3v1GMDEA",
-          "types": [
-              "administrative_area_level_3",
-              "political"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Metropolitan City of Rome Capital",
-                  "short_name": "RM",
-                  "types": [
-                      "administrative_area_level_2",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Metropolitan City of Rome Capital, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 42.296038000000003,
-                      "lng": 13.296275400000001
-                  },
-                  "southwest": {
-                      "lat": 41.407569899999999,
-                      "lng": 11.733545599999999
-                  }
-              },
-              "location": {
-                  "lat": 41.921453399999997,
-                  "lng": 12.713512100000001
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 42.296038000000003,
-                      "lng": 13.296275400000001
-                  },
-                  "southwest": {
-                      "lat": 41.407569899999999,
-                      "lng": 11.733545599999999
-                  }
-              }
-          },
-          "place_id": "ChIJw0rXGxGKJRMRAIE4sppPCQM",
-          "types": [
-              "administrative_area_level_2",
-              "political"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Lazio",
-                  "short_name": "Lazio",
-                  "types": [
-                      "administrative_area_level_1",
-                      "political"
-                  ]
-              },
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Lazio, Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 42.838745899999999,
-                      "lng": 14.027644499999999
-                  },
-                  "southwest": {
-                      "lat": 40.784733699999997,
-                      "lng": 11.449370500000001
-                  }
-              },
-              "location": {
-                  "lat": 41.655241799999999,
-                  "lng": 12.989615000000001
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 42.838745899999999,
-                      "lng": 14.027644499999999
-                  },
-                  "southwest": {
-                      "lat": 40.784733699999997,
-                      "lng": 11.449370500000001
-                  }
-              }
-          },
-          "place_id": "ChIJNWU6NebuJBMRKYWj8WSQSm8",
-          "types": [
-              "administrative_area_level_1",
-              "political"
-          ]
-      },
-      {
-          "address_components": [
-              {
-                  "long_name": "Italy",
-                  "short_name": "IT",
-                  "types": [
-                      "country",
-                      "political"
-                  ]
-              }
-          ],
-          "formatted_address": "Italy",
-          "geometry": {
-              "bounds": {
-                  "northeast": {
-                      "lat": 47.091999999999999,
-                      "lng": 18.797599900000002
-                  },
-                  "southwest": {
-                      "lat": 35.489699999999999,
-                      "lng": 6.6267201
-                  }
-              },
-              "location": {
-                  "lat": 41.871940000000002,
-                  "lng": 12.56738
-              },
-              "location_type": "APPROXIMATE",
-              "viewport": {
-                  "northeast": {
-                      "lat": 47.091999999999999,
-                      "lng": 18.797599900000002
-                  },
-                  "southwest": {
-                      "lat": 35.489699999999999,
-                      "lng": 6.6267201
-                  }
-              }
-          },
-          "place_id": "ChIJA9KNRIL-1BIRb15jJFz1LOI",
-          "types": [
-              "country",
-              "political"
-          ]
-      }
-  ],
-  "status": "OK",
-  "cached": true
+	"plus_code": {
+		"compound_code": "VF3X+MFX Rome, Metropolitan City of Rome Capital, Italy",
+		"global_code": "8FHJVF3X+MFX"
+	},
+	"results": [
+		{
+			"address_components": [
+				{
+					"long_name": "98",
+					"short_name": "98",
+					"types": ["street_number"]
+				},
+				{
+					"long_name": "Viale Carlo Tommaso Odescalchi",
+					"short_name": "Viale Carlo Tommaso Odescalchi",
+					"types": ["route"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"buildings": [
+				{
+					"building_outlines": [
+						{
+							"display_polygon": {
+								"coordinates": [
+									[
+										[12.498754364698, 41.854050368240401],
+										[12.498880548427801, 41.854328807354598],
+										[12.4986390318409, 41.854388709951898],
+										[12.498515823576, 41.854110241529298],
+										[12.498565526894099, 41.854097748508998],
+										[12.498548375746701, 41.854060071863998],
+										[12.4986120800216, 41.854043498175898],
+										[12.4986351815806, 41.8540375191008],
+										[12.498651457681801, 41.854076187978698],
+										[12.498754364698, 41.854050368240401]
+									]
+								],
+								"type": "Polygon"
+							}
+						}
+					],
+					"place_id": "ChIJey-W5G6KJRMRecjkbR8jWTw"
+				}
+			],
+			"formatted_address": "Viale Carlo Tommaso Odescalchi, 98, 00147 Roma RM, Italy",
+			"geometry": {
+				"location": {
+					"lat": 41.854212599999997,
+					"lng": 12.498692999999999
+				},
+				"location_type": "ROOFTOP",
+				"viewport": {
+					"northeast": {
+						"lat": 41.8555615802915,
+						"lng": 12.500041980291501
+					},
+					"southwest": {
+						"lat": 41.852863619708501,
+						"lng": 12.4973440197085
+					}
+				}
+			},
+			"navigation_points": [
+				{
+					"location": {
+						"latitude": 41.853878000000002,
+						"longitude": 12.498849999999999
+					}
+				}
+			],
+			"place_id": "ChIJ8apIfLGLJRMR-CCK0mdLG2w",
+			"plus_code": {
+				"compound_code": "VF3X+MF Rome, Metropolitan City of Rome Capital, Italy",
+				"global_code": "8FHJVF3X+MF"
+			},
+			"types": ["establishment", "health", "point_of_interest"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "98",
+					"short_name": "98",
+					"types": ["street_number"]
+				},
+				{
+					"long_name": "Viale Carlo Tommaso Odescalchi",
+					"short_name": "Viale Carlo Tommaso Odescalchi",
+					"types": ["route"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"buildings": [
+				{
+					"building_outlines": [
+						{
+							"display_polygon": {
+								"coordinates": [
+									[
+										[12.498754364698, 41.854050368240401],
+										[12.498880548427801, 41.854328807354598],
+										[12.4986390318409, 41.854388709951898],
+										[12.498515823576, 41.854110241529298],
+										[12.498565526894099, 41.854097748508998],
+										[12.498548375746701, 41.854060071863998],
+										[12.4986120800216, 41.854043498175898],
+										[12.4986351815806, 41.8540375191008],
+										[12.498651457681801, 41.854076187978698],
+										[12.498754364698, 41.854050368240401]
+									]
+								],
+								"type": "Polygon"
+							}
+						}
+					],
+					"place_id": "ChIJey-W5G6KJRMRecjkbR8jWTw"
+				}
+			],
+			"formatted_address": "Viale Carlo Tommaso Odescalchi, 98, 00147 Roma RM, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 41.854388700000001,
+						"lng": 12.4988805
+					},
+					"southwest": {
+						"lat": 41.854037499999997,
+						"lng": 12.4985158
+					}
+				},
+				"location": {
+					"lat": 41.854212599999997,
+					"lng": 12.498692999999999
+				},
+				"location_type": "ROOFTOP",
+				"viewport": {
+					"northeast": {
+						"lat": 41.855562080291492,
+						"lng": 12.500047130291501
+					},
+					"southwest": {
+						"lat": 41.852864119708492,
+						"lng": 12.4973491697085
+					}
+				}
+			},
+			"navigation_points": [
+				{
+					"location": {
+						"latitude": 41.853878000000002,
+						"longitude": 12.498849999999999
+					}
+				}
+			],
+			"place_id": "ChIJey-W5G6KJRMRecjkbR8jWTw",
+			"types": ["premise", "street_address"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "1000",
+					"short_name": "1000",
+					"types": ["street_number"]
+				},
+				{
+					"long_name": "Viale Carlo Tommaso Odescalchi",
+					"short_name": "Viale Carlo Tommaso Odescalchi",
+					"types": ["route"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"formatted_address": "Viale Carlo Tommaso Odescalchi, 1000, 00147 Roma RM, Italy",
+			"geometry": {
+				"location": {
+					"lat": 41.853882400000003,
+					"lng": 12.498715900000001
+				},
+				"location_type": "ROOFTOP",
+				"viewport": {
+					"northeast": {
+						"lat": 41.855231380291492,
+						"lng": 12.5000648802915
+					},
+					"southwest": {
+						"lat": 41.8525334197085,
+						"lng": 12.497366919708501
+					}
+				}
+			},
+			"navigation_points": [
+				{
+					"location": {
+						"latitude": 41.8538481,
+						"longitude": 12.4987315
+					}
+				}
+			],
+			"place_id": "ChIJT6Dp5m6KJRMR1y14ftns54s",
+			"plus_code": {
+				"compound_code": "VF3X+HF Rome, Metropolitan City of Rome Capital, Italy",
+				"global_code": "8FHJVF3X+HF"
+			},
+			"types": ["street_address"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Tor Marancia\/Mantegna",
+					"short_name": "Tor Marancia\/Mantegna",
+					"types": ["establishment", "point_of_interest", "transit_station"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"formatted_address": "Tor Marancia\/Mantegna, 00147 Roma RM, Italy",
+			"geometry": {
+				"location": {
+					"lat": 41.853877999999987,
+					"lng": 12.497977000000001
+				},
+				"location_type": "GEOMETRIC_CENTER",
+				"viewport": {
+					"northeast": {
+						"lat": 41.855226980291498,
+						"lng": 12.4993259802915
+					},
+					"southwest": {
+						"lat": 41.852529019708498,
+						"lng": 12.496628019708499
+					}
+				}
+			},
+			"navigation_points": [
+				{
+					"location": {
+						"latitude": 41.853867000000001,
+						"longitude": 12.497907700000001
+					}
+				}
+			],
+			"place_id": "ChIJmyAjH2-KJRMRvs22YpDbkHg",
+			"plus_code": {
+				"compound_code": "VF3X+H5 Rome, Metropolitan City of Rome Capital, Italy",
+				"global_code": "8FHJVF3X+H5"
+			},
+			"types": ["establishment", "point_of_interest", "transit_station"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "75",
+					"short_name": "75",
+					"types": ["street_number"]
+				},
+				{
+					"long_name": "Viale Carlo Tommaso Odescalchi",
+					"short_name": "Viale Carlo Tommaso Odescalchi",
+					"types": ["route"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"buildings": [
+				{
+					"building_outlines": [
+						{
+							"display_polygon": {
+								"coordinates": [
+									[
+										[12.499857470733, 41.8537692269826],
+										[12.4999817305289, 41.853865276361397],
+										[12.5002085487587, 41.854083952591999],
+										[12.5002783794618, 41.854177636867099],
+										[12.5003536356558, 41.8541451574931],
+										[12.500536350900701, 41.854392430363497],
+										[12.500633834153801, 41.854620575915199],
+										[12.500515349133501, 41.854649158803802],
+										[12.500427841812, 41.854466646314499],
+										[12.500344534904199, 41.854336673471302],
+										[12.5002612280571, 41.854368248142499],
+										[12.5001268171379, 41.8541877668059],
+										[12.4999726298069, 41.854019467024997],
+										[12.4999185505313, 41.854054241442299],
+										[12.4996985584022, 41.853869451298301],
+										[12.499533345816999, 41.853771344032999],
+										[12.499496243023501, 41.853813057095003],
+										[12.4993779341966, 41.853754872437598],
+										[12.4992594504794, 41.853712234740001],
+										[12.499284652323301, 41.853666756393601],
+										[12.4991791196392, 41.853631351462703],
+										[12.499225848029599, 41.8535342300178],
+										[12.4994796167757, 41.8536300470942],
+										[12.4995450717023, 41.853559827992697],
+										[12.4995548724433, 41.853503355191997],
+										[12.4995532973241, 41.853488448686299],
+										[12.499514794418801, 41.853362195926302],
+										[12.499503943602299, 41.853363988644702],
+										[12.4994360385164, 41.853142730084002],
+										[12.499591100189299, 41.853117434230199],
+										[12.499659180380799, 41.853337329652902],
+										[12.4996978583484, 41.853462219321699],
+										[12.4996051012537, 41.853479157781301],
+										[12.4996103516532, 41.853534420254398],
+										[12.499592850322299, 41.853574720427403],
+										[12.4995279204078, 41.853651451196498],
+										[12.499760863210399, 41.853793756490099],
+										[12.499795865926499, 41.853820955717097],
+										[12.499857470733, 41.8537692269826]
+									]
+								],
+								"type": "Polygon"
+							}
+						}
+					],
+					"place_id": "ChIJ49clx26KJRMR4LmOtEk7DRc"
+				}
+			],
+			"entrances": [
+				{
+					"building_place_id": "ChIJ49clx26KJRMR4LmOtEk7DRc",
+					"location": {
+						"lat": 41.853695599999988,
+						"lng": 12.4992687
+					}
+				},
+				{
+					"building_place_id": "ChIJ49clx26KJRMR4LmOtEk7DRc",
+					"location": {
+						"lat": 41.853768799999997,
+						"lng": 12.4994061
+					}
+				}
+			],
+			"formatted_address": "Viale Carlo Tommaso Odescalchi, 75, 00147 Roma RM, Italy",
+			"geometry": {
+				"location": {
+					"lat": 41.853625899999997,
+					"lng": 12.4991889
+				},
+				"location_type": "ROOFTOP",
+				"viewport": {
+					"northeast": {
+						"lat": 41.8549748802915,
+						"lng": 12.5005378802915
+					},
+					"southwest": {
+						"lat": 41.852276919708501,
+						"lng": 12.4978399197085
+					}
+				}
+			},
+			"navigation_points": [
+				{
+					"location": {
+						"latitude": 41.853718899999997,
+						"longitude": 12.4992544
+					}
+				}
+			],
+			"place_id": "ChIJEcaR6W6KJRMRx50Ewx9zZPE",
+			"types": ["street_address", "subpremise"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "98",
+					"short_name": "98",
+					"types": ["street_number"]
+				},
+				{
+					"long_name": "Viale Carlo Tommaso Odescalchi",
+					"short_name": "Viale Carlo Tommaso Odescalchi",
+					"types": ["route"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"formatted_address": "Viale Carlo Tommaso Odescalchi, 98, 00147 Roma RM, Italy",
+			"geometry": {
+				"location": {
+					"lat": 41.853818599999997,
+					"lng": 12.4988779
+				},
+				"location_type": "RANGE_INTERPOLATED",
+				"viewport": {
+					"northeast": {
+						"lat": 41.8551675802915,
+						"lng": 12.5002268802915
+					},
+					"southwest": {
+						"lat": 41.852469619708501,
+						"lng": 12.4975289197085
+					}
+				}
+			},
+			"place_id": "EjhWaWFsZSBDYXJsbyBUb21tYXNvIE9kZXNjYWxjaGksIDk4LCAwMDE0NyBSb21hIFJNLCBJdGFseSIaEhgKFAoSCc-5Re5uiiUTEWkMLDE3BBnVEGI",
+			"types": ["street_address"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "VF3X+MF",
+					"short_name": "VF3X+MF",
+					"types": ["plus_code"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "VF3X+MF Rome, Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 41.85425,
+						"lng": 12.498749999999999
+					},
+					"southwest": {
+						"lat": 41.854125000000003,
+						"lng": 12.498625000000001
+					}
+				},
+				"location": {
+					"lat": 41.8542457,
+					"lng": 12.4987207
+				},
+				"location_type": "GEOMETRIC_CENTER",
+				"viewport": {
+					"northeast": {
+						"lat": 41.855536480291498,
+						"lng": 12.5000364802915
+					},
+					"southwest": {
+						"lat": 41.852838519708499,
+						"lng": 12.497338519708499
+					}
+				}
+			},
+			"place_id": "GhIJ0x9Q7FftREARLK3QUVj_KEA",
+			"plus_code": {
+				"compound_code": "VF3X+MF Rome, Metropolitan City of Rome Capital, Italy",
+				"global_code": "8FHJVF3X+MF"
+			},
+			"types": ["plus_code"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Viale Carlo Tommaso Odescalchi",
+					"short_name": "Viale Carlo Tommaso Odescalchi",
+					"types": ["route"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Roma",
+					"short_name": "Roma",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Citt\u00e0 metropolitana di Roma Capitale",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				},
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				}
+			],
+			"formatted_address": "Viale Carlo Tommaso Odescalchi, 00147 Roma RM, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 41.8545552,
+						"lng": 12.499924
+					},
+					"southwest": {
+						"lat": 41.853731699999997,
+						"lng": 12.498533500000001
+					}
+				},
+				"location": {
+					"lat": 41.853993099999997,
+					"lng": 12.4993926
+				},
+				"location_type": "GEOMETRIC_CENTER",
+				"viewport": {
+					"northeast": {
+						"lat": 41.855492430291513,
+						"lng": 12.5005777302915
+					},
+					"southwest": {
+						"lat": 41.852794469708513,
+						"lng": 12.497879769708501
+					}
+				}
+			},
+			"place_id": "ChIJz7lF7m6KJRMRaAwsMTcEGdU",
+			"types": ["route"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "00147",
+					"short_name": "00147",
+					"types": ["postal_code"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "00147 Rome, Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 41.869219899999997,
+						"lng": 12.5161351
+					},
+					"southwest": {
+						"lat": 41.840343999999988,
+						"lng": 12.484326899999999
+					}
+				},
+				"location": {
+					"lat": 41.852188900000002,
+					"lng": 12.5011247
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 41.869219899999997,
+						"lng": 12.5161351
+					},
+					"southwest": {
+						"lat": 41.840343999999988,
+						"lng": 12.484326899999999
+					}
+				}
+			},
+			"place_id": "ChIJaQiDk3GKJRMR8KRbGp5PCRw",
+			"types": ["postal_code"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Ardeatino",
+					"short_name": "Ardeatino",
+					"types": ["neighborhood", "political"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Ardeatino, Rome, Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 41.873251799999998,
+						"lng": 12.540464399999999
+					},
+					"southwest": {
+						"lat": 41.825113899999998,
+						"lng": 12.4789668
+					}
+				},
+				"location": {
+					"lat": 41.848446000000003,
+					"lng": 12.489148399999999
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 41.873251799999998,
+						"lng": 12.540464399999999
+					},
+					"southwest": {
+						"lat": 41.825113899999998,
+						"lng": 12.4789668
+					}
+				}
+			},
+			"place_id": "ChIJB13PWtlhLxMRt9MCC6EavBk",
+			"types": ["neighborhood", "political"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Municipio VIII",
+					"short_name": "Municipio VIII",
+					"types": ["political", "sublocality", "sublocality_level_1"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Municipio VIII, Rome, Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 41.887278899999998,
+						"lng": 12.599316399999999
+					},
+					"southwest": {
+						"lat": 41.788549600000003,
+						"lng": 12.4705169
+					}
+				},
+				"location": {
+					"lat": 41.859832300000001,
+					"lng": 12.498293
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 41.887278899999998,
+						"lng": 12.599316399999999
+					},
+					"southwest": {
+						"lat": 41.788549600000003,
+						"lng": 12.4705169
+					}
+				}
+			},
+			"place_id": "ChIJByu4A8JhLxMRWNrAd84QFak",
+			"types": ["political", "sublocality", "sublocality_level_1"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["locality", "political"]
+				},
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Rome, Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 42.050546199999999,
+						"lng": 12.7302888
+					},
+					"southwest": {
+						"lat": 41.769596,
+						"lng": 12.341707
+					}
+				},
+				"location": {
+					"lat": 41.896706799999997,
+					"lng": 12.4822025
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 42.050546199999999,
+						"lng": 12.7302888
+					},
+					"southwest": {
+						"lat": 41.769596,
+						"lng": 12.341707
+					}
+				}
+			},
+			"place_id": "ChIJu46S-ZZhLxMROG5lkwZ3D7k",
+			"types": ["locality", "political"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Rome",
+					"short_name": "Rome",
+					"types": ["administrative_area_level_3", "political"]
+				},
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Rome, Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 42.140969299999988,
+						"lng": 12.8558381
+					},
+					"southwest": {
+						"lat": 41.655406200000002,
+						"lng": 12.234155100000001
+					}
+				},
+				"location": {
+					"lat": 41.896706799999997,
+					"lng": 12.4822027
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 42.140969299999988,
+						"lng": 12.8558381
+					},
+					"southwest": {
+						"lat": 41.655406200000002,
+						"lng": 12.234155100000001
+					}
+				}
+			},
+			"place_id": "ChIJXxbwqK9hLxMR1Rw3v1GMDEA",
+			"types": ["administrative_area_level_3", "political"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Metropolitan City of Rome Capital",
+					"short_name": "RM",
+					"types": ["administrative_area_level_2", "political"]
+				},
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Metropolitan City of Rome Capital, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 42.296038000000003,
+						"lng": 13.296275400000001
+					},
+					"southwest": {
+						"lat": 41.407569899999999,
+						"lng": 11.733545599999999
+					}
+				},
+				"location": {
+					"lat": 41.921453399999997,
+					"lng": 12.713512100000001
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 42.296038000000003,
+						"lng": 13.296275400000001
+					},
+					"southwest": {
+						"lat": 41.407569899999999,
+						"lng": 11.733545599999999
+					}
+				}
+			},
+			"place_id": "ChIJw0rXGxGKJRMRAIE4sppPCQM",
+			"types": ["administrative_area_level_2", "political"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Lazio",
+					"short_name": "Lazio",
+					"types": ["administrative_area_level_1", "political"]
+				},
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Lazio, Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 42.838745899999999,
+						"lng": 14.027644499999999
+					},
+					"southwest": {
+						"lat": 40.784733699999997,
+						"lng": 11.449370500000001
+					}
+				},
+				"location": {
+					"lat": 41.655241799999999,
+					"lng": 12.989615000000001
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 42.838745899999999,
+						"lng": 14.027644499999999
+					},
+					"southwest": {
+						"lat": 40.784733699999997,
+						"lng": 11.449370500000001
+					}
+				}
+			},
+			"place_id": "ChIJNWU6NebuJBMRKYWj8WSQSm8",
+			"types": ["administrative_area_level_1", "political"]
+		},
+		{
+			"address_components": [
+				{
+					"long_name": "Italy",
+					"short_name": "IT",
+					"types": ["country", "political"]
+				}
+			],
+			"formatted_address": "Italy",
+			"geometry": {
+				"bounds": {
+					"northeast": {
+						"lat": 47.091999999999999,
+						"lng": 18.797599900000002
+					},
+					"southwest": {
+						"lat": 35.489699999999999,
+						"lng": 6.6267201
+					}
+				},
+				"location": {
+					"lat": 41.871940000000002,
+					"lng": 12.56738
+				},
+				"location_type": "APPROXIMATE",
+				"viewport": {
+					"northeast": {
+						"lat": 47.091999999999999,
+						"lng": 18.797599900000002
+					},
+					"southwest": {
+						"lat": 35.489699999999999,
+						"lng": 6.6267201
+					}
+				}
+			},
+			"place_id": "ChIJA9KNRIL-1BIRb15jJFz1LOI",
+			"types": ["country", "political"]
+		}
+	],
+	"status": "OK",
+	"cached": true
 }

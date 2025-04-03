@@ -8,65 +8,73 @@
 // types
 import { ExtendedSegment, RoofSegmentStats } from './types';
 
-
 // internal dependencies, trigonometrical functions
 import {
-  orthopedicRegtanglePoints,
-  rotateRectangle,
-  convertPointsArrayToLatLngString,
-  convertPolygonPathToStringLatLng,
+	orthopedicRegtanglePoints,
+	rotateRectangle,
+	convertPointsArrayToLatLngString,
+	convertPolygonPathToStringLatLng,
 } from './trigonometry-helpers';
 
 // internal dependencies, paiting on the map
 import {
-  paintASunForSegment,
-  highlightSegment,
-  resetSegmentVisibility,
-  fadeSegment,
-  removeRectangleInMap,
-  paintSegment,
-  deleteMarkersCompletely,
-  paintRectangleInMap,
- } from './drawing-helpers';
+	paintASunForSegment,
+	highlightSegment,
+	resetSegmentVisibility,
+	fadeSegment,
+	removeRectangleInMap,
+	paintSegment,
+	deleteMarkersCompletely,
+	paintRectangleInMap,
+} from './drawing-helpers';
 
 import { highlightSegmentInfo, resetSegmentsInfo } from './debug';
 import { getCurrentStepCocoMap } from '.';
 import { getStep3CocoMapSetup } from './step3_functions';
-import { createButtonActivateDeactivateSolarPanels, createSaveSegmentButton, createUnselectSegmentButton } from './buttons-unselect-save-rectangle';
-import { setupRectangles, highlightSavedRectangle, unhighlightSavedRectangle, handlerFirstClickDrawRectangleOverSegment, getSavedRectangleBySegment, FADED_RECTANGLE_OPTIONS } from './setup-rectangle-interactive'
+import {
+	createButtonActivateDeactivateSolarPanels,
+	createSaveSegmentButton,
+	createUnselectSegmentButton,
+} from './buttons-unselect-save-rectangle';
+import {
+	setupRectangles,
+	highlightSavedRectangle,
+	unhighlightSavedRectangle,
+	handlerFirstClickDrawRectangleOverSegment,
+	getSavedRectangleBySegment,
+	FADED_RECTANGLE_OPTIONS,
+} from './setup-rectangle-interactive';
 import { getRotationTypePortraitSelected } from './command-rotate-portrait-segments';
-import { activateInteractionWithRectangleResizeHandler, paintResizeHandlersInUsersRectangle } from './setup-resize-rectangle-interaction';
+import {
+	activateInteractionWithRectangleResizeHandler,
+	paintResizeHandlersInUsersRectangle,
+} from './setup-resize-rectangle-interaction';
 
 // colours of the polygons
 export const SEGMENT_DEFAULT: google.maps.PolygonOptions = {
-  fillColor: 'red',
-  fillOpacity: 0.4,
-  strokeColor: 'black',
-  strokeWeight: 0,
-  clickable: true
-}
+	fillColor: 'red',
+	fillOpacity: 0.4,
+	strokeColor: 'black',
+	strokeWeight: 0,
+	clickable: true,
+};
 
 export const SEGMENT_WHEN_RECTANGLE: google.maps.PolygonOptions = {
-  ...SEGMENT_DEFAULT,
-  fillOpacity: 0.1,
-  strokeWeight: 1,
-  strokeOpacity: 0.5,
-  clickable: true
-}
+	...SEGMENT_DEFAULT,
+	fillOpacity: 0.1,
+	strokeWeight: 1,
+	strokeOpacity: 0.5,
+	clickable: true,
+};
 
 export const SEGMENT_HOVER: google.maps.PolygonOptions = {
-  fillOpacity: 0.8,
-}
+	fillOpacity: 0.8,
+};
 export const SEGMENT_HOVER_WHEN_RECTANGLE: google.maps.PolygonOptions = {
-  strokeWeight: 5
-}
-export const SEGMENT_SELECTED: google.maps.PolygonOptions = {
-
-}
-export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {
-
-}
-
+	strokeWeight: 5,
+};
+export const SEGMENT_SELECTED: google.maps.PolygonOptions = {};
+export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {};
 
 /**
  * Initializes and sets up the roof segments for the map.
@@ -76,301 +84,314 @@ export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {
  *
  * This uses the exposed js vars set up in class-gravity-hooks.php
  */
-const setupSegments = ( paintSunMarkers = true ) => {
+const setupSegments = (paintSunMarkers = true) => {
+	const cocoMapSetup = getCurrentStepCocoMap();
+	if (!cocoMapSetup) {
+		console.log(`:Not found the coco-map in page ${window.gf_current_page}. Early exit`, cocoMapSetup);
+		return;
+	}
 
-  const cocoMapSetup = getCurrentStepCocoMap();
-  if ( ! cocoMapSetup ) {
-    console.log(`:Not found the coco-map in page ${window.gf_current_page}. Early exit`, cocoMapSetup);
-    return;
-  }
+	const { map: theMap } = cocoMapSetup as { map: google.maps.Map };
 
-  const { map: theMap } = cocoMapSetup as { map: google.maps.Map };
+	// retrieve the segments to. In a just-loaded page, they won't exist yet.
+	const segments: ExtendedSegment[] = cocoMapSetup.segments ? cocoMapSetup.segments : [];
 
-  // retrieve the segments to. In a just-loaded page, they won't exist yet.
-  const segments: ExtendedSegment[] = cocoMapSetup.segments? cocoMapSetup.segments : [];
+	// retrieve the exra rotation, if any
+	let rotationSegments = window.step2RotationInserted ?? 'no-extra-rotation';
+	rotationSegments = getRotationTypePortraitSelected(rotationSegments);
 
-  // retrieve the exra rotation, if any
-  let rotationSegments = window.step2RotationInserted ?? 'no-extra-rotation';
-  rotationSegments = getRotationTypePortraitSelected( rotationSegments );
+	/** ========================================
+	 * RESET THINGS, IF THEY EXISTED ALREADY
+	 * ========================================*/
 
+	// reset the SEGMENTS polygons, deleting them if they exist
+	if (segments.length) {
+		segments.forEach((segment: ExtendedSegment) => {
+			deactivateInteractivityOnSegment(segment);
+			cleanupAssociatedMarkers(segment as unknown as AssociatedMarkersParent);
+			if (segment.lowRoofLine) {
+				segment.lowRoofLine.setMap(null);
+			}
+			segment.setMap(null);
+		});
+		cocoMapSetup.segments = [];
+	}
 
-  /** ========================================
-   * RESET THINGS, IF THEY EXISTED ALREADY
-   * ========================================*/
+	// reset: If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
+	removeRectangleInMap(theMap, true);
 
-  // reset the SEGMENTS polygons, deleting them if they exist
-  if ( segments.length ) {
-    segments.forEach( (segment: ExtendedSegment) => {
-      deactivateInteractivityOnSegment(segment);
-      cleanupAssociatedMarkers( segment as unknown as AssociatedMarkersParent );
-      if (segment.lowRoofLine) {
-        segment.lowRoofLine.setMap(null);
-      }
-      segment.setMap(null);
-    } );
-    cocoMapSetup.segments = [];
-  }
+	/** ========================================
+	 * PAINT THE SEGMENTS
+	 * ========================================*/
 
+	// get the info of the segments and paint them, one by one
+	const roofSegments = window.cocoBuildingSegments;
 
-  // reset: If the rectangle by the user was painted, we delete it and we clear all info stored about its creation
-  removeRectangleInMap(theMap, true);
+	if (roofSegments.length) {
+		roofSegments.forEach((segmentItem: RoofSegmentStats, i: number) => {
+			console.log('Calculos par segment ', i, segmentItem);
 
-  /** ========================================
-   * PAINT THE SEGMENTS
-   * ========================================*/
+			const {
+				center,
+				azimuthDegrees,
+				boundingBox: { sw, ne },
+			} = segmentItem;
 
-  // get the info of the segments and paint them, one by one
-  const roofSegments = window.cocoBuildingSegments;
+			// Early exit if any required property is undefined
+			if (!center || azimuthDegrees === undefined || !sw || !ne) {
+				console.error('Missing required segment data. Skipping segment:', {
+					center,
+					azimuthDegrees,
+					sw,
+					ne,
+				});
+				return;
+			}
 
-  if ( roofSegments.length ) {
-    roofSegments.forEach((segmentItem : RoofSegmentStats, i: number) => {
-      console.log( 'Calculos par segment ', i, segmentItem);
+			// based on sw and ne, get the full rectangle
+			// aligned with North
+			const rectPoints = orthopedicRegtanglePoints(theMap, sw, ne);
 
-      const {center, azimuthDegrees, boundingBox: {sw, ne}} = segmentItem;
+			if (!rectPoints) {
+				return null;
+			}
 
-      // Early exit if any required property is undefined
-      if (!center || azimuthDegrees === undefined || !sw || !ne) {
-        console.error('Missing required segment data. Skipping segment:', { center, azimuthDegrees, sw, ne });
-        return;
-      }
+			// is higher than wider?
+			const isPortrait = rectPoints
+				? Math.abs(rectPoints[0].x - rectPoints[2].x) < Math.abs(rectPoints[0].y - rectPoints[1].y)
+				: false;
 
+			// angle that we'll turn the drwan rectangle
+			// here the API of gmaps is weird: if the rectangle is landscape, the angle is correct,
+			// but if the rectangle is portrait, we need to add 90 degrees to the angle (still verifying that)
+			let realAngleRotation = azimuthDegrees;
+			switch (rotationSegments) {
+				case 'no-rotation-at-all':
+					realAngleRotation = 0;
+					break; // not in use
+				case 'no-extra-rotation':
+					break;
+				case 'rotate-90-only-portrait':
+					realAngleRotation += isPortrait ? 90 : 0;
+					break;
+				default:
+					break;
+			}
+			const newRectPoints = rotateRectangle(rectPoints, realAngleRotation);
+			const rectangleToPaint = newRectPoints
+				? convertPointsArrayToLatLngString(theMap, newRectPoints)
+				: null;
+			if (!rectangleToPaint || rectangleToPaint.includes('NaN')) {
+				console.error(
+					'we coudlnt calculate the coords to paint the segment',
+					rectangleToPaint,
+					newRectPoints
+				);
+				return;
+			}
 
-      // based on sw and ne, get the full rectangle
-      // aligned with North
-      const rectPoints = orthopedicRegtanglePoints(theMap, sw, ne);
+			// Finally paint the inclined rectangle, adding some properties for easy access
+			if (cocoMapSetup) {
+				cocoMapSetup.segments = cocoMapSetup.segments || [];
+			} else {
+				console.error('cocoMapSetup is not initialized. Early exit', cocoMapSetup);
+				return null;
+			}
 
-      if ( ! rectPoints ) {
-        return null;
-      }
+			/**
+			 * PAINT THE SEGMENT POLYGON (inclined rectangle)
+			 */
+			const segment = paintSegment(theMap, rectangleToPaint, { ...segmentItem, ...{ isPortrait } });
+			if (segment) {
+				// paint a line for the side from vertex 1 to 2, which is the lower side of the roof
+				// const [ , v1, v2, ] = segment.getPath().getArray();
+				// new google.maps.Polyline({
+				//   path: [v1, v2],
+				//   strokeColor: "#FFA500",
+				//   strokeOpacity: 1,
+				//   strokeWeight: 5, // we'll show it on hover and selected
+				//   map: theMap,
+				// });
+			}
 
-      // is higher than wider?
-      const isPortrait = rectPoints ?
-        Math.abs(rectPoints[0].x - rectPoints[2].x) < Math.abs(rectPoints[0].y - rectPoints[1].y)
-        : false;
+			// add extra data to the segment so we can manipulate it better.
+			segment.data = segmentItem; // to access to the solar API data of the segment
+			segment.indexInMap = i;
 
-      // angle that we'll turn the drwan rectangle
-      // here the API of gmaps is weird: if the rectangle is landscape, the angle is correct,
-      // but if the rectangle is portrait, we need to add 90 degrees to the angle (still verifying that)
-      let realAngleRotation = azimuthDegrees;
-      switch ( rotationSegments ) {
-        case 'no-rotation-at-all': realAngleRotation = 0; break; // not in use
-        case 'no-extra-rotation': break;
-        case 'rotate-90-only-portrait':
-          realAngleRotation += isPortrait ? 90 : 0; break;
-        default: break;
-      }
-      const newRectPoints = rotateRectangle(rectPoints, realAngleRotation);
-      const rectangleToPaint = newRectPoints? convertPointsArrayToLatLngString(theMap, newRectPoints) : null;
-      if (!rectangleToPaint || rectangleToPaint.includes('NaN')) {
-        console.error('we coudlnt calculate the coords to paint the segment', rectangleToPaint, newRectPoints);
-        return;
-      }
+			if (paintSunMarkers) {
+				paintASunForSegment(theMap, segment, `sun-marker${isPortrait ? '-hover' : ''}.png`).then(
+					(sunMarker) => {
+						addAssociatedMarker(sunMarker, segment as unknown as AssociatedMarkersParent);
+					}
+				);
+			}
 
-      // Finally paint the inclined rectangle, adding some properties for easy access
-      if (cocoMapSetup) {
-        cocoMapSetup.segments = cocoMapSetup.segments || [];
-      } else {
-        console.error('cocoMapSetup is not initialized. Early exit', cocoMapSetup);
-        return null;
-      }
+			segment.realRotationAngle = realAngleRotation;
+			segment.isPortrait = isPortrait;
 
-      /**
-       * PAINT THE SEGMENT POLYGON (inclined rectangle)
-       */
-      const segment = paintSegment(theMap, rectangleToPaint, {...segmentItem, ...{isPortrait} });
-      if (segment) {
-        // paint a line for the side from vertex 1 to 2, which is the lower side of the roof
+			cocoMapSetup.segments.push(segment);
 
-        // const [ , v1, v2, ] = segment.getPath().getArray();
-        // new google.maps.Polyline({
-        //   path: [v1, v2],
-        //   strokeColor: "#FFA500",
-        //   strokeOpacity: 1,
-        //   strokeWeight: 5, // we'll show it on hover and selected
-        //   map: theMap,
-        // });
-      }
+			resetSegmentVisibility(segment); // if the segment has rectangle the visibility needs update.
 
-      // add extra data to the segment so we can manipulate it better.
-      segment.data = segmentItem; // to access to the solar API data of the segment
-      segment.indexInMap = i;
+			// Add Listeners to the segment
+			activateInteractivityOnSegment(segment);
+		});
 
-      if (paintSunMarkers) {
-        paintASunForSegment(theMap, segment, `sun-marker${isPortrait? '-hover':''}.png` ).then( sunMarker => {
-          addAssociatedMarker(sunMarker, segment as unknown as AssociatedMarkersParent);
-        });
-      }
-
-      segment.realRotationAngle = realAngleRotation;
-      segment.isPortrait = isPortrait;
-
-      cocoMapSetup.segments.push( segment );
-
-      resetSegmentVisibility(segment); // if the segment has rectangle the visibility needs update.
-
-      // Add Listeners to the segment
-      activateInteractivityOnSegment(segment);
-    });
-
-
-    // if there are rectangles designed by the user, paint them
-    setupRectangles();
-
-  } // end of painting the segments.
-}
+		// if there are rectangles designed by the user, paint them
+		setupRectangles();
+	} // end of painting the segments.
+};
 
 // handlers
-function handlerMouseOverHighlightSegment (this: ExtendedSegment, e: Event) {
+function handlerMouseOverHighlightSegment(this: ExtendedSegment, e: Event) {
+	const segment: ExtendedSegment = this;
+	const cocoMapSetup = getStep3CocoMapSetup();
+	if (!cocoMapSetup) {
+		console.error(`Not found the coco-map of step 3 . Early exit`, cocoMapSetup);
+		return;
+	}
 
-  const segment: ExtendedSegment = this;
-  const cocoMapSetup = getStep3CocoMapSetup();
-  if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 3 . Early exit`, cocoMapSetup);
-    return;
-  }
+	highlightSegment(segment);
+	highlightSavedRectangle(segment);
+	highlightSegmentInfo(segment); // debug info highlighted.
+	// eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 
-  highlightSegment(segment);
-  highlightSavedRectangle(segment);
-  highlightSegmentInfo(segment); // debug info highlighted.
-  // eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+	window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
+	window.cocoDrawingRectangle.hoveredSegment = segment;
 
-  window.cocoDrawingRectangle = window.cocoDrawingRectangle || {};
-  window.cocoDrawingRectangle.hoveredSegment = segment;
-
-  // hide all other segments
-  cocoMapSetup.segments?.forEach((segm: ExtendedSegment) => {
-    if ( segm.indexInMap !== segment.indexInMap ) {
-      fadeSegment(segm);
-    }
-  })
-
+	// hide all other segments
+	cocoMapSetup.segments?.forEach((segm: ExtendedSegment) => {
+		if (segm.indexInMap !== segment.indexInMap) {
+			fadeSegment(segm);
+		}
+	});
 }
 
-const handlerMouseOutUnhighlightSegment = function(this: ExtendedSegment, e: Event) {
-  // init things
-  const segment: ExtendedSegment  = this;
-  const cocoMapSetup = getStep3CocoMapSetup();
-  if ( ! cocoMapSetup ) {
-    console.error(`Not found the coco-map of step 3--. Early exit`, cocoMapSetup);
-    return;
-  }
-  // verifications
-  if ( window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap
-    || window.cocoDrawingRectangle?.selectedSegment?.indexInMap === segment.indexInMap
-  ) {
-    return;
-  }
+const handlerMouseOutUnhighlightSegment = function (this: ExtendedSegment, e: Event) {
+	// init things
+	const segment: ExtendedSegment = this;
+	const cocoMapSetup = getStep3CocoMapSetup();
+	if (!cocoMapSetup) {
+		console.error(`Not found the coco-map of step 3--. Early exit`, cocoMapSetup);
+		return;
+	}
+	// verifications
+	if (
+		window.cocoDrawingRectangle?.hoveredSegment?.indexInMap !== segment.indexInMap ||
+		window.cocoDrawingRectangle?.selectedSegment?.indexInMap === segment.indexInMap
+	) {
+		return;
+	}
 
-  // the action
-  window.cocoDrawingRectangle.hoveredSegment = undefined;
-  resetSegmentVisibility(segment);
-  unhighlightSavedRectangle(segment);
-  resetSegmentsInfo(); // debug purposes
-  // hide all other segments .
-  if (cocoMapSetup?.segments?.length)
-    cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
-}
+	// the action
+	window.cocoDrawingRectangle.hoveredSegment = undefined;
+	resetSegmentVisibility(segment);
+	unhighlightSavedRectangle(segment);
+	resetSegmentsInfo(); // debug purposes
+	// hide all other segments .
+	if (cocoMapSetup?.segments?.length) cocoMapSetup.segments.forEach((segm) => resetSegmentVisibility(segm));
+};
 
 export function handlerClickSelectSegment(this: ExtendedSegment, e: Event) {
-  const segm: ExtendedSegment = this;
-  selectSegment(segm);
+	const segm: ExtendedSegment = this;
+	selectSegment(segm);
 }
 
-export const selectSegment = function(segm: ExtendedSegment) {
+export const selectSegment = function (segm: ExtendedSegment) {
+	// unhighlight all segments
+	const allSegments = window.cocoMaps[window.step3CocoMapInputId].segments;
+	allSegments?.forEach((s: ExtendedSegment) => {
+		if (s.indexInMap !== segm.indexInMap) {
+			s.setVisible(false);
+		}
+		resetSegmentVisibility(s);
+	});
+	highlightSegment(segm, {
+		fillColor: 'green',
+		fillOpacity: 0.5,
+		strokeWeight: 5,
+		draggableCursor: 'crosshair',
+	}); // green
 
-  // unhighlight all segments
-  const allSegments = window.cocoMaps[window.step3CocoMapInputId].segments;
-  allSegments?.forEach( (s: ExtendedSegment) => {
-    if ( s.indexInMap !== segm.indexInMap ) {
-      s.setVisible(false);
-    }
-    resetSegmentVisibility(s);
-  } );
-  highlightSegment(segm, { fillColor: 'green', fillOpacity: 0.5, strokeWeight: 5, draggableCursor: 'crosshair'  }); // green
+	// Debugging: show popoover info. It stopped working
+	// const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
+	// if (popoverInfo) {
+	//   createPopup(popoverInfo);
+	// }
 
-  // Debugging: show popoover info. It stopped working
-  // const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
-  // if (popoverInfo) {
-  //   createPopup(popoverInfo);
-  // }
+	window.cocoDrawingRectangle ||= {};
+	window.cocoDrawingRectangle.selectedSegment = segm;
+	delete window.cocoDrawingRectangle.hoveredSegment;
 
-  window.cocoDrawingRectangle ||= {};
-  window.cocoDrawingRectangle.selectedSegment = segm;
-  delete window.cocoDrawingRectangle.hoveredSegment;
+	['click', 'mouseover', 'mouseout', 'mousemove'].forEach((eventName) => {
+		google.maps.event.clearListeners(segm, eventName);
+		if (segm.map) google.maps.event.clearListeners(segm.map, eventName);
+	});
 
-  ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
-    google.maps.event.clearListeners(segm, eventName);
-    if (segm.map) google.maps.event.clearListeners(segm.map, eventName);
-  });
+	const rectangleInfo = getSavedRectangleBySegment(segm);
 
+	// hide all other rectangles, they are not being edited
+	window.cocoSavedRectangles?.forEach((r) => {
+		if (rectangleInfo?.segmentIndex !== r.segmentIndex) {
+			console.log(' >>> hiding: ', rectangleInfo, rectangleInfo?.segmentIndex);
+			r.polygon?.setOptions(FADED_RECTANGLE_OPTIONS);
+		}
+	});
 
-  const rectangleInfo = getSavedRectangleBySegment(segm);
+	// If the segment has already a saved rectangle associated, we select that rectangle
+	// NOTE: we could allow having more than one rectangle per segment. For that we would not
+	// select the rectangle just yet, but add a click event for the rectangles of this segment first.
+	if (rectangleInfo?.polygon) {
+		// we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
+		// we recreate the rectangle to set up everything in place.
+		const pathString = convertPolygonPathToStringLatLng(rectangleInfo?.polygon);
+		paintRectangleInMap(rectangleInfo?.polygon?.getMap()!, segm, pathString);
 
-  // hide all other rectangles, they are not being edited
-  window.cocoSavedRectangles?.forEach( r => {
-    if (rectangleInfo?.segmentIndex !== r.segmentIndex) {
-      console.log( ' >>> hiding: ', rectangleInfo, rectangleInfo?.segmentIndex)
-      r.polygon?.setOptions(FADED_RECTANGLE_OPTIONS);
-    }
-  } );
+		paintResizeHandlersInUsersRectangle();
+		activateInteractionWithRectangleResizeHandler(segm);
+	} else {
+		// this makes that the user starts painting the rectangle at the same time that he selects the segment
+		// handlerFirstClickDrawRectangleOverSegment(e); // currently removed.
 
-  // If the segment has already a saved rectangle associated, we select that rectangle
-  // NOTE: we could allow having more than one rectangle per segment. For that we would not
-  // select the rectangle just yet, but add a click event for the rectangles of this segment first.
-  if (rectangleInfo?.polygon) {
-    // we make the rectangle editable. It's up to the user now to save it or delete it with the buttons
-    // we recreate the rectangle to set up everything in place.
-    const pathString = convertPolygonPathToStringLatLng(rectangleInfo?.polygon);
-    paintRectangleInMap(rectangleInfo?.polygon?.getMap()!, segm, pathString);
+		// this, on the other hand, makes that the user needs to click again on the segment to start painting the rectangle
+		google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
+	}
 
-    paintResizeHandlersInUsersRectangle();
-    activateInteractionWithRectangleResizeHandler(segm);
+	// commands in the top right UI of the map
+	createUnselectSegmentButton(segm.map, 'Unselect');
+	// if the segment had a rectangle, we automatically select the rectangle,
+	// so with the buttons  can save it or delete it
+	if (getSavedRectangleBySegment(segm)) {
+		createSaveSegmentButton(segm.map);
+	}
 
-  } else {
-
-    // this makes that the user starts painting the rectangle at the same time that he selects the segment
-    // handlerFirstClickDrawRectangleOverSegment(e); // currently removed.
-
-    // this, on the other hand, makes that the user needs to click again on the segment to start painting the rectangle
-    google.maps.event.addListener(segm, 'click', handlerFirstClickDrawRectangleOverSegment);
-
-  }
-
-  // commands in the top right UI of the map
-  createUnselectSegmentButton(segm.map, 'Unselect');
-  // if the segment had a rectangle, we automatically select the rectangle,
-  // so with the buttons  can save it or delete it
-  if ( getSavedRectangleBySegment(segm) ) {
-    createSaveSegmentButton(segm.map);
-  }
-
-  // show button to start 'edit solar panels activate/desactivate' mode.
-  const sr = getSavedRectangleBySegment(segm);
-  if (sr) {
-    createButtonActivateDeactivateSolarPanels(segm.map, sr);
-  }
-}
+	// show button to start 'edit solar panels activate/desactivate' mode.
+	const sr = getSavedRectangleBySegment(segm);
+	if (sr) {
+		createButtonActivateDeactivateSolarPanels(segm.map, sr);
+	}
+};
 
 /** Add the three handlers to the segment  */
 export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
-  if (!window.cocoIsStepSelectRectangle) return;
-  segment.setOptions({clickable:true});
-  segment.addListener('mouseover', handlerMouseOverHighlightSegment );
-  google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment ) ;
-  google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
-}
+	if (!window.cocoIsStepSelectRectangle) return;
+	segment.setOptions({ clickable: true });
+	segment.addListener('mouseover', handlerMouseOverHighlightSegment);
+	google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment);
+	google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
+};
 export const deactivateInteractivityOnSegment = (segm: ExtendedSegment) => {
-  ['click', 'mouseover', 'mouseout', 'mousemove'].forEach(eventName => {
-    google.maps.event.clearListeners(segm, eventName);
-    google.maps.event.clearListeners(segm.map, eventName);
-    segm.setOptions({clickable:false});
-  });
-}
+	['click', 'mouseover', 'mouseout', 'mousemove'].forEach((eventName) => {
+		google.maps.event.clearListeners(segm, eventName);
+		google.maps.event.clearListeners(segm.map, eventName);
+		segm.setOptions({ clickable: false });
+	});
+};
 
 export const addAssociatedMarker = (marker: AdvancedMarkerElement, parent: AssociatedMarkersParent) => {
-  parent.associatedMarkers ||= [];
-  parent.associatedMarkers.push(marker);
+	parent.associatedMarkers ||= [];
+	parent.associatedMarkers.push(marker);
 };
 
 /**
@@ -378,21 +399,24 @@ export const addAssociatedMarker = (marker: AdvancedMarkerElement, parent: Assoc
  * created asyncronously. (e.g. when creating markers on every mousemove)
  * @param parent
  */
-export const cleanupAssociatedMarkers = ( parent: AssociatedMarkersParent, overwritingPropForAssociatedMarkers?: string) => {
-  const prop = overwritingPropForAssociatedMarkers || 'associatedMarkers';
-  parent[prop] ||= [];
-  deleteMarkersCompletely(parent[prop]);
-  parent[prop] = [];
+export const cleanupAssociatedMarkers = (
+	parent: AssociatedMarkersParent,
+	overwritingPropForAssociatedMarkers?: string
+) => {
+	const prop = overwritingPropForAssociatedMarkers || 'associatedMarkers';
+	parent[prop] ||= [];
+	deleteMarkersCompletely(parent[prop]);
+	parent[prop] = [];
 };
 
-export const getSegmentByIndex = function(index: number) : ExtendedSegment | null{
-  const cocoSetupMap = getCurrentStepCocoMap();
-  if (!cocoSetupMap?.segments) {
-    console.error('not found segments source of truth info', cocoSetupMap);
-    return null;
-  }
-  const segment = cocoSetupMap.segments[index];
-  return segment?? null;
-}
+export const getSegmentByIndex = function (index: number): ExtendedSegment | null {
+	const cocoSetupMap = getCurrentStepCocoMap();
+	if (!cocoSetupMap?.segments) {
+		console.error('not found segments source of truth info', cocoSetupMap);
+		return null;
+	}
+	const segment = cocoSetupMap.segments[index];
+	return segment ?? null;
+};
 
 export default setupSegments;
