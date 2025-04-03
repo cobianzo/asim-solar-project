@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Undocumented class
+ */
 class Gravity_Model_Panel {
 
 	public static function init() {
@@ -7,6 +10,15 @@ class Gravity_Model_Panel {
 		add_filter( 'gform_pre_validation', [ __CLASS__, 'populate_panel_dropdown' ] );
 		add_filter( 'gform_pre_submission_filter', [ __CLASS__, 'populate_panel_dropdown' ] );
 		add_filter( 'gform_admin_pre_render', [ __CLASS__, 'populate_panel_dropdown' ] );
+
+		// change the `<input step=0.01` in the field efficienciy
+		add_filter('gform_field_content', function ($content, $field) {
+			if ($field->type === 'number' && $field->adminLabel === 'panel-efficiency') {
+					$content = str_replace('<input', '<input step="0.01"', $content);
+			}
+			return $content;
+		}, 10, 2);
+
 	}
 
 	public static function populate_panel_dropdown($form) {

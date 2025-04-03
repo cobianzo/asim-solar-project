@@ -1,14 +1,19 @@
 # TODO NEXT
 
-
 Create step 4: calculations.
+Save data in form submitted
+Add Save form in every step.
+Add all PHP CS to all files.
+Refactor code and sort it out better.
+Add Playwright testing
+Add JS linting and apply to the whole project.
 Imprve position of buttons, closer to the segment
   Btn Save use name 'Finish' in green
-  When resizing Save changes to Apply changes.
 When dragging and redimensioning the rect, hide the solar panels
 Show in DB the data from the rectangles and solar panels
-Update the sizes of the panels. Make the options definitive.
 Fix form back and fw.
+Message to mobile: not shown. Try to make it mobile friendly, with tap events
+Install all development to Emiliano.
 
 # What
 
@@ -18,6 +23,7 @@ Fix form back and fw.
   `solar-project` plugin, where I actively develop
 - Sometimes I modify also the plugin `coco-gravity-form-map-field/`, to improve it
 - We develop both folders (the plugin and this one together)
+- We need to setup the API for Solar and Google Maps, and the Map ID, and insert the values in the CMS
 
 # Setup the minimum project:
 
@@ -40,6 +46,11 @@ Fix form back and fw.
 
     -- More fields in step 3 gravity forms with class and adminLabel: 
     [...]
+    --- `panel-length`
+    --- `panel-height`
+    --- `panel-power`
+    --- `panel-efficiency`
+    --- Dropdown of panels: allow dynamic content: param `panel_list`
   - The step 4 needs to have any field with class and adminLabel === 'power-calculations'
 
 # Develop

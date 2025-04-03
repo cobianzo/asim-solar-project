@@ -1,6 +1,10 @@
 // WordPress dependencies
 import apiFetch from '@wordpress/api-fetch';
 import { getCurrentStepCocoMap } from ".";
+import { ExtendedSegment } from './types';
+import { getSavedRectangleBySegment } from './setup-rectangle-interactive';
+import { getAnnualGeneratedPower, getCurrentHoursPerYear, getCurrentPanelsDimensions, getCurrentPanelsModel, getCurrentPanelsNominalPower, getCurrentPanelsSystemEfficiency, getCurrentQuantilScenario, numberOfPanelsInRectangle } from './setup-solar-panels';
+import { getCardinalOrientationFromAngle } from './trigonometry-helpers';
 
 
 const PRESET_MSG: Record<string, string> = {
@@ -83,8 +87,22 @@ export const removeNotification = (messageKey?: string | null) => {
 
 
 
-
 // Now the notifications more complex. The ones that load an html in a popup
+
+
+export const closeNotificationPopup = function() {
+  const parentDiv = document.getElementById('popup-generic');
+  const contentContainer = parentDiv?.querySelector('.popup-generic-content');
+
+  if (!parentDiv || ! contentContainer) return;
+  parentDiv.classList.add('hidden');
+  parentDiv.classList.remove('show');
+  contentContainer.innerHTML = '';
+}
+window.closeNotificationPopup = closeNotificationPopup;
+
+
+
 
 export const openNotificationPopup = (filename: string, placeholders: Record<string, string | number> = {}) => {
   //cleanup
@@ -124,13 +142,54 @@ export const openNotificationPopup = (filename: string, placeholders: Record<str
         .catch(error => console.error("Error loading the notification "+ filename +":", error));
 }
 
-export const closeNotificationPopup = function() {
-  const parentDiv = document.getElementById('popup-generic');
-  const contentContainer = parentDiv?.querySelector('.popup-generic-content');
 
-  if (!parentDiv || ! contentContainer) return;
-  parentDiv.classList.add('hidden');
-  parentDiv.classList.remove('show');
-  contentContainer.innerHTML = '';
+// Special notificaion with all the info about the segment and its rectangle
+export const createPanelNotificationPopup = function(segment: ExtendedSegment | null = null) {
+
+  if (!segment) {
+    segment = window.cocoDrawingRectangle.selectedSegment ?? null;
+  }
+  if (!segment) {
+    return;
+  }
+
+  const hasRectangle = getSavedRectangleBySegment(segment);
+
+  let numberOfSolarPanels, annualPower, panelDimansions, systemEfficiency, panelsModel, scenarioName, hoursPerYear, nominalPower;
+  let percentilesHoursPerYear: Record<string, number> = {};
+  segment.data?.stats.sunshineQuantiles.forEach( (perc, i) => {
+    percentilesHoursPerYear[`percentil_${i}`] = parseInt(perc.toString());
+  } )
+  if (hasRectangle) {
+    numberOfSolarPanels = numberOfPanelsInRectangle(hasRectangle);
+    annualPower = getAnnualGeneratedPower(hasRectangle);
+    panelDimansions = getCurrentPanelsDimensions().join('m x ') + 'm';
+    systemEfficiency = getCurrentPanelsSystemEfficiency();
+    panelsModel = getCurrentPanelsModel();
+    nominalPower = getCurrentPanelsNominalPower();
+    const scenario = getCurrentQuantilScenario();
+    scenarioName = scenario.scenarioName;
+    hoursPerYear = getCurrentHoursPerYear(segment);
+  }
+  // popup on the top left.
+  openNotificationPopup( 'segmentInfo', {...segment.data,
+    ...{
+      indexInMap: segment.indexInMap! + 1,
+      orientation: getCardinalOrientationFromAngle(segment.data?.azimuthDegrees!).join(', '),
+      pitchDegrees: segment.data!.pitchDegrees.toFixed(1),
+      azimuthDegrees: segment.data!.azimuthDegrees.toFixed(1),
+      areaMeters2: segment.data!.stats.areaMeters2.toFixed(0),
+      showRectangleInfo: hasRectangle? 'yes' : 'no',
+      numberOfSolarPanels,
+      annualPower,
+      panelDimansions,
+      nominalPower,
+      systemEfficiency,
+      maxSunshineHoursPerYear: window.cocoSolarPotential.maxSunshineHoursPerYear.toFixed(0),
+      panelsModel,
+      scenarioName,
+      hoursPerYear: hoursPerYear?.toFixed(0)
+    },
+    ...percentilesHoursPerYear // access with percentil_0
+  } as unknown as Record<string, string>);
 }
-window.closeNotificationPopup = closeNotificationPopup;

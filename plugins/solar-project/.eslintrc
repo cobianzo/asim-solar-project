@@ -1,0 +1,26 @@
+{
+	"extends": [
+		"plugin:@wordpress/eslint-plugin/recommended-with-formatting",
+		"prettier"
+	],
+	"ignorePatterns": [
+		"build/**/*",
+		"dist/**/*",
+		"bin/**/*",
+		"plugins/**/*",
+		"node_modules/**/*",
+		"vendor/**/*",
+		"webpack.config.js",
+		"tests/**/*",
+		"plugins/**/*"
+	],
+	"rules": {
+		"max-len": [
+			"error",
+			{
+				"code": 115
+			}
+		]
+	}
+}
+

@@ -46,7 +46,7 @@ class Enqueue {
 		if ( $form_id ) {
 
 			// grab the already insterted values in the form and expose them to js globals
-			$form           = \GFAPI::get_form( $form_id );
+			$form = \GFAPI::get_form( $form_id );
 
 			// step 1 fields
 			$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );

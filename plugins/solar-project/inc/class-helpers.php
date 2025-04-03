@@ -43,6 +43,16 @@ class Helper {
 
     return false; // No Gravity Forms block found
 	}
+
+	public static function dd( $var ) {
+		echo '<pre>';
+		print_r( $var );
+		echo '</pre>';
+	}
+	public static function ddie( $var ) {
+		dd( $var );
+		wp_die( 'mueto' );
+	}
 }
 
 function dd( $var ) {

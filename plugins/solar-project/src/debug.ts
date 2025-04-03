@@ -13,7 +13,7 @@ import { removeRectangleInMap } from "./drawing-helpers";
 window.debug = window.debug || {};
 
 // expose all trigonmetry functions so I can use window.rotateRectangle(,.,) in console
-window.debug = { ...window.debug , ...trigo, ...notification };
+window.debug = { ...window.debug , ...trigo };
 window.debug.getSavedRectangleBySegment =  function(s: ExtendedSegment) {
   return getSavedRectangleBySegment( s );
 };

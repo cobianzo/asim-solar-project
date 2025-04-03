@@ -1,11 +1,10 @@
 // WIP
 import apiFetch from "@wordpress/api-fetch";
 import { getCurrentStepCocoMap } from ".";
-import { createButtonActivateDeactivateSolarPanels, createOrientationRadio } from "./buttons-unselect-save-rectangle";
-import { createNotification, removeNotification } from "./notification-api";
+import { createNotification, createPanelNotificationPopup, removeNotification } from "./notification-api";
 import { FADED_RECTANGLE_OPTIONS, getSavedRectangleBySegment, SELECTED_RECTANGLE_OPTIONS } from "./setup-rectangle-interactive";
 import { getInclinationByPolygonPath, getPolygonCenterCoords, getRectangleSideDimensionsByPolygonPath, metersToLatDegrees, metersToLngDegrees, rotatePolygonRectangleToOrthogonal, rotateRectanglePolygon } from "./trigonometry-helpers";
-import { ExtendedSegment, SavedRectangle, SolarPanelsOrientation } from "./types"
+import { ExtendedSegment, SavedRectangle } from "./types"
 import { getSegmentByIndex } from "./setup-segments-interactive-functions";
 
 export const PANEL_OPTIONS: google.maps.PolygonOptions = {
@@ -342,14 +341,13 @@ export const loadModelPanelParametersInInputs = function() {
   apiFetch({ path: `/wp/v2/panel/${postId}` }).then(
     data => {
       const typedData = data as { custom_fields?: { length: string; height: string; nominal_power: string } };
-      if (!typedData.custom_fields) {
-        console.error('custom_fields not found', data);
-        return;
+      let [ length, height, nominal_power ] = [ 1.5, 2.2, 450 ];
+      if (! typedData?.custom_fields) {
+        console.warn('custom_fields not found. Set to default', data, [ length, height, nominal_power ]);
       }
-      const { length, height, nominal_power } = typedData.custom_fields;
-      (inputLength as HTMLInputElement).value = length;
-      (inputHeight as HTMLInputElement).value = height;
-      (inputPower as HTMLInputElement).value = nominal_power;
+      (inputLength as HTMLInputElement).value = typedData.custom_fields!.length;
+      (inputHeight as HTMLInputElement).value = typedData.custom_fields!.height;
+      (inputPower as HTMLInputElement).value = typedData.custom_fields!.nominal_power;
     }
   );
 }
@@ -358,6 +356,19 @@ export const applyListenersToPanelModelsDropdown = function() {
   const dropdown = document.querySelector('.panel-model-dropdown select');
   dropdown?.addEventListener('change', (e) => {
     loadModelPanelParametersInInputs();
+  });
+
+  // on every change, if the notification popup is on, we update it.
+  const inputEfficiency = document.querySelector('.panel-efficiency input');
+  const inputLength = document.querySelector('.panel-length input');
+  const inputHeight = document.querySelector('.panel-height input');
+  const inputPower = document.querySelector('.panel-nominal-power input');
+  const quantileInputs = Array.from(document.querySelectorAll('.panel-quantiles input'));
+  const allInputs = [inputEfficiency, inputLength, inputHeight, inputPower, ...quantileInputs];
+  allInputs.forEach(input => {
+    input?.addEventListener('change', (e) => {
+      createPanelNotificationPopup();
+    });
   });
 }
 
@@ -475,3 +486,5 @@ export const exitEditSolarPanelsMode = function() {
 
   removeNotification();
 }
+
+

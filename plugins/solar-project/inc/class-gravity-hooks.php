@@ -157,11 +157,16 @@ class Gravity_Hooks {
 	}
 
 	public static function step4_power_calculations_html($field_content, $field, $value, $lead_id, $form_id) {
-    if ($field->adminLabel == 'power-calculations') {
-        $html_before = '<div class="my-html-before">This is HTML before the field.</div>';
-        $html_after = '<div class="my-html-after">This is HTML after the field.</div>';
-
-        return $html_before . $field_content . $html_after;
+		if ( $field->adminLabel === 'power-calculations' ) {
+			if ( $field->pageNumber !== \GFFormDisplay::get_current_page( $form_id ) ) {
+				return $field_content;
+			}
+			ob_start();
+				include 'render-step-4.php';
+			$new_content = ob_get_clean();
+			$html_before = '';
+			$html_after  = '';
+      return $html_before . $new_content . $field_content . $html_after;
     }
 
     return $field_content;
