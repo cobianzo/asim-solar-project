@@ -9,4 +9,5 @@ module.exports = {
 			},
 		},
 	],
+	htmlWhitespaceSensitivity: 'ignore', // Ignore whitespace sensitivity in HTML
 };

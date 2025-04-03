@@ -1,4 +1,4 @@
-import { handlerClickSaveRectangleButton } from './buttons-unselect-save-rectangle';
+import { handlerClickSaveRectangleButton } from './buttons-topright-map';
 import { MARKER_CENTERED_OPTIONS, paintCenterOfUsersRectangleInMap } from './drawing-helpers';
 import {
 	getSavedRectangleBySegment,

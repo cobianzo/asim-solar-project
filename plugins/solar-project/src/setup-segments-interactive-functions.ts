@@ -35,7 +35,7 @@ import {
 	createButtonActivateDeactivateSolarPanels,
 	createSaveSegmentButton,
 	createUnselectSegmentButton,
-} from './buttons-unselect-save-rectangle';
+} from './buttons-topright-map';
 import {
 	setupRectangles,
 	highlightSavedRectangle,

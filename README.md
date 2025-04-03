@@ -1,5 +1,6 @@
 # TODO NEXT
 
+Bugs: invert horizontal and vertical for rotated segments.
 Bugs: when changing length, height, power, we deactivate the Model.
 Save data in form submitted
 Add Save form in every step.

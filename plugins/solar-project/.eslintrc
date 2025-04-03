@@ -20,7 +20,7 @@
 			{
 				"code": 115
 			}
-		]
+		],
+		"no-trailing-spaces": "off" // Disable trimming spaces at the end of a line
 	}
 }
-

@@ -27,9 +27,13 @@ import {
 	latLngToPoint,
 } from './trigonometry-helpers';
 import { ExtendedSegment, LoadedSavedRectangeData, MapMouseEvent, SavedRectangle } from './types';
-import { handlerClickSaveRectangleButton } from './buttons-unselect-save-rectangle';
+import { handlerClickSaveRectangleButton } from './buttons-topright-map';
 import { addAssociatedMarker, getSegmentByIndex, selectSegment } from './setup-segments-interactive-functions';
-import { cleanupSolarPanelsForSavedRectangle, numberOfPanelsInRectangle, setupSolarPanels } from './setup-solar-panels';
+import {
+	cleanupSolarPanelsForSavedRectangle,
+	numberOfPanelsInRectangle,
+	setupSolarPanels,
+} from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
 import { createNotification } from './notification-api';
 
@@ -148,14 +152,14 @@ export const saveSavedRectanglesInTextArea = function () {
 			// 4. associated segment
 			rectData.indexSegment = savedR.segmentIndex;
 
-      // This info is needed in step 4, but not needed here in step 3.
-      // ==========
-      const theSegm = getSegmentByIndex(savedR.segmentIndex!);
-      if (theSegm) {
-        rectData.orientation = getCardinalOrientationFromAngle(theSegm.data?.azimuthDegrees!).join(', ')
-      }
-      rectData.numberPanels = numberOfPanelsInRectangle(savedR);
-      // ==========
+			// This info is needed in step 4, but not needed here in step 3.
+			// ==========
+			const theSegm = getSegmentByIndex(savedR.segmentIndex!);
+			if (theSegm) {
+				rectData.orientation = getCardinalOrientationFromAngle(theSegm.data?.azimuthDegrees!).join(', ');
+			}
+			rectData.numberPanels = numberOfPanelsInRectangle(savedR);
+			// ==========
 
 			return rectData;
 		})

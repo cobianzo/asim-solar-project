@@ -7,7 +7,6 @@
  */
 
 import setupSegments from './setup-segments-interactive-functions';
-import { exitEditSolarPanelsMode } from './setup-solar-panels';
 import { SelectRotationPortraitSegmentsOptions } from './types';
 
 /**
