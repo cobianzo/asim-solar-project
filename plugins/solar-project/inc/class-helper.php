@@ -7,12 +7,26 @@ class Helper {
 	public static function capture_coco_map_field_instance( $form, $adminLabel ) {
 		$entry = \GFFormsModel::get_current_lead(); // get all data already inputted in the form
 
+		// Evaluate the case of visiting the form with Save and Continue
+		$token = $_GET['gf_token'] ?? null;
+		if ( $token ) {
+			$draft          = \GFFormsModel::get_draft_submission_values( $token );
+			$form_data      = json_decode( $draft['submission'], true );
+			$submitted_data = $form_data['submitted_values'] ?? null;
+		}
+
+
 		// we detect the coco-form which is hidden now because we are not in the page 1.
 		foreach ( $form['fields'] as $field ) {
 			if (
 				! rgar( $field, 'isHidden' ) && $adminLabel === $field->adminLabel
 			) {
 				$field->value = $entry[ $field->id ] ?? null;
+
+				if ( null === $field->value && isset( $submitted_data[ $field->id ] ) ) {
+					$field->value = $submitted_data[ $field->id ];
+				}
+
 				return $field;
 			}
 		}
@@ -29,19 +43,19 @@ class Helper {
 
 	public static function get_gravity_form_id_from_page( $post_id = null ) {
 		$post_id = $post_id ?? get_the_ID();
-    $content = get_post_field( 'post_content', $post_id );
+		$content = get_post_field( 'post_content', $post_id );
 
-    if ( has_block( 'gravityforms/form', $content ) ) {
-        // Extract form ID from the block
-        $blocks = parse_blocks( $content );
-        foreach ( $blocks as $block ) {
-            if ( $block['blockName'] === 'gravityforms/form' && !empty($block['attrs']['formId']) ) {
-                return $block['attrs']['formId'];
-            }
-        }
-    }
+		if ( has_block( 'gravityforms/form', $content ) ) {
+			// Extract form ID from the block
+			$blocks = parse_blocks( $content );
+			foreach ( $blocks as $block ) {
+				if ( $block['blockName'] === 'gravityforms/form' && ! empty( $block['attrs']['formId'] ) ) {
+					return $block['attrs']['formId'];
+				}
+			}
+		}
 
-    return false; // No Gravity Forms block found
+		return false; // No Gravity Forms block found
 	}
 
 	public static function dd( $var ) {

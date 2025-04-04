@@ -11,7 +11,8 @@ import {
 	getCurrentPanelsNominalPower,
 	getCurrentPanelsSystemEfficiency,
 	getCurrentQuantilScenario,
-	numberOfPanelsInRectangle,
+	getNumberOfPanelsInRectangle,
+  getSolarPanelsSurface,
 } from './setup-solar-panels';
 import { getCardinalOrientationFromAngle } from './trigonometry-helpers';
 
@@ -150,7 +151,7 @@ export const openNotificationPopup = (filename: string, placeholders: Record<str
 		.catch((error) => console.error('Error loading the notification ' + filename + ':', error));
 };
 
-// Special notificaion with all the info about the segment and its rectangle
+// Special notification with all the info about the segment and its rectangle
 export const createPanelNotificationPopup = function (segment: ExtendedSegment | null = null) {
 	if (!segment) {
 		segment = window.cocoDrawingRectangle?.selectedSegment ?? null;
@@ -164,25 +165,40 @@ export const createPanelNotificationPopup = function (segment: ExtendedSegment |
 	let numberOfSolarPanels,
 		annualPower,
 		panelDimansions,
+    panelsSurface,
 		systemEfficiency,
 		panelsModel,
 		scenarioName,
 		hoursPerYear,
-		nominalPower;
+		nominalPower,
+    // now total values for all the segments (all roof)
+    totalPanelsSurface: number = 0,
+    totalAnnualPower: number = 0,
+    totalNumberPanels: number = 0;
 	let percentilesHoursPerYear: Record<string, number> = {};
 	segment.data?.stats.sunshineQuantiles.forEach((perc, i) => {
 		percentilesHoursPerYear[`percentil_${i}`] = parseInt(perc.toString());
 	});
 	if (hasRectangle) {
-		numberOfSolarPanels = numberOfPanelsInRectangle(hasRectangle);
+		numberOfSolarPanels = getNumberOfPanelsInRectangle(hasRectangle);
 		annualPower = getAnnualGeneratedPower(hasRectangle);
 		panelDimansions = getCurrentPanelsDimensions().join('m x ') + 'm';
+    panelsSurface = getSolarPanelsSurface(hasRectangle);
 		systemEfficiency = getCurrentPanelsSystemEfficiency();
 		panelsModel = getCurrentPanelsModel();
 		nominalPower = getCurrentPanelsNominalPower();
 		const scenario = getCurrentQuantilScenario();
 		scenarioName = scenario.scenarioName;
 		hoursPerYear = getCurrentHoursPerYear(segment);
+
+    // total values for all the segments (all roof)
+    const allRectangles = window.cocoSavedRectangles ?? [];
+    allRectangles.forEach((rectangle) => {
+      totalPanelsSurface += getSolarPanelsSurface(rectangle);
+      totalAnnualPower += getAnnualGeneratedPower(rectangle);
+      totalNumberPanels += getNumberOfPanelsInRectangle(rectangle);
+    });
+
 	}
 	// popup on the top left.
 	openNotificationPopup('segmentInfo', {
@@ -192,18 +208,23 @@ export const createPanelNotificationPopup = function (segment: ExtendedSegment |
 			orientation: getCardinalOrientationFromAngle(segment.data?.azimuthDegrees!).join(', '),
 			pitchDegrees: segment.data!.pitchDegrees.toFixed(1),
 			azimuthDegrees: segment.data!.azimuthDegrees.toFixed(1),
-			areaMeters2: segment.data!.stats.areaMeters2.toFixed(0),
 			showRectangleInfo: hasRectangle ? 'yes' : 'no',
 			numberOfSolarPanels,
-			annualPower,
+			annualPower: annualPower? annualPower.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : 0,
 			panelDimansions,
+      panelsSurface,
 			nominalPower,
 			systemEfficiency,
 			maxSunshineHoursPerYear: window.cocoSolarPotential.maxSunshineHoursPerYear.toFixed(0),
 			panelsModel,
 			scenarioName,
 			hoursPerYear: hoursPerYear?.toFixed(0),
-		},
-		...percentilesHoursPerYear, // access with percentil_0
+      // whle roof calculations
+      showTotalData: totalNumberPanels ? 'yes' : 'no',
+      totalPanelsSurface: totalPanelsSurface.toFixed(2),
+      totalAnnualPower: totalAnnualPower.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
+      totalNumberPanels,
+        },
+        ...percentilesHoursPerYear, // access with percentil_0
 	} as unknown as Record<string, string>);
 };

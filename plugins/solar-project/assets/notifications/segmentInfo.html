@@ -1,28 +1,21 @@
-<h4>Roof segment #{{indexInMap}}</h4>
-
-<ul>
-  <li>Orientation: <b>{{orientation}}</b>
-    <br><small>{{azimuthDegrees}} º respect North</small>
-  </li>
-  <li>Inclination of the roof <b>{{pitchDegrees}}º</b>
-    <br><small>the orange bar shows the lower part of the roof</small>
-  </li>
-  <li>Square meters: <b>{{areaMeters2}} m<sup>2</sup></b> </li>
-  <li>Hours of sun per year for the whole roof: <b>{{maxSunshineHoursPerYear}} h</b> </li>
-  <li>Scenarios
-    <ul>
-      <li>worse scenario {{percentil_0}} h/year</li>
-      <li>average scenario {{percentil_5}} h/year</li>
-      <li>best scenario {{percentil_10}} h/year</li>
-    </ul>
-  </li>
-</ul>
+<div class="visible-{{showTotalData}}">
+	<div style="display: flex; justify-content: space-between; align-items: center;">
+		<div>
+			<h4 style="margin-bottom: 0;">Total energy</h4>
+			<small><b>{{totalNumberPanels}}</b> panels, <b>{{totalPanelsSurface}} m<sup>2</sup></b></small>
+		</div>
+		<div>
+			<h3 style="margin: 0;">{{totalAnnualPower}} kW</h3>
+		</div>
+	</div>
+</div>
 
 <div class="visible-{{showRectangleInfo}}">
   <h4>Rectangle with solar panels</h4>
   <ul>
     <li>Panel model: <b>{{panelsModel}}</b> </li>
     <li>Panel dimensions: <b>{{panelDimansions}}</b> </li>
+    <li>Total surface: <b>{{panelsSurface}} m<sup>2</sup></b> </li>
     <li>Nominal Power per panel: <b>{{nominalPower}} W/h</b>  </li>
     <li>Number of panels: <b>{{numberOfSolarPanels}}</b> </li>
     <li>
@@ -39,3 +32,23 @@
   </li>
   </ul>
 </div>
+
+
+<h4>Roof segment #{{indexInMap}}</h4>
+
+<ul>
+  <li>Orientation: <b>{{orientation}}</b>
+    <br><small>{{azimuthDegrees}} º respect North</small>
+  </li>
+  <li>Inclination of the roof <b>{{pitchDegrees}}º</b>
+    <br><small>the orange bar shows the lower part of the roof</small>
+  </li>
+  <li>Hours of sun per year for the whole roof: <b>{{maxSunshineHoursPerYear}} h</b> </li>
+  <li>Scenarios
+    <ul>
+      <li>worse scenario {{percentil_0}} h/year</li>
+      <li>average scenario {{percentil_5}} h/year</li>
+      <li>best scenario {{percentil_10}} h/year</li>
+    </ul>
+  </li>
+</ul>

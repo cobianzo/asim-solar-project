@@ -7,8 +7,6 @@ import { CocoMapSetup } from './types';
 
 import { paintBoundingBoxAsRectangle, paintPolygonsByArrayOfStrings } from './drawing-helpers';
 import {
-	getMovingBoundingBoxOffsetFromOrigin,
-	getOffsetFromValueInDB,
 	handlerBoundingBoxHover,
 	handlerBoundingBoxMouseOut,
 	updateMovingBoundingBoxFromDBOffset,

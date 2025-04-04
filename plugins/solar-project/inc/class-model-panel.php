@@ -70,22 +70,22 @@ class Model_Panel {
 	}
 
 	public static function render_meta_box( $post ) {
-		$length        = get_post_meta( $post->ID, 'length', true ) ?? '1.5';
-		$height        = get_post_meta( $post->ID, 'height', true ) ?? '1';
-		$nominal_power = get_post_meta( $post->ID, 'nominal_power', true ) ?? '400';
-		$length        = $length ? $length : '1.5';
-		$height        = $height ? $height : '1';
-		$nominal_power = $nominal_power ? $nominal_power : '400';
+		$length        = get_post_meta( $post->ID, 'length', true ) ?? null;
+		$height        = get_post_meta( $post->ID, 'height', true ) ?? null;
+		$nominal_power = get_post_meta( $post->ID, 'nominal_power', true ) ?? null;
+		$length        = $length ? $length : '1960';
+		$height        = $height ? $height : '1134';
+		$nominal_power = $nominal_power ? $nominal_power : '480';
 
 		wp_nonce_field( basename( __FILE__ ), 'custom_fields_nonce' );
 		?>
 		<p>
-				<label for="length">Length (m):</label>
-				<input type="number" step="0.001" name="length" value="<?php echo esc_attr( $length ); ?>" />
+				<label for="length">Length (mimimeters):</label>
+				<input type="number" step="1" name="length" value="<?php echo esc_attr( $length ); ?>" />
 		</p>
 		<p>
-				<label for="height">Height (m):</label>
-				<input type="number" step="0.001" name="height" value="<?php echo esc_attr( $height ); ?>" />
+				<label for="height">Height (mimimeters):</label>
+				<input type="number" step="1" name="height" value="<?php echo esc_attr( $height ); ?>" />
 		</p>
 		<p>
 				<label for="nominal_power">Nominal Power (W):</label>
@@ -136,12 +136,12 @@ class Model_Panel {
 		);
 	}
 
-	public static function calculate_power_energy( $values = [
-		'number_panels' => 0,
-		'panel_power' => 0,
-		'hours_sun' => 0,
+	public static function calculate_power_energy( $values = array(
+		'number_panels'    => 0,
+		'panel_power'      => 0,
+		'hours_sun'        => 0,
 		'final_efficiency' => 0,
-	] ) {
+	) ) {
 		$roof_energy = $values['number_panels']
 			* $values['panel_power']
 			* $values['hours_sun']

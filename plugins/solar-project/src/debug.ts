@@ -1,7 +1,6 @@
 import { ExtendedSegment } from './types';
 import * as trigo from './trigonometry-helpers';
 import { getSavedRectangleBySegment, removeSavedRectangleBySegmentIndex } from './setup-rectangle-interactive';
-import * as notification from './notification-api';
 import { getCurrentStepCocoMap } from '.';
 import { getMovingBoundingBoxOffsetFromOrigin } from './setup-drag-all-segments-interaction';
 import { cleanupAssociatedMarkers } from './setup-segments-interactive-functions';

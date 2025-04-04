@@ -12,16 +12,17 @@ namespace Coco_Solar;
  */
 abstract class API {
 
-	const GOOGLE_API_KEY_OPTION_NAME    = 'coco_google_maps_api_key';
+	const GOOGLE_API_KEY_OPTION_NAME = 'coco_google_maps_api_key';
 	protected static string $base_endpoint;
 
 	public static function init(): void {
-		add_action( 'admin_menu', [ __CLASS__, 'add_settings_page' ] );
-		add_action( 'admin_init', [ __CLASS__, 'register_settings_fields' ] );
+		add_action( 'admin_menu', array( __CLASS__, 'add_settings_page' ) );
+		add_action( 'admin_init', array( __CLASS__, 'register_settings_fields' ) );
 	}
 
 	public static function get_google_api() {
-		$key = get_option( self::GOOGLE_API_KEY_OPTION_NAME );;
+		$key = get_option( self::GOOGLE_API_KEY_OPTION_NAME );
+
 		// $key = 'AIzaSyB3FE3KIBaI8qOWxZCYuUbYRQDBs61a6v0'; // TODELETE
 		return $key;
 	}
@@ -33,9 +34,9 @@ abstract class API {
 	 * @param array $data
 	 * @return mixed
 	 */
-	public static function get_google_api_response( string $base_endpoint, string $method, array $data = array() ) : array | bool {
-		$api_url         = $base_endpoint . $method;
-		$transient_key   = '_google_api_' . md5( $api_url . wp_json_encode( $data ) );
+	public static function get_google_api_response( string $base_endpoint, string $method, array $data = array() ): array|bool {
+		$api_url       = $base_endpoint . $method;
+		$transient_key = '_google_api_' . md5( $api_url . wp_json_encode( $data ) );
 		if ( isset( $_GET['solar-cache-clear'] ) ) {
 			delete_transient( $transient_key );
 		}
@@ -78,7 +79,7 @@ abstract class API {
 			__( 'Coco Solar', 'coco-solar' ),
 			'manage_options',
 			'coco_solar_settings',
-			[ __CLASS__, 'render_settings_page' ]
+			array( __CLASS__, 'render_settings_page' )
 		);
 	}
 	/**
@@ -109,7 +110,7 @@ abstract class API {
 		register_setting(
 			'coco_solar_settings',
 			self::GOOGLE_API_KEY_OPTION_NAME,
-			['sanitize_callback' => 'sanitize_text_field', ]
+			array( 'sanitize_callback' => 'sanitize_text_field' )
 		);
 		add_settings_section(
 			'coco_solar_google_section',
@@ -120,7 +121,7 @@ abstract class API {
 		add_settings_field(
 			self::GOOGLE_API_KEY_OPTION_NAME,
 			__( 'API Key', 'coco-solar' ),
-			static function() {
+			static function () {
 				printf(
 					'<input type="password" value="%s" name="%s" class="regular-text">',
 					esc_attr( get_option( self::GOOGLE_API_KEY_OPTION_NAME ) ),
@@ -131,7 +132,6 @@ abstract class API {
 			'coco_solar_google_section'
 		);
 	}
-
 }
 
 API::init();

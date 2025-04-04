@@ -452,9 +452,7 @@ export const getPolygonCenterBySWNE = function (swNE: boxBySWNE): google.maps.La
 export const getInclinedAxisAsLinesFromCoordenates = (
 	crossPointInMap: google.maps.Point,
 	degrees: number
-): {
-	axisLinesDefinedByPoints: { lineX: CoupleOfPoints; lineY: CoupleOfPoints };
-} => {
+): { axisLinesDefinedByPoints: { lineX: CoupleOfPoints; lineY: CoupleOfPoints } } => {
 	const axisLinesDefinedByPoints: { lineX: CoupleOfPoints; lineY: CoupleOfPoints } = { lineX: [], lineY: [] };
 
 	// draw line 1 (the X axis)
@@ -472,9 +470,7 @@ export const getInclinedAxisAsLinesFromCoordenates = (
 	tempPoint = projectLineFromXY(crossPointInMap.x, crossPointInMap.y, angle0, -100);
 	axisLinesDefinedByPoints.lineY[1] = tempPoint;
 
-	return {
-		axisLinesDefinedByPoints,
-	};
+	return { axisLinesDefinedByPoints };
 };
 
 /**
@@ -602,24 +598,35 @@ export const getInclinationByPolygonPath = function (polygon: google.maps.Polygo
 	return inclination; // Devuelve el ángulo en grados
 };
 
+// in milimeters
 export const getRectangleSideDimensionsByPolygonPath = function (polygon: google.maps.Polygon) {
 	const pathAsArray = polygon.getPath().getArray();
 
 	const side1_length = google.maps.geometry.spherical.computeDistanceBetween(pathAsArray[0], pathAsArray[1]);
 	const side2_length = google.maps.geometry.spherical.computeDistanceBetween(pathAsArray[1], pathAsArray[2]);
 
-	return [side1_length, side2_length];
+	return [side1_length * 1000, side2_length * 1000];
 };
 
-export const getCardinalOrientationFromPolygon = function (poly: google.maps.Polygon) {
-	const [v0, v1] = poly.getPath().getArray();
-	return convertLineIntoCardinalOrientation(v0, v1);
-};
+export const getPolygonAreaByPolygonPath  = function (polygon: google.maps.Polygon) {
+  const path = polygon.getPath();
+  const area = google.maps.geometry.spherical.computeArea(path);
+  return area; // Área en m²
+}
+
 export const getCardinalOrientationFromAngle = function (angle: number): [string, string?] {
+	// Define the type for cardinal boundaries
+  interface CardinalBoundaries {
+		min: number;
+		max: number;
+	}
+	// Define the type for the cardinales object
+	type Cardinales = { [key: string]: CardinalBoundaries };
 	// Normalize the angle to be within 0-360 degrees
-	const cardinales = {};
+	const cardinales: Cardinales = {};
 	const amplitude = 45;
 	const extramargin = 15;
+	// @typescript-ignore
 	cardinales.North = { min: 337.5, max: 22.5 };
 	cardinales.East = { min: cardinales.North.max + amplitude, max: cardinales.North.max + amplitude * 2 };
 	cardinales.South = { min: cardinales.East.max + amplitude, max: cardinales.East.max + amplitude * 2 };
@@ -642,7 +649,7 @@ export const getCardinalOrientationFromAngle = function (angle: number): [string
 		max: cardinales.West.max + amplitude + extramargin,
 	};
 
-	const cardinalPoints = [];
+	const cardinalPoints: string[] = [];
 	Object.keys(cardinales).forEach((cardinalName) => {
 		// particular case of north where max is lower than min
 		const cardinalBoundaries = cardinales[cardinalName];
@@ -659,19 +666,6 @@ export const getCardinalOrientationFromAngle = function (angle: number): [string
 	// sanitize, Ensure the array has max two items
 	cardinalPoints.splice(2);
 	return cardinalPoints as [string, string?];
-};
-const convertLineIntoCardinalOrientation = function (v0: google.maps.LatLng, v1: google.maps.LatLng): string {
-	const [lat0, lng0, lat1, lng1] = [v0.lat(), v0.lng(), v1.lat(), v1.lng()];
-
-	const deltaLat = lat1 - lat0;
-	const deltaLng = lng1 - lng0;
-
-	if (deltaLat === 0 && deltaLng === 0) {
-		return 'Undefined'; // hadnle this differently
-	}
-
-	const angle = (Math.atan2(deltaLng, deltaLat) * 180) / Math.PI;
-	return getCardinalOrientationFromAngle(angle);
 };
 
 /**

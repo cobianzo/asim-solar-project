@@ -16,6 +16,7 @@ import {
 } from './trigonometry-helpers';
 import { ExtendedSegment, SavedRectangle } from './types';
 import { getSegmentByIndex } from './setup-segments-interactive-functions';
+import { isPortaitSegmentRotated } from './setup-drag-all-segments-interaction';
 
 export const PANEL_OPTIONS: google.maps.PolygonOptions = {
 	strokeColor: 'black',
@@ -80,23 +81,21 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
 	// end of cleanup
 
 	console.log('%c TITLE: solar panels for saved rectangle ', 'font-size:2rem;color:blue', savedRectangle);
-	const [lengthSideY, lengthSideX] = getRectangleSideDimensionsByPolygonPath(polygon);
+	const [rectLengthY, rectLengthX] = getRectangleSideDimensionsByPolygonPath(polygon); // in mm
 
 	// calculate the fatorfacto to scale to get a rectangle 10x15m
-	// let dimensionsPanel = [ 1.134, 1.172 ]; // meters
-	let dimensionsPanel = getCurrentPanelsDimensions(); // meters
+	let dimensionsPanel = getCurrentPanelsDimensions(); // milimeters
 
-	if ('horizontal' == savedRectangle.panelOrientation) {
+  // check if it's a portrait segment that has been rotated.
+  const segment = getSegmentByIndex(savedRectangle.segmentIndex);
+  const isRotated = isPortaitSegmentRotated(segment);
+	if (( 'horizontal' === savedRectangle.panelOrientation && isRotated) ||
+    // 0
+    (! isRotated && 'vertical' === savedRectangle.panelOrientation)
+  ) {
 		const [width, height] = dimensionsPanel;
 		dimensionsPanel = [height, width];
 	}
-	const factorX = dimensionsPanel[0] / lengthSideX;
-	const factorY = dimensionsPanel[1] / lengthSideY;
-
-	console.log(`Panel Size: `, dimensionsPanel.join('x') + 'm');
-	console.log(
-		`Y is ${lengthSideY} m. The length of the panel (${dimensionsPanel[1]}) is ${factorY.toFixed(2)} times that size`
-	);
 
 	// get rectangle aligned to North (no need to paint it, just get the coords)
 	const rectPathToNorth = rotatePolygonRectangleToOrthogonal(polygon);
@@ -110,27 +109,65 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
 	];
 
 	// both of these solutions work the same, i think
+  const factorX = dimensionsPanel[0] / rectLengthX; // whats the proportion of the panel respect the rect
+	const factorY = dimensionsPanel[1] / rectLengthY;
 	const latLengthPanel = (latNorth - latSouth) * factorY;
 	const lngLengthPanel = (lngEast - lngWest) * factorX;
 
-	const maxPanelsInY = Math.floor(1 / factorY);
-	const maxPanelsInX = Math.floor(1 / factorX);
+  // now with the gaps.
+  const dim = getCurrentPanelsDimensions();
+  const gaps = getCurrentPanelsLengthHeightGaps();
+
+  const latLengthGap = latLengthPanel * gaps[1] / dim[1];
+	const lngLengthGap = lngLengthPanel * gaps[0] / dim[0];
+
+  // calculate number of panels in the rectangle:
+  // how many times the panel fits in the rectangle
+	const maxPanelsInY = Math.floor(rectLengthY / (dimensionsPanel[1] + gaps[1]));
+	const maxPanelsInX = Math.floor(rectLengthX / (dimensionsPanel[0] + gaps[0]));
 
 	for (let i = 0; i < maxPanelsInY; i++) {
 		for (let j = 0; j < maxPanelsInX; j++) {
 			// Paint the solar panel and apply the style depending on it is deselected or not
-			paintASolarPanel(savedRectangle, rectPathToNorth[0], i, j, latLengthPanel, lngLengthPanel);
+			paintASolarPanel(savedRectangle,
+          rectPathToNorth[0], // vertex (lat(), lng()) origin where we will start to draw.
+          i, j,
+          latLengthPanel, lngLengthPanel,
+          latLengthGap, lngLengthGap
+        );
 		}
 	}
 };
 
+
+/**
+ * Paints a solar panel on the map within a specified rectangle and manages its rotation and state.
+ *
+ * @param theSavedRectangle - The rectangle object containing the polygon and solar panel grid data.
+ * @param startSWLatLng - The starting southwest latitude and longitude of the rectangle.
+ * @param indexLat - The index of the panel in the latitude direction (row index).
+ * @param indexLng - The index of the panel in the longitude direction (column index).
+ * @param latLengthPanel - The length of the panel in the latitude direction.
+ * @param lngLengthPanel - The length of the panel in the longitude direction.
+ * @param latGap - The gap between panels in the latitude direction.
+ * @param lngGap - The gap between panels in the longitude direction.
+ * @returns The created `google.maps.Polygon` object representing the solar panel, or `null` if the panel could not be created.
+ *
+ * @remarks
+ * - This function calculates the position of the solar panel based on the provided indices and dimensions.
+ * - The panel is rotated to match the inclination of the rectangle and saved in the grid for future reference.
+ * - If a panel already exists at the specified grid position, it is removed before creating a new one.
+ * - The function also updates the panel's style based on its activation state.
+ */
 const paintASolarPanel = function (
 	theSavedRectangle: SavedRectangle,
 	startSWLatLng: google.maps.LatLng,
-	orderLat: number,
-	orderLng: number,
+	indexLat: number,
+	indexLng: number,
 	latLengthPanel: number,
-	lngLengthPanel: number
+	lngLengthPanel: number,
+  latGap: number,
+  lngGap: number,
 ): google.maps.Polygon | null {
 	const polygon = theSavedRectangle.polygon;
 	const map = polygon!.getMap();
@@ -140,10 +177,11 @@ const paintASolarPanel = function (
 
 	const [latSouth, lngWest] = [startSWLatLng.lat(), startSWLatLng.lng()];
 
-	const panelLatSouth = latSouth + latLengthPanel * orderLat;
+   // indexLat starts in 0
+	const panelLatSouth = latSouth + latLengthPanel * indexLat + (latGap * indexLat);
 	const panelLatNorth = panelLatSouth + latLengthPanel;
-	const panelLngWest = lngWest + lngLengthPanel * orderLng;
-	const panelLngEast = panelLngWest + lngLengthPanel;
+	const panelLngWest = lngWest + lngLengthPanel * indexLng + (lngGap * indexLng);
+	const panelLngEast = panelLngWest + lngLengthPanel ;
 
 	const coords = [
 		`${panelLatSouth},${panelLngWest}`, // v0
@@ -170,12 +208,12 @@ const paintASolarPanel = function (
 	);
 
 	// We save the reference to the panel in the grid
-	if (!theSavedRectangle.solarPanelsPolygons[orderLng]) {
-		theSavedRectangle.solarPanelsPolygons[orderLng] = [];
-	} else if (theSavedRectangle.solarPanelsPolygons[orderLng][orderLat]) {
-		theSavedRectangle.solarPanelsPolygons[orderLng][orderLat].setMap(null);
+	if (!theSavedRectangle.solarPanelsPolygons[indexLng]) {
+		theSavedRectangle.solarPanelsPolygons[indexLng] = [];
+	} else if (theSavedRectangle.solarPanelsPolygons[indexLng][indexLat]) {
+		theSavedRectangle.solarPanelsPolygons[indexLng][indexLat].setMap(null);
 	}
-	theSavedRectangle.solarPanelsPolygons[orderLng][orderLat] = panel;
+	theSavedRectangle.solarPanelsPolygons[indexLng][indexLat] = panel;
 
 	if (panel) {
 		// update the stlye if the panel is deactivated
@@ -186,6 +224,9 @@ const paintASolarPanel = function (
 
 	return panel;
 };
+
+
+
 
 export const cleanupSolarPanelsForSavedRectangle = function (
 	savedRect: SavedRectangle,
@@ -282,12 +323,19 @@ export const getCurrentPanelsDimensions = function (): [number, number] {
 	const inputLength = document.querySelector('.panel-length input');
 	const inputHeight = document.querySelector('.panel-height input');
 	const [length, height] = [(inputLength as HTMLInputElement).value, (inputHeight as HTMLInputElement).value];
-	return [parseFloat(length ?? '1'), parseFloat(height ?? '1.5')]; // in meters
+	return [parseFloat(length ?? '1960'), parseFloat(height ?? '1134')]; // in milimeters
 };
+
+export const getCurrentPanelsLengthHeightGaps = function (): [number, number] {
+  const inputLengthGap = document.querySelector('.panel-length-gap input');
+  const inputHightGap = document.querySelector('.panel-height-gap input');
+  const [length, height] = [(inputLengthGap as HTMLInputElement).value, (inputHightGap as HTMLInputElement).value];
+	return [parseFloat(length ?? '0'), parseFloat(height ?? '0')]; // in milimeters
+}
 
 export const getCurrentPanelsNominalPower = function (): number {
 	const inputPower = document.querySelector('.panel-nominal-power input');
-	const power = (inputPower as HTMLInputElement).value ?? '400';
+	const power = (inputPower as HTMLInputElement).value ?? '480';
 	return parseInt(power); // in Watios
 };
 
@@ -307,7 +355,7 @@ export const getAnnualGeneratedPower = function (savedRect: SavedRectangle): num
 		console.error('No saved Rectagnle info or no segmeent', savedRect, segment);
 		return 0;
 	}
-	const numberOfPanels = numberOfPanelsInRectangle(savedRect);
+	const numberOfPanels = getNumberOfPanelsInRectangle(savedRect);
 	const panelPower = getCurrentPanelsNominalPower() / 1000; // in kW
 	const hours_of_sun = getCurrentHoursPerYear(segment);
 	const finalEfficiency = getCurrentPanelsSystemEfficiency();
@@ -315,12 +363,19 @@ export const getAnnualGeneratedPower = function (savedRect: SavedRectangle): num
 	return parseInt(powerInKW.toFixed(0));
 };
 
+export const getSolarPanelsSurface = function(savedR: SavedRectangle) : number {
+  const dim = getCurrentPanelsDimensions();
+  const panelSurface = dim[0]/1000 * dim[1]/1000; // in m2
+  const numberPanels = getNumberOfPanelsInRectangle(savedR);
+  return parseFloat((numberPanels * panelSurface).toFixed(2));
+}
+
 /**
  * Counts the activated panels in a rectangle drawn by the user.
  * @param savedRect
  * @returns
  */
-export const numberOfPanelsInRectangle = function (savedRect: SavedRectangle): number {
+export const getNumberOfPanelsInRectangle = function (savedRect: SavedRectangle): number {
 	let countPanels = 0;
 	savedRect.solarPanelsPolygons.forEach((row) => {
 		row.forEach((panel) => {
@@ -354,7 +409,7 @@ export const loadModelPanelParametersInInputs = function () {
 	// Data from WordPress for the CPT `panel`.
 	apiFetch({ path: `/wp/v2/panel/${postId}` }).then((data) => {
 		const typedData = data as { custom_fields?: { length: string; height: string; nominal_power: string } };
-		let [length, height, nominal_power] = [1.5, 2.2, 450]; // default, but it will be overwritten.
+		let [length, height, nominal_power] = [1960, 1134, 480]; // default, but it will be overwritten.
 		if (!typedData?.custom_fields) {
 			console.warn('custom_fields not found. Set to default', data, [length, height, nominal_power]);
 		}
@@ -374,39 +429,30 @@ export const applyListenersToPanelModelsDropdown = function () {
 	const inputEfficiency = document.querySelector('.panel-efficiency input');
 	const inputLength = document.querySelector('.panel-length input');
 	const inputHeight = document.querySelector('.panel-height input');
+	const inputLengthGap = document.querySelector('.panel-length-gap input');
+	const inputHeightGap = document.querySelector('.panel-height-gap input');
 	const inputPower = document.querySelector('.panel-nominal-power input');
 	const quantileInputs = Array.from(document.querySelectorAll('.panel-quantiles input'));
-	const allInputs = [inputEfficiency, inputLength, inputHeight, inputPower, ...quantileInputs];
+	const allInputs = [
+    inputEfficiency,
+    inputLength, inputHeight, inputPower, inputLengthGap, inputHeightGap,
+    ...quantileInputs
+  ];
 	allInputs.forEach((input) => {
 		input?.addEventListener('change', (e) => {
 			createPanelNotificationPopup();
 		});
 	});
-};
 
-async function getIdealSunHours(lat: number, lon: number) {
-	const url = `https://re.jrc.ec.europa.eu/api/v5_2/seriescalc?lat=${lat}&lon=${lon}&outputformat=json`;
-
-	try {
-		const response = await fetch(url);
-		const data = await response.json();
-
-		// Extraer la irradiación solar promedio mensual en inclinación óptima
-		const monthlyData = data.outputs.monthly;
-
-		// Sumar las horas de sol estimadas a partir de G(i)
-		let totalHours = 0;
-		monthlyData.forEach((month) => {
-			const irradiance = month['G(i)']; // kWh/m² por mes
-			totalHours += (irradiance * 1000) / 100; // Conversión a horas de sol
+  // if we change inputs relative to the Solar Panel Model dropdown, we reset the solar panel name
+  const solarPanelInputs = [inputLength, inputHeight, inputPower];
+  solarPanelInputs.forEach((input) => {
+		input?.addEventListener('change', (e) => {
+			const modelDropdown = document.querySelector('.panel-model-dropdown select');
+      (modelDropdown as HTMLSelectElement).value = 'x';
 		});
-
-		console.log(`Horas de sol ideales al año: ${totalHours.toFixed(2)} h`);
-		return totalHours;
-	} catch (error) {
-		console.error('Error obteniendo datos de PVGIS:', error);
-	}
-}
+	});
+};
 
 /**
  * Handlers for individual solar panels

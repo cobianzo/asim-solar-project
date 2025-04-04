@@ -39,7 +39,7 @@ class Gravity_Hooks {
 		add_filter( 'coco_gravity_form_map_field_default_lng', array( __CLASS__, 'set_default_lng' ), 10, 2 );
 
 		// Step 4, custom HTML there in combination with step4·functions.ts
-		add_filter('gform_field_content', [ __CLASS__, 'step4_power_calculations_html' ], 10, 5 );
+		add_filter( 'gform_field_content', array( __CLASS__, 'step4_power_calculations_html' ), 10, 5 );
 	}
 
 	public static function form_top_message( $form, $form_id ) {
@@ -131,7 +131,6 @@ class Gravity_Hooks {
 
 		<button onClick="window.debug.showAllJSGlobalVarsInPopup(event); return false;">Mostra JS variables</button>
 		<?php
-
 	}
 
 	public static function set_default_zoom( $zoom, $form ) {
@@ -156,7 +155,7 @@ class Gravity_Hooks {
 		return $lng;
 	}
 
-	public static function step4_power_calculations_html($field_content, $field, $value, $lead_id, $form_id) {
+	public static function step4_power_calculations_html( $field_content, $field, $value, $lead_id, $form_id ) {
 		if ( $field->adminLabel === 'power-calculations' ) {
 			if ( $field->pageNumber !== \GFFormDisplay::get_current_page( $form_id ) ) {
 				return $field_content;
@@ -166,10 +165,10 @@ class Gravity_Hooks {
 			$new_content = ob_get_clean();
 			$html_before = '';
 			$html_after  = '';
-      return $html_before . $new_content . $field_content . $html_after;
-    }
+			return $html_before . $new_content . $field_content . $html_after;
+		}
 
-    return $field_content;
+		return $field_content;
 	}
 }
 

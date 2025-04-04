@@ -13,11 +13,11 @@ class Google_Maps_API extends API {
 	 * @param array $data
 	 * @return mixed
 	 */
-	public static function get( string $method, array $data = array() ) : array | bool {
+	public static function get( string $method, array $data = array() ): array|bool {
 		return parent::get_google_api_response( self::$base_endpoint, $method, $data );
 	}
 
-	public static function get_maps_building_data( float|string $latitude, float|string $longitude ) : array | bool{
+	public static function get_maps_building_data( float|string $latitude, float|string $longitude ): array|bool {
 		return self::get( 'geocode/json', array(
 			'latlng'             => "$latitude, $longitude",
 			'extra_computations' => 'BUILDING_AND_ENTRANCES',
@@ -46,5 +46,4 @@ class Google_Maps_API extends API {
 		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		return $buildings_string_coord; // ['43.234,1.32 44.23,1.33 ... ' , '124.43,-1.44 124...']
 	}
-
 }

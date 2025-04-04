@@ -1,10 +1,7 @@
 // types
 import { boxBySWNE, ExtendedSegment, RoofSegmentStats } from './types';
 import {
-	convertStringCoordsInLatLng,
 	convertStringLatLngToArrayLatLng,
-	getCardinalOrientationFromAngle,
-	getCardinalOrientationFromPolygon,
 	getPolygonCenterCoords,
 } from './trigonometry-helpers';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
@@ -17,26 +14,14 @@ import {
 	SEGMENT_WHEN_RECTANGLE,
 } from './setup-segments-interactive-functions';
 import { getSavedRectangleBySegment } from './setup-rectangle-interactive';
-import { rawHandler } from '@wordpress/blocks';
 import { getCurrentStepCocoMap } from '.';
 import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
 import {
 	closeNotificationPopup,
 	createNotification,
 	createPanelNotificationPopup,
-	openNotificationPopup,
 	removeNotification,
 } from './notification-api';
-import {
-	getAnnualGeneratedPower,
-	getCurrentHoursPerYear,
-	getCurrentPanelsDimensions,
-	getCurrentPanelsModel,
-	getCurrentPanelsNominalPower,
-	getCurrentPanelsSystemEfficiency,
-	getCurrentQuantilScenario,
-	numberOfPanelsInRectangle,
-} from './setup-solar-panels';
 
 export const MARKER_CENTERED_OPTIONS = {
 	style: {

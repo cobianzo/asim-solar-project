@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (window.gf_current_page !== '4') {
 		return;
 	}
-	alert('step4');
 	setup_step_4();
 });
 

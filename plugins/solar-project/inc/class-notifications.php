@@ -11,18 +11,18 @@
 namespace Coco_Solar;
 
 class Notifications {
-  public static function init() {
+	public static function init() {
 
 		add_action( 'rest_api_init', function () {
 			// create the new endpoint
 			// Usage: 'wp-json/wp/coco-solar/v1/notifications/segmentInfo.html'
-      \register_rest_route( 'coco-solar/v1', '/notifications/(?P<notificationName>[a-zA-Z0-9-]+)', array(
-        'methods' => 'GET',
-        'callback' => [ get_called_class(), 'get_notification_html' ],
-        'permission_callback' => '__return_true',
-      ) );
-    } );
-  }
+			\register_rest_route( 'coco-solar/v1', '/notifications/(?P<notificationName>[a-zA-Z0-9-]+)', array(
+				'methods'             => 'GET',
+				'callback'            => array( get_called_class(), 'get_notification_html' ),
+				'permission_callback' => '__return_true',
+			) );
+		} );
+	}
 
 	/**
 	 * Retrieves the HTML content of a notification file.
@@ -33,16 +33,16 @@ class Notifications {
 	 *
 	 * @param \WP_REST_Request $request The request containing the notification name.
 	*/
-  public static function get_notification_html( \WP_REST_Request $request ): \WP_REST_Response | \WP_Error {
-    $notification_name = $request->get_param( 'notificationName' );
-    $notification_name .= ( substr( $notification_name, -5 ) !== '.html' ) ? '.html' : '';
-    $notificationPath = plugin_dir_path( __DIR__ ) . 'assets/notifications/' . $notification_name;
-    if ( ! file_exists( $notificationPath ) ) {
-      return new \WP_Error( 'not_found', __( 'Notificaiton not found' ), array( 'status' => 404 ) );
-    }
-    $notificationHtml = file_get_contents( $notificationPath );
-    return rest_ensure_response( $notificationHtml );
-  }
+	public static function get_notification_html( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
+		$notification_name  = $request->get_param( 'notificationName' );
+		$notification_name .= ( substr( $notification_name, -5 ) !== '.html' ) ? '.html' : '';
+		$notification_path  = plugin_dir_path( __DIR__ ) . 'assets/notifications/' . $notification_name;
+		if ( ! file_exists( $notification_path ) ) {
+			return new \WP_Error( 'not_found', __( 'Notificaiton not found' ), array( 'status' => 404 ) );
+		}
+		$notification_html = file_get_contents( $notification_path );
+		return rest_ensure_response( $notification_html );
+	}
 }
 
 Notifications::init();

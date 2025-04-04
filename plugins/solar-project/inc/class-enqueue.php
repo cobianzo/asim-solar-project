@@ -2,7 +2,6 @@
 
 namespace Coco_Solar;
 
-
 class Enqueue {
 
 	public static function init() {
@@ -13,12 +12,10 @@ class Enqueue {
 		// Styles
 		add_action( 'wp_enqueue_scripts', function () {
 			$asset_file = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
-			$version = $asset_file['version'] ?? null;
-			wp_register_style( 'coco-solar-project', plugins_url( 'src/style.css', __DIR__ ), [], $version);
+			$version    = $asset_file['version'] ?? null;
+			wp_register_style( 'coco-solar-project', plugins_url( 'src/style.css', __DIR__ ), array(), $version );
 			wp_enqueue_style( 'coco-solar-project' );
 		} );
-
-
 	}
 
 	/**
@@ -50,14 +47,14 @@ class Enqueue {
 
 			// step 1 fields
 			$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
-			$coco_map_entry = $coco_maproofselect_instance->value;
+			$coco_map_entry              = $coco_maproofselect_instance->value;
 
 			// step 2 fields
 			$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
 			$coco_mapfieldoffset_instance      = Helper::capture_coco_map_field_instance( $form, 'map-segments-offset' );
 			// step 3
-			$coco_mapfieldrectangle_instance   = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
-			$coco_savedrectangles_instance     = Helper::capture_coco_map_field_instance( $form, 'saved-rectangles' );
+			$coco_mapfieldrectangle_instance = Helper::capture_coco_map_field_instance( $form, 'map-rectangle' );
+			$coco_savedrectangles_instance   = Helper::capture_coco_map_field_instance( $form, 'saved-rectangles' );
 			// step 4. Not there yet.
 			// ...
 
@@ -71,7 +68,6 @@ class Enqueue {
 				true
 			);
 
-			// $data_layers           = \Coco_Solar\Google_Solar_API::get_datalayer_urls( $previous_marker_value[0], $previous_marker_value[1] );
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url() . "'; \n" .
@@ -80,11 +76,11 @@ class Enqueue {
 				"window.step1CocoMapInputId = 'input_{$coco_maproofselect_instance->formId}_{$coco_maproofselect_instance->id}'; \n" .
 				// step 2
 				"window.step2CocoMapInputId = 'input_{$coco_mapfieldoffset_instance->formId}_{$coco_mapfieldoffset_instance->id}'; \n" .
-				"window.step2RotationInserted = " . wp_json_encode( $coco_segmentrotationtype_instance->value ) ." \n" .
-				"window.step2OffsetInserted = " . wp_json_encode( $coco_mapfieldoffset_instance->value ) ." \n" . // respect the center of the bounding box
+				'window.step2RotationInserted = ' . wp_json_encode( $coco_segmentrotationtype_instance->value ) . " \n" .
+				'window.step2OffsetInserted = ' . wp_json_encode( $coco_mapfieldoffset_instance->value ) . " \n" . // respect the center of the bounding box
 				// step 3
 				"window.step3CocoMapInputId = 'input_{$coco_mapfieldrectangle_instance->formId}_{$coco_mapfieldrectangle_instance->id}'; \n" .
-				"window.step3Rectangles = " . $coco_savedrectangles_instance->value . " \n" .
+				'window.step3Rectangles = ' . $coco_savedrectangles_instance->value . " \n" .
 				// gravity forms related
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
@@ -99,19 +95,21 @@ class Enqueue {
 				if ( $stats ) {
 
 					// We add more data to the segments as we'll use it in the js side.
-					$stats = array_map( fn($segment_data) => array_merge(
+					$stats = array_map( fn( $segment_data ) => array_merge(
 						$segment_data,
-						array('originalCoords' => [
-							'originalBoundingBox' => $segment_data['boundingBox'],
-							'originalCenter'      => $segment_data['center'],
-						])
+						array(
+							'originalCoords' => array(
+								'originalBoundingBox' => $segment_data['boundingBox'],
+								'originalCenter'      => $segment_data['center'],
+							),
+						)
 					), $stats );
 
 					$solar_potential = $solar_building_data['solarPotential'];
-					unset($solar_potential['roofSegmentStats']);
+					unset( $solar_potential['roofSegmentStats'] );
 					wp_add_inline_script( 'coco-solar-functions',
 						'window.cocoBuildingSegments = ' . wp_json_encode( $stats ) . "; \n" .
-						'window.cocoSolarPotential = ' .  wp_json_encode( $solar_potential ) . "; \n" .
+						'window.cocoSolarPotential = ' . wp_json_encode( $solar_potential ) . "; \n" .
 						'window.cocoOriginalBoundingBox = ' . wp_json_encode( $solar_building_data['boundingBox'] ) . "; \n" .
 						'window.cocoOriginalBoundingBoxCenter = ' . wp_json_encode( $solar_building_data['center'] ) . "; \n"
 					);
@@ -166,7 +164,6 @@ class Enqueue {
 
 		}
 	}
-
 }
 
 Enqueue::init();

@@ -1,9 +1,14 @@
 # TODO NEXT
 
-Bugs: invert horizontal and vertical for rotated segments.
-Bugs: when changing length, height, power, we deactivate the Model.
-Save data in form submitted
-Add Save form in every step.
+
+DONE: Bugs: invert horizontal and vertical for rotated segments.
+DONE: misure in mm
+DONE: superficie panelli, deleted segment surface.
+DONE: add space between pannelli.
+
+DONE: Bugs: when changing length, height, power, we deactivate the Model.
+DONE: Save data in form submitted
+DONE: Add Save form in every step.
 Add all PHP CS to all files.
 Refactor code and sort it out better.
 Add Playwright testing
@@ -46,6 +51,8 @@ Install all development to Emiliano.
     [...]
     --- `panel-length`
     --- `panel-height`
+    --- `panel-length-gap`
+    --- `panel-height-gap`
     --- `panel-power`
     --- `panel-efficiency`
     --- Dropdown of panels: allow dynamic content: param `panel_list`

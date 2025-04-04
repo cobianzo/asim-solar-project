@@ -39,9 +39,9 @@ document.addEventListener('solarMapReady', (event: Event) => {
 
 	// notification
 	if (window.cocoSavedRectangles?.length) {
-		createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles.length.toString()]);
+		createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles?.length.toString()]);
 	} else {
-		createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments.length.toString()]);
+		createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments?.length.toString()]);
 	}
 
 	// Sync inputs on page load

@@ -10,6 +10,7 @@
  */
 
 import { convertStringCoordsInLatLng } from './trigonometry-helpers';
+import { ExtendedSegment } from './types';
 
 export const MOVING_BOUNDINGBOX_OPTIONS: google.maps.RectangleOptions = {
 	editable: false, // No permite editar vértices
@@ -52,7 +53,7 @@ export const updateValuesCoordsSegmentsWithOffset = function (
 		);
 		return;
 	}
-	window.cocoBuildingSegments.forEach((s) => {
+	window.cocoBuildingSegments?.forEach((s) => {
 		s.boundingBox.sw.latitude = s.originalCoords.originalBoundingBox.sw.latitude + latOffset;
 		s.boundingBox.sw.longitude = s.originalCoords.originalBoundingBox.sw.longitude + lngOffset;
 		s.boundingBox.ne.latitude = s.originalCoords.originalBoundingBox.ne.latitude + latOffset;
@@ -115,6 +116,11 @@ export const getMovingBoundingBoxOffsetFromOrigin = function (): [number, number
 	];
 	return [offsetLat, offsetLng];
 };
+
+export const isPortaitSegmentRotated = function(segment: ExtendedSegment | null) : boolean {
+  if (!segment) return false;
+  return (segment.realRotationAngle == ((segment.data?.azimuthDegrees ?? 0) + 90));
+}
 
 // The value stored in the gravity forms entry is exposed in window. step2·OffsetInserted
 export const getOffsetFromValueInDB = function (): [number, number] {

@@ -13,7 +13,7 @@ class Google_Solar_API extends API {
 	 * @param array $data
 	 * @return mixed
 	 */
-	public static function get( string $method, array $data = array() )  {
+	public static function get( string $method, array $data = array() ) {
 		return self::get_google_api_response( self::$base_endpoint, $method, $data );
 	}
 
@@ -24,7 +24,7 @@ class Google_Solar_API extends API {
 	 * @param float $longitude
 	 * @return array|bool
 	 */
-	public static function get_solar_building_data( float $latitude, float $longitude )  {
+	public static function get_solar_building_data( float $latitude, float $longitude ) {
 		return self::get( 'buildingInsights:findClosest', array(
 			'location.latitude'  => $latitude,
 			'location.longitude' => $longitude,
@@ -55,5 +55,4 @@ class Google_Solar_API extends API {
 		$response = self::get( 'dataLayers:get', $data );
 		return $response;
 	}
-
 }
