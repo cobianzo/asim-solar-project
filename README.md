@@ -1,7 +1,13 @@
 # TODO NEXT
 
-Bugs: invert horizontal and vertical for rotated segments.
+
+DONE: Bugs: invert horizontal and vertical for rotated segments.
+DONE: misure in mm
+DONE: superficie panelli, deleted segment surface.
+:add space between pannelli.
+
 Bugs: when changing length, height, power, we deactivate the Model.
+Calculate sq meters of the rectangle. Removed the one from the segment (not reliable)
 Save data in form submitted
 Add Save form in every step.
 Add all PHP CS to all files.

@@ -31,7 +31,8 @@ import { handlerClickSaveRectangleButton } from './buttons-topright-map';
 import { addAssociatedMarker, getSegmentByIndex, selectSegment } from './setup-segments-interactive-functions';
 import {
 	cleanupSolarPanelsForSavedRectangle,
-	numberOfPanelsInRectangle,
+	getNumberOfPanelsInRectangle,
+	getSolarPanelsSurface,
 	setupSolarPanels,
 } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
@@ -158,7 +159,8 @@ export const saveSavedRectanglesInTextArea = function () {
 			if (theSegm) {
 				rectData.orientation = getCardinalOrientationFromAngle(theSegm.data?.azimuthDegrees!).join(', ');
 			}
-			rectData.numberPanels = numberOfPanelsInRectangle(savedR);
+			rectData.numberPanels = getNumberOfPanelsInRectangle(savedR);
+      rectData.panelsSurface = getSolarPanelsSurface(savedR);
 			// ==========
 
 			return rectData;

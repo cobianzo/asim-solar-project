@@ -33,11 +33,9 @@ export const getRotationTypePortraitSelected = (
 	return fallback as SelectRotationPortraitSegmentsOptions;
 };
 
-export const applyRotationPortraitSegmentsByRadioSelected = (
-	createBoundingBoxAfterCreatingSegments: Boolean = true
-): SelectRotationPortraitSegmentsOptions => {
+export const applyRotationPortraitSegmentsByRadioSelected = (): SelectRotationPortraitSegmentsOptions => {
 	const valorSeleccionado = getRotationTypePortraitSelected();
-	console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments`);
+	console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments and the panels`);
 
 	setupSegments(false);
 

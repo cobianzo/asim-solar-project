@@ -16,6 +16,7 @@ import {
 } from './trigonometry-helpers';
 import { ExtendedSegment, SavedRectangle } from './types';
 import { getSegmentByIndex } from './setup-segments-interactive-functions';
+import { isPortaitSegmentRotated } from './setup-drag-all-segments-interaction';
 
 export const PANEL_OPTIONS: google.maps.PolygonOptions = {
 	strokeColor: 'black',
@@ -86,7 +87,14 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
 	// let dimensionsPanel = [ 1.134, 1.172 ]; // meters
 	let dimensionsPanel = getCurrentPanelsDimensions(); // meters
 
-	if ('horizontal' == savedRectangle.panelOrientation) {
+  // check if it's a portrait segment that has been rotated.
+  const segment = getSegmentByIndex(savedRectangle.segmentIndex);
+  const isRotated = isPortaitSegmentRotated(segment);
+	if (( 'horizontal' === savedRectangle.panelOrientation && isRotated) ||
+    // 0
+    (! isRotated && 'vertical' === savedRectangle.panelOrientation)
+  ) {
+    console.info('>>>> TODELETE: is rotated and vertical', savedRectangle.panelOrientation, isRotated);
 		const [width, height] = dimensionsPanel;
 		dimensionsPanel = [height, width];
 	}
@@ -282,12 +290,12 @@ export const getCurrentPanelsDimensions = function (): [number, number] {
 	const inputLength = document.querySelector('.panel-length input');
 	const inputHeight = document.querySelector('.panel-height input');
 	const [length, height] = [(inputLength as HTMLInputElement).value, (inputHeight as HTMLInputElement).value];
-	return [parseFloat(length ?? '1'), parseFloat(height ?? '1.5')]; // in meters
+	return [parseFloat(length ?? '1960'), parseFloat(height ?? '1134')]; // in milimeters
 };
 
 export const getCurrentPanelsNominalPower = function (): number {
 	const inputPower = document.querySelector('.panel-nominal-power input');
-	const power = (inputPower as HTMLInputElement).value ?? '400';
+	const power = (inputPower as HTMLInputElement).value ?? '480';
 	return parseInt(power); // in Watios
 };
 
@@ -307,7 +315,7 @@ export const getAnnualGeneratedPower = function (savedRect: SavedRectangle): num
 		console.error('No saved Rectagnle info or no segmeent', savedRect, segment);
 		return 0;
 	}
-	const numberOfPanels = numberOfPanelsInRectangle(savedRect);
+	const numberOfPanels = getNumberOfPanelsInRectangle(savedRect);
 	const panelPower = getCurrentPanelsNominalPower() / 1000; // in kW
 	const hours_of_sun = getCurrentHoursPerYear(segment);
 	const finalEfficiency = getCurrentPanelsSystemEfficiency();
@@ -315,12 +323,19 @@ export const getAnnualGeneratedPower = function (savedRect: SavedRectangle): num
 	return parseInt(powerInKW.toFixed(0));
 };
 
+export const getSolarPanelsSurface = function(savedR: SavedRectangle) {
+  const dim = getCurrentPanelsDimensions();
+  const panelSurface = dim[0]/1000 * dim[1]/1000; // in m2
+  const numberPanels = getNumberOfPanelsInRectangle(savedR);
+  return numberPanels * panelSurface;
+}
+
 /**
  * Counts the activated panels in a rectangle drawn by the user.
  * @param savedRect
  * @returns
  */
-export const numberOfPanelsInRectangle = function (savedRect: SavedRectangle): number {
+export const getNumberOfPanelsInRectangle = function (savedRect: SavedRectangle): number {
 	let countPanels = 0;
 	savedRect.solarPanelsPolygons.forEach((row) => {
 		row.forEach((panel) => {
@@ -354,7 +369,7 @@ export const loadModelPanelParametersInInputs = function () {
 	// Data from WordPress for the CPT `panel`.
 	apiFetch({ path: `/wp/v2/panel/${postId}` }).then((data) => {
 		const typedData = data as { custom_fields?: { length: string; height: string; nominal_power: string } };
-		let [length, height, nominal_power] = [1.5, 2.2, 450]; // default, but it will be overwritten.
+		let [length, height, nominal_power] = [1960, 1134, 480]; // default, but it will be overwritten.
 		if (!typedData?.custom_fields) {
 			console.warn('custom_fields not found. Set to default', data, [length, height, nominal_power]);
 		}

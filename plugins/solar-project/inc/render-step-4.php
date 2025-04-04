@@ -92,7 +92,7 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 	?>
 		<h3><?php printf( __( 'Segment %d', 'solar-panel' ), $i + 1 ); ?></h3>
 		<p>
-			<?php printf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-panel' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $roof['stats']['areaMeters2'] ); ?>
+			<?php printf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-panel' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $saved_rectangle['panelsSurface'] ); ?>
 		</p>
 		<table class="table">
 			<thead>

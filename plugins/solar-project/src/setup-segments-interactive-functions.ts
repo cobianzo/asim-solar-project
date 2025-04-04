@@ -199,7 +199,7 @@ const setupSegments = (paintSunMarkers = true) => {
 			}
 
 			/**
-			 * PAINT THE SEGMENT POLYGON (inclined rectangle)
+			 * PAINT THE SEGMENT POLYGON (it is an inclined rectangle)
 			 */
 			const segment = paintSegment(theMap, rectangleToPaint, { ...segmentItem, ...{ isPortrait } });
 			if (segment) {
@@ -237,8 +237,13 @@ const setupSegments = (paintSunMarkers = true) => {
 			activateInteractivityOnSegment(segment);
 		});
 
-		// if there are rectangles designed by the user, paint them
+
+    /**
+     * PAINT RECTANGLES INSIDE THE SEGMENT
+     * if there are rectangles designed by the user, paint them
+     */
 		setupRectangles();
+
 	} // end of painting the segments.
 };
 
@@ -409,7 +414,10 @@ export const cleanupAssociatedMarkers = (
 	parent[prop] = [];
 };
 
-export const getSegmentByIndex = function (index: number): ExtendedSegment | null {
+export const getSegmentByIndex = function (index: number | undefined): ExtendedSegment | null {
+  if (index === undefined || index === null) {
+    return null;
+  }
 	const cocoSetupMap = getCurrentStepCocoMap();
 	if (!cocoSetupMap?.segments) {
 		console.error('not found segments source of truth info', cocoSetupMap);
