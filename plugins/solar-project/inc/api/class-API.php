@@ -21,10 +21,7 @@ abstract class API {
 	}
 
 	public static function get_google_api() {
-		$key = get_option( self::GOOGLE_API_KEY_OPTION_NAME );
-
-		// $key = 'AIzaSyB3FE3KIBaI8qOWxZCYuUbYRQDBs61a6v0'; // TODELETE
-		return $key;
+		return get_option( self::GOOGLE_API_KEY_OPTION_NAME );
 	}
 
 	/**
@@ -37,7 +34,8 @@ abstract class API {
 	public static function get_google_api_response( string $base_endpoint, string $method, array $data = array() ): array|bool {
 		$api_url       = $base_endpoint . $method;
 		$transient_key = '_google_api_' . md5( $api_url . wp_json_encode( $data ) );
-		if ( isset( $_GET['solar-cache-clear'] ) ) {
+		$skip_cache    = isset( $_GET['solar-cache-clear'] );
+		if ( $skip_cache ) {
 			delete_transient( $transient_key );
 		}
 		$cached_response = get_transient( $transient_key );
@@ -46,6 +44,7 @@ abstract class API {
 		// echo '<br><br>API url : ' . $api_url . '<br><br>';
 		// echo json_encode( $data, JSON_PRETTY_PRINT );
 		// echo '<br>API: ' . self::get_google_api();
+		// wp_die();
 
 		if ( false !== $cached_response ) {
 			$cached_response['cached'] = true;
@@ -54,7 +53,13 @@ abstract class API {
 
 		$data['key'] = self::get_google_api();
 		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get
-		$response = wp_remote_get( $api_url, array( 'body' => $data ) );
+		$body_and_headers = array( 'body' => $data );
+		if ( $skip_cache ) {
+			$body_and_headers['headers'] = array( 'Cache-Control' => 'no-cache' );
+		}
+		$response = wp_remote_get( $api_url, $body_and_headers );
+
+		//  ddie($response); // TODELETE
 
 		if ( is_wp_error( $response ) ) {
 			return false;

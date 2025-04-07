@@ -73,7 +73,13 @@ export const SEGMENT_HOVER: google.maps.PolygonOptions = {
 export const SEGMENT_HOVER_WHEN_RECTANGLE: google.maps.PolygonOptions = {
 	strokeWeight: 5,
 };
-export const SEGMENT_SELECTED: google.maps.PolygonOptions = {};
+export const SEGMENT_SELECTED: google.maps.PolygonOptions = {
+	...SEGMENT_HOVER,
+	fillOpacity: 0.5,
+	strokeColor: 'green',
+	strokeWeight: 2,
+	strokeOpacity: 1,
+};
 export const SEGMENT_SELECTED_WHEN_RECTANGLE: google.maps.PolygonOptions = {};
 
 /**
@@ -237,13 +243,11 @@ const setupSegments = (paintSunMarkers = true) => {
 			activateInteractivityOnSegment(segment);
 		});
 
-
-    /**
-     * PAINT RECTANGLES INSIDE THE SEGMENT
-     * if there are rectangles designed by the user, paint them
-     */
+		/**
+		 * PAINT RECTANGLES INSIDE THE SEGMENT
+		 * if there are rectangles designed by the user, paint them
+		 */
 		setupRectangles();
-
 	} // end of painting the segments.
 };
 
@@ -312,11 +316,9 @@ export const selectSegment = function (segm: ExtendedSegment) {
 		}
 		resetSegmentVisibility(s);
 	});
+
 	highlightSegment(segm, {
-		fillColor: 'green',
-		fillOpacity: 0.5,
-		strokeWeight: 5,
-		draggableCursor: 'crosshair',
+		...SEGMENT_SELECTED,
 	}); // green
 
 	// Debugging: show popoover info. It stopped working
@@ -415,9 +417,9 @@ export const cleanupAssociatedMarkers = (
 };
 
 export const getSegmentByIndex = function (index: number | undefined): ExtendedSegment | null {
-  if (index === undefined || index === null) {
-    return null;
-  }
+	if (index === undefined || index === null) {
+		return null;
+	}
 	const cocoSetupMap = getCurrentStepCocoMap();
 	if (!cocoSetupMap?.segments) {
 		console.error('not found segments source of truth info', cocoSetupMap);

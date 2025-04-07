@@ -92,6 +92,11 @@ class Enqueue {
 				// new calculated data
 				$solar_building_data = \Coco_Solar\Google_Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 				$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
+				if (! $stats ) {
+					$error =  $solar_building_data['error']['message'] ?? '';
+					echo '<script>console.error(" Error retrieving the data from Solar Building Data. Try with solar-cache-clear. ' . $error . ' ");</script>';
+					return;
+				}
 				if ( $stats ) {
 
 					// We add more data to the segments as we'll use it in the js side.

@@ -136,6 +136,7 @@ class Model_Panel {
 		);
 	}
 
+	// Not in use anymore. We take the value from the previous step, parsed in a textarea GF field
 	public static function calculate_power_energy( $values = array(
 		'number_panels'    => 0,
 		'panel_power'      => 0,

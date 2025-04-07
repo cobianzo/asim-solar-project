@@ -17,11 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	const inputOptions = document.querySelectorAll('.segment-rotation input');
 	inputOptions?.forEach((radio) => {
 		radio.addEventListener('change', (event) => {
-			applyRotationPortraitSegmentsByRadioSelected();
+			setupSegments(false);
 		});
 	});
 });
 
+/**
+ * Retrieve the value in radio button 'no-extra-rotation' or 'extra-rotation'
+ * @param fallback
+ * @returns
+ */
 export const getRotationTypePortraitSelected = (
 	fallback = 'no-extra-rotation'
 ): SelectRotationPortraitSegmentsOptions => {
@@ -31,13 +36,4 @@ export const getRotationTypePortraitSelected = (
 		return (selected as HTMLInputElement).value as SelectRotationPortraitSegmentsOptions;
 	}
 	return fallback as SelectRotationPortraitSegmentsOptions;
-};
-
-export const applyRotationPortraitSegmentsByRadioSelected = (): SelectRotationPortraitSegmentsOptions => {
-	const valorSeleccionado = getRotationTypePortraitSelected();
-	console.log(`Opción seleccionada: ${valorSeleccionado} . Now we paint the segments and the panels`);
-
-	setupSegments(false);
-
-	return valorSeleccionado;
 };

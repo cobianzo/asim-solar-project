@@ -8,7 +8,7 @@ import {
 } from './setup-rectangle-interactive';
 import { cleanupAssociatedMarkers, selectSegment } from './setup-segments-interactive-functions';
 import { getStep3CocoMapSetup } from './step3_functions';
-import {convertPolygonPathToStringLatLng} from './trigonometry-helpers';
+import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import { ExtendedSegment } from './types';
 
 export const paintResizeHandlersInUsersRectangle = function () {

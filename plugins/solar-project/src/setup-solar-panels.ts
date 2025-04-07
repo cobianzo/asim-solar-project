@@ -5,6 +5,7 @@ import { createNotification, createPanelNotificationPopup, removeNotification } 
 import {
 	FADED_RECTANGLE_OPTIONS,
 	getSavedRectangleBySegment,
+	saveSavedRectanglesInTextArea,
 	SELECTED_RECTANGLE_OPTIONS,
 } from './setup-rectangle-interactive';
 import {
@@ -86,13 +87,14 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
 	// calculate the fatorfacto to scale to get a rectangle 10x15m
 	let dimensionsPanel = getCurrentPanelsDimensions(); // milimeters
 
-  // check if it's a portrait segment that has been rotated.
-  const segment = getSegmentByIndex(savedRectangle.segmentIndex);
-  const isRotated = isPortaitSegmentRotated(segment);
-	if (( 'horizontal' === savedRectangle.panelOrientation && isRotated) ||
-    // 0
-    (! isRotated && 'vertical' === savedRectangle.panelOrientation)
-  ) {
+	// check if it's a portrait segment that has been rotated.
+	const segment = getSegmentByIndex(savedRectangle.segmentIndex);
+	const isRotated = isPortaitSegmentRotated(segment);
+	if (
+		('horizontal' === savedRectangle.panelOrientation && isRotated) ||
+		// 0
+		(!isRotated && 'vertical' === savedRectangle.panelOrientation)
+	) {
 		const [width, height] = dimensionsPanel;
 		dimensionsPanel = [height, width];
 	}
@@ -109,36 +111,46 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
 	];
 
 	// both of these solutions work the same, i think
-  const factorX = dimensionsPanel[0] / rectLengthX; // whats the proportion of the panel respect the rect
+	const factorX = dimensionsPanel[0] / rectLengthX; // whats the proportion of the panel respect the rect
 	const factorY = dimensionsPanel[1] / rectLengthY;
 	const latLengthPanel = (latNorth - latSouth) * factorY;
 	const lngLengthPanel = (lngEast - lngWest) * factorX;
 
-  // now with the gaps.
-  const dim = getCurrentPanelsDimensions();
-  const gaps = getCurrentPanelsLengthHeightGaps();
+	// now with the gaps.
+	let dim = getCurrentPanelsDimensions();
+	let gaps = getCurrentPanelsLengthHeightGaps();
 
-  const latLengthGap = latLengthPanel * gaps[1] / dim[1];
-	const lngLengthGap = lngLengthPanel * gaps[0] / dim[0];
+  // swap dimensions if the sgment is rotated
+	if (isRotated) {
+    gaps = [gaps[1], gaps[0]];
+    dim = [dim[1], dim[0]];
+	}
 
-  // calculate number of panels in the rectangle:
-  // how many times the panel fits in the rectangle
+
+	const latLengthGap = (latLengthPanel * gaps[1]) / dim[1];
+	const lngLengthGap = (lngLengthPanel * gaps[0]) / dim[0];
+
+	// calculate number of panels in the rectangle:
+	// how many times the panel fits in the rectangle
 	const maxPanelsInY = Math.floor(rectLengthY / (dimensionsPanel[1] + gaps[1]));
 	const maxPanelsInX = Math.floor(rectLengthX / (dimensionsPanel[0] + gaps[0]));
 
 	for (let i = 0; i < maxPanelsInY; i++) {
 		for (let j = 0; j < maxPanelsInX; j++) {
 			// Paint the solar panel and apply the style depending on it is deselected or not
-			paintASolarPanel(savedRectangle,
-          rectPathToNorth[0], // vertex (lat(), lng()) origin where we will start to draw.
-          i, j,
-          latLengthPanel, lngLengthPanel,
-          latLengthGap, lngLengthGap
-        );
+			paintASolarPanel(
+				savedRectangle,
+				rectPathToNorth[0], // vertex (lat(), lng()) origin where we will start to draw.
+				i,
+				j,
+				latLengthPanel,
+				lngLengthPanel,
+				latLengthGap,
+				lngLengthGap
+			);
 		}
 	}
 };
-
 
 /**
  * Paints a solar panel on the map within a specified rectangle and manages its rotation and state.
@@ -166,8 +178,8 @@ const paintASolarPanel = function (
 	indexLng: number,
 	latLengthPanel: number,
 	lngLengthPanel: number,
-  latGap: number,
-  lngGap: number,
+	latGap: number,
+	lngGap: number
 ): google.maps.Polygon | null {
 	const polygon = theSavedRectangle.polygon;
 	const map = polygon!.getMap();
@@ -177,11 +189,11 @@ const paintASolarPanel = function (
 
 	const [latSouth, lngWest] = [startSWLatLng.lat(), startSWLatLng.lng()];
 
-   // indexLat starts in 0
-	const panelLatSouth = latSouth + latLengthPanel * indexLat + (latGap * indexLat);
+	// indexLat starts in 0
+	const panelLatSouth = latSouth + latLengthPanel * indexLat + latGap * indexLat;
 	const panelLatNorth = panelLatSouth + latLengthPanel;
-	const panelLngWest = lngWest + lngLengthPanel * indexLng + (lngGap * indexLng);
-	const panelLngEast = panelLngWest + lngLengthPanel ;
+	const panelLngWest = lngWest + lngLengthPanel * indexLng + lngGap * indexLng;
+	const panelLngEast = panelLngWest + lngLengthPanel;
 
 	const coords = [
 		`${panelLatSouth},${panelLngWest}`, // v0
@@ -224,9 +236,6 @@ const paintASolarPanel = function (
 
 	return panel;
 };
-
-
-
 
 export const cleanupSolarPanelsForSavedRectangle = function (
 	savedRect: SavedRectangle,
@@ -327,11 +336,15 @@ export const getCurrentPanelsDimensions = function (): [number, number] {
 };
 
 export const getCurrentPanelsLengthHeightGaps = function (): [number, number] {
-  const inputLengthGap = document.querySelector('.panel-length-gap input');
-  const inputHightGap = document.querySelector('.panel-height-gap input');
-  const [length, height] = [(inputLengthGap as HTMLInputElement).value, (inputHightGap as HTMLInputElement).value];
-	return [parseFloat(length ?? '0'), parseFloat(height ?? '0')]; // in milimeters
-}
+	const inputLengthGap = document.querySelector('.panel-length-gap input');
+	const inputHightGap = document.querySelector('.panel-height-gap input');
+	const [length, height] = [
+		(inputLengthGap as HTMLInputElement).value,
+		(inputHightGap as HTMLInputElement).value,
+	];
+
+	return [parseFloat(height ?? '0'), parseFloat(length ?? '0')]; // in milimeters
+};
 
 export const getCurrentPanelsNominalPower = function (): number {
 	const inputPower = document.querySelector('.panel-nominal-power input');
@@ -363,12 +376,12 @@ export const getAnnualGeneratedPower = function (savedRect: SavedRectangle): num
 	return parseInt(powerInKW.toFixed(0));
 };
 
-export const getSolarPanelsSurface = function(savedR: SavedRectangle) : number {
-  const dim = getCurrentPanelsDimensions();
-  const panelSurface = dim[0]/1000 * dim[1]/1000; // in m2
-  const numberPanels = getNumberOfPanelsInRectangle(savedR);
-  return parseFloat((numberPanels * panelSurface).toFixed(2));
-}
+export const getSolarPanelsSurface = function (savedR: SavedRectangle): number {
+	const dim = getCurrentPanelsDimensions();
+	const panelSurface = ((dim[0] / 1000) * dim[1]) / 1000; // in m2
+	const numberPanels = getNumberOfPanelsInRectangle(savedR);
+	return parseFloat((numberPanels * panelSurface).toFixed(2));
+};
 
 /**
  * Counts the activated panels in a rectangle drawn by the user.
@@ -419,6 +432,9 @@ export const loadModelPanelParametersInInputs = function () {
 	});
 };
 
+/**
+ * On every change of the inputs, we update the values shown in the popup
+ */
 export const applyListenersToPanelModelsDropdown = function () {
 	const dropdown = document.querySelector('.panel-model-dropdown select');
 	dropdown?.addEventListener('change', (e) => {
@@ -434,22 +450,31 @@ export const applyListenersToPanelModelsDropdown = function () {
 	const inputPower = document.querySelector('.panel-nominal-power input');
 	const quantileInputs = Array.from(document.querySelectorAll('.panel-quantiles input'));
 	const allInputs = [
-    inputEfficiency,
-    inputLength, inputHeight, inputPower, inputLengthGap, inputHeightGap,
-    ...quantileInputs
-  ];
+		inputEfficiency,
+		inputLength,
+		inputHeight,
+		inputPower,
+		inputLengthGap,
+		inputHeightGap,
+		...quantileInputs,
+	];
 	allInputs.forEach((input) => {
 		input?.addEventListener('change', (e) => {
 			createPanelNotificationPopup();
 		});
 	});
+	allInputs.forEach((input) => { // I tried to include in together in the previous but apparently it fails
+		input?.addEventListener('change', (e) => {
+			saveSavedRectanglesInTextArea();
+		});
+	});
 
-  // if we change inputs relative to the Solar Panel Model dropdown, we reset the solar panel name
-  const solarPanelInputs = [inputLength, inputHeight, inputPower];
-  solarPanelInputs.forEach((input) => {
+	// if we change inputs relative to the Solar Panel Model dropdown, we reset the solar panel model
+	const solarPanelInputs = [inputLength, inputHeight, inputPower];
+	solarPanelInputs.forEach((input) => {
 		input?.addEventListener('change', (e) => {
 			const modelDropdown = document.querySelector('.panel-model-dropdown select');
-      (modelDropdown as HTMLSelectElement).value = 'x';
+			(modelDropdown as HTMLSelectElement).value = 'x';
 		});
 	});
 };

@@ -11,6 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		return;
 	}
 	setup_step_4();
+
+	setTimeout(() => {
+		const totalenergy = document.querySelector('#total-energy')?.textContent?.replace(',', '');
+		const inputStep4 = document.querySelector('.power-calculations input');
+		if (totalenergy && inputStep4) {
+			(inputStep4 as HTMLInputElement).value = totalenergy;
+		}
+	}, 500);
 });
 
 /**

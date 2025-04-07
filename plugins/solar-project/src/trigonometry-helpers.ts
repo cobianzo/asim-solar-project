@@ -608,15 +608,15 @@ export const getRectangleSideDimensionsByPolygonPath = function (polygon: google
 	return [side1_length * 1000, side2_length * 1000];
 };
 
-export const getPolygonAreaByPolygonPath  = function (polygon: google.maps.Polygon) {
-  const path = polygon.getPath();
-  const area = google.maps.geometry.spherical.computeArea(path);
-  return area; // Área en m²
-}
+export const getPolygonAreaByPolygonPath = function (polygon: google.maps.Polygon) {
+	const path = polygon.getPath();
+	const area = google.maps.geometry.spherical.computeArea(path);
+	return area; // Área en m²
+};
 
 export const getCardinalOrientationFromAngle = function (angle: number): [string, string?] {
 	// Define the type for cardinal boundaries
-  interface CardinalBoundaries {
+	interface CardinalBoundaries {
 		min: number;
 		max: number;
 	}

@@ -190,6 +190,18 @@ body .report-intro {
   border-radius: 5px;
   margin: 1rem 0;
   box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.2);
+
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	font-size: var(--wp--preset--font-size--small);
+
+	strong {
+		font-weight: bold;
+		font-size: var(--wp--preset--font-size--large);
+	}
 }
 
 body .report-container {
@@ -199,18 +211,38 @@ body .report-container {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
   h2 {
-    padding: 1rem;
+		font-weight: bold;
   }
+
+	h3 {
+		border-bottom: 1px solid #ccc;
+		margin: 3rem 0 1rem;
+		display: flex;
+		justify-content: space-between;
+	}
+	ul {
+		padding: 1rem 0;
+	}
+	p, ul > li {
+		font-size: var(--wp--preset--font-size--medium);
+		padding: 0.2rem 0;
+	}
 
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
   }
+	thead th {
+		font-size: var(--wp--preset--font-size--small);
+	}
   th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+		b {
+			font-weight: bold;
+		}
   }
   th {
     background-color: #f8f8f8;

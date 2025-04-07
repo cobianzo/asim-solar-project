@@ -43,6 +43,9 @@ Install all development to Emiliano.
 - Sometimes I modify also the plugin `coco-gravity-form-map-field/`, to improve it
 - We develop both folders (the plugin and this one together)
 - We need to setup the API for Solar and Google Maps, and the Map ID, and insert the values in the CMS
+http://localhost:8777/wp-admin/options-general.php?page=coco_solar_settings
+http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-forms-map-addon
+- The permalinks must be /%postname%/ . Make sure you flush the rules o resave the option. Otherwise the apr fetch to WP requests fail (like notification api)
 
 # Setup the minimum project:
 
@@ -102,10 +105,11 @@ npx wp-env run tests-cli wp core install --url="http://localhost:8889" --title="
 npx wp-env run tests-cli plugin activate coco-gravity-form-map-field gravityforms solar-project solar
 
 Since we need to setup the plugin with the Google Places API, and Map Id, these need to be 
-provided in an .env file. 
+provided in an .env file, to be used in http://localhost:8777/wp-admin/options-general.php?page=testing-page
 
 # Testing unit test of js (jest)
 
+We created some js unit testing for the trigonmetry functions
 npm run test:jest
 or
 cd plugins/solar && npm run test
@@ -122,7 +126,7 @@ user:
 # Debug and test in console
 
 I have nicely exposed in console many functions, and you can expose more, to test visually some functions.
-Check debug.ts. I expose the trigonometry functions, so you can call them with data, like this:
+Check `debug.ts`. I expose the trigonometry functions, so you can call them with data, like this:
 
 ```
 s0 = debug.getSegmentAsPoints(0); // gets the points of the segment with index 0.
@@ -135,7 +139,7 @@ The rotateRectangle has been overwritten to paint a preview of the result in an 
 
 I set `npm run eslint` to format all the typescript FILEs in `solar-panel` plugin
 
-# PHPCS
+# PHPCS and PHPCBF
 
 `composer run-script lint plugins/solar-project/solar-project.php`
 para el plugin coco- ... you need to enter the project and see its README.
@@ -144,5 +148,7 @@ para el plugin coco- ... you need to enter the project and see its README.
 
 - segment: when selecting a roof, Solar API provides several areas with radiance information. Everyone of them is a segment.
 - rectangle: the user will draw a rectangle over the roof, which is the area where the panels will go. That's the rectangle
+	- savedRectangle: object that contains the data for a google.map.polygon rectangle drawn over the map. Contains info about the solarPanelsPolygons drawin inside of it.
 - azimuth: the angle of orientation of every segment, 0 degrees is set to North.
 - building profile: Google Maps API gives the path of a polygon defining the shape of the roof.
+

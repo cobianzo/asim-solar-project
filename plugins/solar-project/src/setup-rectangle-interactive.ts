@@ -24,11 +24,18 @@ import {
 	getInclinationByPolygonPath,
 	latLngToPoint,
 } from './trigonometry-helpers';
-import { ExtendedSegment, LoadedSavedRectangeData, MapMouseEvent, SavedRectangle } from './types';
-import { handlerClickSaveRectangleButton } from './buttons-topright-map';
+import {
+	ExtendedSegment,
+	LoadedSavedRectangeData,
+	MapMouseEvent,
+	SavedRectangle,
+	SavedRectangleDataInTextarea,
+} from './types';
+import { DEFAULT_PANELS_ORIENTATION, handlerClickSaveRectangleButton } from './buttons-topright-map';
 import { addAssociatedMarker, getSegmentByIndex, selectSegment } from './setup-segments-interactive-functions';
 import {
 	cleanupSolarPanelsForSavedRectangle,
+	getAnnualGeneratedPower,
 	getNumberOfPanelsInRectangle,
 	getSolarPanelsSurface,
 	setupSolarPanels,
@@ -138,7 +145,16 @@ export const saveSavedRectanglesInTextArea = function () {
 	const dataToSave = window.cocoSavedRectangles
 		.map((savedR: SavedRectangle) => {
 			// 1. save the shape of the rectangle
-			const rectData = {};
+			const rectData: SavedRectangleDataInTextarea = {
+				rectanglePath: '',
+				deactivatedSolarPanels: [],
+				panelOrientation: DEFAULT_PANELS_ORIENTATION,
+				indexSegment: -1,
+				orientation: '',
+				numberPanels: 0,
+				panelsSurface: 0,
+				annualPower: 0,
+			};
 			if (!savedR.polygon) return null;
 			rectData.rectanglePath = convertPolygonPathToStringLatLng(savedR.polygon);
 
@@ -146,10 +162,10 @@ export const saveSavedRectanglesInTextArea = function () {
 			rectData.deactivatedSolarPanels = Array.from(savedR.deactivatedSolarPanels ?? []);
 
 			// 3. save orientation of solar panels
-			rectData.panelOrientation = savedR.panelOrientation ?? '';
+			rectData.panelOrientation = savedR.panelOrientation ?? DEFAULT_PANELS_ORIENTATION;
 
 			// 4. associated segment
-			rectData.indexSegment = savedR.segmentIndex;
+			rectData.indexSegment = savedR.segmentIndex ?? -1;
 
 			// This info is needed in step 4, but not needed here in step 3.
 			// ==========
@@ -158,7 +174,8 @@ export const saveSavedRectanglesInTextArea = function () {
 				rectData.orientation = getCardinalOrientationFromAngle(theSegm.data?.azimuthDegrees!).join(', ');
 			}
 			rectData.numberPanels = getNumberOfPanelsInRectangle(savedR);
-      rectData.panelsSurface = getSolarPanelsSurface(savedR);
+			rectData.panelsSurface = getSolarPanelsSurface(savedR);
+			rectData.annualPower = getAnnualGeneratedPower(savedR);
 			// ==========
 
 			return rectData;

@@ -56,25 +56,27 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		// Helper::ddie($saved_rectangle);
 		// Helper::ddie($roof);
 
-		$roof = $roofs[ $saved_rectangle['indexSegment'] ];
+		// $roof = $roofs[ $saved_rectangle['indexSegment'] ];
 
 		// Calculate Energy:
-		$number_panels = intval( $saved_rectangle['numberPanels'] ?? 0 );
-		$panel_power   = intval( $panelpower_field->value );
+		// $number_panels = intval( $saved_rectangle['numberPanels'] ?? 0 );
+		// $panel_power   = intval( $panelpower_field->value );
 
-		$hours_sun        = intval( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ] );
-		$final_efficiency = floatval( $efficiency_field->value );
+		// $hours_sun        = intval( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ] );
+		// $final_efficiency = floatval( $efficiency_field->value );
 
-		$roof_energy   = Model_Panel::calculate_power_energy( array(
-			'number_panels'    => $number_panels,
-			'panel_power'      => $panel_power,
-			'hours_sun'        => $hours_sun,
-			'final_efficiency' => $final_efficiency,
-		) );
-		$total_energy += $roof_energy;
+
+		// $rectangle_power   = Model_Panel::calculate_power_energy( array(
+		// 	'number_panels'    => $number_panels,
+		// 	'panel_power'      => $panel_power,
+		// 	'hours_sun'        => $hours_sun,
+		// 	'final_efficiency' => $final_efficiency,
+		// ) );
+		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
+		$total_energy += $rectangle_power;
 	}
 
-	printf( __( 'Total Energy Production: <strong>%s kWh/year</strong>', 'solar-panel' ), number_format( $total_energy, 2 ) );
+	printf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-panel' ), number_format( $total_energy, 0 ) );
 	?>
 </div> <!-- /report-intro -->
 
@@ -82,6 +84,15 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 
 <div id="report" class="report-container">
 	<h2><?php _e( 'Energy Report', 'solar-project' ); ?></h2>
+	<ul>
+		<li><b><?php _e( 'Panel Model', 'solar-project' ); ?></b>:
+			<?php echo esc_html( $model_label ); ?></li>
+		<li><b><?php _e( 'Panel dimensions', 'solar-project' ); ?></b>:
+			<?php echo esc_html( $length_field->value ); ?> x <?php echo esc_html( $height_field->value ); ?> mm
+		</li>
+		<li><b><?php _e( 'Nominal power per panel', 'solar-project' ); ?></b>:
+			<?php echo esc_html( $panelpower_field->value ); ?> W</li>
+	</ul>
 
 	<?php
 	foreach ( $saved_rectangles_data as $i => $saved_rectangle ) :
@@ -89,44 +100,36 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		// Helper::ddie($roof);
 
 		$roof = $roofs[ $saved_rectangle['indexSegment'] ];
+		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
 		?>
-		<h3><?php printf( __( 'Segment %d', 'solar-panel' ), $i + 1 ); ?></h3>
+		<h3><?php printf( __( 'Segment %d', 'solar-panel' ), $i + 1 ); ?> <em><?php echo number_format( $rectangle_power, 0 ); ?> kWh</em> </h3>
 		<p>
 			<?php printf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-panel' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $saved_rectangle['panelsSurface'] ); ?>
 		</p>
 		<table class="table">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Segment', 'solar-panel' ); ?></th>
+					<th><?php esc_html_e( 'Hours sun / year', 'solar-panel' ); ?></th>
 					<th><?php esc_html_e( 'Panels', 'solar-panel' ); ?></th>
-					<th><?php esc_html_e( 'Model', 'solar-panel' ); ?></th>
 					<th><?php esc_html_e( 'Power per Panel', 'solar-panel' ); ?></th>
+					<th><?php esc_html_e( 'System Efficiency', 'solar-panel' ); ?></th>
 					<th><?php esc_html_e( 'Annual Energy (kWh)', 'solar-panel' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td><?php echo esc_html( $i + 1 ); ?></td>
-					<td><?php echo esc_html( $saved_rectangle['numberPanels'] ); ?></td>
-					<td><?php echo esc_html( $model_label ); ?></td>
-					<td><?php echo esc_html( $panelpower_field->value ); ?> W</td>
 					<?php
-					$roof_energy = Model_Panel::calculate_power_energy( array(
-						'number_panels'    => intval( $saved_rectangle['numberPanels'] ),
-						'panel_power'      => $panelpower_field->value,
-						'hours_sun'        => intval( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ] ),
-						'final_efficiency' => floatval( $efficiency_field->value ),
-					) );
+					$hours_sun = number_format( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ], 1 );
 					?>
-					<td><?php echo number_format( $roof_energy, 2 ); ?> kWh</td>
+					<td><?php echo esc_html( $hours_sun ); ?> h</td>
+					<td><?php echo esc_html( $saved_rectangle['numberPanels'] ); ?></td>
+					<td><?php echo esc_html( $panelpower_field->value ); ?> W</td>
+					<td><?php echo esc_html( $efficiency_field->value * 100 ); ?> %</td>
+					<td><b><?php echo number_format( $rectangle_power, 0 ); ?> kWh </b></td>
 				</tr>
 			</tbody>
 		</table>
-		<p>
-			<strong>
-				<?php printf( __( 'Total Energy for segment %1$s: %2$s kWh/year', 'solar-panel' ), esc_html( $i ), number_format( $roof_energy, 2 ) ); ?>
-			</strong>
-		</p>
+
 	<?php endforeach; ?>
 </div>
 

@@ -1,6 +1,6 @@
 {
 	"name": "solar-functions",
-	"version": "3.0.9",
+	"version": "4.0.0",
 	"main": "index.js",
 	"scripts": {
 		"build": "wp-scripts build",

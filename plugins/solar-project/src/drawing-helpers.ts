@@ -1,9 +1,6 @@
 // types
 import { boxBySWNE, ExtendedSegment, RoofSegmentStats } from './types';
-import {
-	convertStringLatLngToArrayLatLng,
-	getPolygonCenterCoords,
-} from './trigonometry-helpers';
+import { convertStringLatLngToArrayLatLng, getPolygonCenterCoords } from './trigonometry-helpers';
 import { destroyHandlersInRectanglePolygon } from './setup-resize-rectangle-interaction';
 import {
 	addAssociatedMarker,
@@ -230,7 +227,7 @@ export const paintSegment = function (
 
 export const highlightSegment = function (roofSegment: ExtendedSegment, extraParams = {}) {
 	const options = getSavedRectangleBySegment(roofSegment) ? SEGMENT_HOVER_WHEN_RECTANGLE : SEGMENT_HOVER;
-	roofSegment.setOptions(options);
+	roofSegment.setOptions({ ...options, ...extraParams });
 	if (roofSegment.sunMarker?.content) {
 		roofSegment.sunMarker.content.style.border = '1px solid orange';
 		roofSegment.sunMarker.content.style.borderRadius = '50%';
