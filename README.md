@@ -1,5 +1,21 @@
+# Installatin Emiliano
+
+Generar llave publica y privada en el ordenador
+Anadir llave publica a repo
+Clonar el repo con git clone.
+Instalar node y npm, nvm, git (si no estaba instalado aun), docker
+npm install, composer install
+tal vez instalar wp-env a nivel global
+npm run up
+npm run dev
+
+Explicar donde van los styles. Traduccion de textos.
+
 # TODO NEXT
 
+Make sure kW are correct and they are not Watts.
+Fix style last report.
+Verify format of data in the entries.
 
 DONE: Bugs: invert horizontal and vertical for rotated segments.
 DONE: misure in mm
@@ -84,6 +100,9 @@ npx wp-env run cli plugin activate coco-gravity-form-map-field gravityforms sola
 npx wp-env run tests-cli wp db reset --yes
 npx wp-env run tests-cli wp core install --url="http://localhost:8889" --title="Mi Test Site WP" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
 npx wp-env run tests-cli plugin activate coco-gravity-form-map-field gravityforms solar-project solar
+
+Since we need to setup the plugin with the Google Places API, and Map Id, these need to be 
+provided in an .env file. 
 
 # Testing unit test of js (jest)
 
