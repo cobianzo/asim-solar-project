@@ -73,6 +73,7 @@ class Enqueue {
 				"window.cocoNotificationsUrl = '" . plugins_url( '/assets/notifications', __DIR__ ) . "'; \n" .
 				// step 1
 				"window.step1CocoMapInputId = 'input_{$coco_maproofselect_instance->formId}_{$coco_maproofselect_instance->id}'; \n" .
+				"window.step1MarkerCoords = '$coco_maproofselect_instance->value'; \n" .
 				// step 2
 				"window.step2CocoMapInputId = 'input_{$coco_mapfieldoffset_instance->formId}_{$coco_mapfieldoffset_instance->id}'; \n" .
 				'window.step2RotationInserted = ' . wp_json_encode( $coco_segmentrotationtype_instance->value ) . " \n" .
@@ -86,7 +87,6 @@ class Enqueue {
 
 			$current_page = \GFFormDisplay::get_current_page( $form_id );
 			if ( $coco_maproofselect_instance->value ) {
-
 				// new calculated data
 				$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form_id );
 				$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
@@ -133,12 +133,6 @@ class Enqueue {
 					}
 				}
 			}
-			// TODELETE:
-			// if ( $data_layers ) {
-			//  wp_add_inline_script( 'coco-solar-functions',
-			//      "window.cocoDataLayers = " . wp_json_encode( $data_layers ) . "; \n"
-			//  );
-			// }
 
 			$step_map_roof = $step_map_segments_offset = $step_map_rectangle = null;
 

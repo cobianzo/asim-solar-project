@@ -26,6 +26,7 @@
   },
 	"peacock.color": "#CCCDDD",
 	"intelephense.environment.includePaths": [
+		"plugins/gravityforms",
 		"vendor/johnpbloch/wordpress/wordpress/wp-includes",
 		"vendor/johnpbloch/wordpress/wordpress/wp-admin"
 	]

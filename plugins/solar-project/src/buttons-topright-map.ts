@@ -15,10 +15,10 @@ import {
 	exitEditSolarPanelsMode,
 } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
-import { createNotification, removeNotification } from './notification-api';
+import { createNotification, createPanelNotificationPopup, removeNotification } from './notification-api';
 import { getStep3CocoMapSetup } from './step3_functions';
 
-const DEFAULT_PANELS_ORIENTATION = 'vertical';
+export const DEFAULT_PANELS_ORIENTATION = 'vertical';
 
 /**
  * Creates a custom button and adds it to the top-right corner of a Google Map.
@@ -168,7 +168,7 @@ const getPanelsOrientationByRadioButton = () => {
 };
 
 const syncOrientationRadioButton = (syncDirection: 'panelsToRadio' | 'radioToPanels') => {
-	// sync value in the panelOrientation globa var ===> sync the selected Radio button
+	// sync value in the panelOrientation global var ===> sync the selected Radio button
 	if (syncDirection === 'panelsToRadio') {
 		let orientation = DEFAULT_PANELS_ORIENTATION; // Default to vertical
 		if (window.cocoDrawingRectangle?.selectedSegment) {
@@ -183,7 +183,7 @@ const syncOrientationRadioButton = (syncDirection: 'panelsToRadio' | 'radioToPan
 			radioEl.checked = orientation === radioEl.value;
 		});
 	}
-	// sync the selected Radio button ==> update solar panels
+	// sync the selected Radio button ==> update solar panels (when we click on a radio button)
 	if (syncDirection === 'radioToPanels') {
 		if (window.cocoDrawingRectangle?.selectedSegment) {
 			const currentRectangle = getSavedRectangleBySegment(window.cocoDrawingRectangle.selectedSegment);
@@ -198,6 +198,7 @@ const syncOrientationRadioButton = (syncDirection: 'panelsToRadio' | 'radioToPan
 		if (currentSavedRectangle) {
 			paintSolarPanelsForSavedRectangle(currentSavedRectangle);
 		}
+    createPanelNotificationPopup(currentSegment);
 		exitEditSolarPanelsMode();
 	}
 };

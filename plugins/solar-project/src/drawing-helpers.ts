@@ -42,7 +42,7 @@ export const MARKER_DOT = {
 		opacity: '0.6',
 		border: '3px solid white',
 		'border-radius': '50%',
-		// display: 'none', // We hide it so it's not visible, activate it for debug purposes.
+		display: 'none', // We hide it so it's not visible, activate it for debug purposes.
 	},
 };
 
@@ -251,7 +251,6 @@ export const highlightSegment = function (roofSegment: ExtendedSegment, extraPar
 export const resetSegmentVisibility = function (roofSegment: ExtendedSegment) {
 	// check if the segment has a rectangle. The style is different thena
 	if (getSavedRectangleBySegment(roofSegment)) {
-		console.log('has todelete');
 		roofSegment.setOptions(SEGMENT_WHEN_RECTANGLE);
 	} else {
 		roofSegment.setOptions(SEGMENT_DEFAULT);

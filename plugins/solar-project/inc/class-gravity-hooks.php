@@ -55,23 +55,38 @@ class Gravity_Hooks {
 	}
 
 	public static function set_default_zoom( $zoom, $form ) {
-		$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
-		return ! empty( $coco_map_field->value ) ? 20 : $zoom;
+		if ( Helper::is_page_of_field( $form['id'], 'map-roof' ) ) {
+			// if we are in the step 1
+			return 10;
+		} elseif
+		( Helper::is_page_of_field( $form['id'], 'map-segments-offset' ) ||
+			Helper::is_page_of_field( $form['id'], 'map-rectangle' ) ) {
+			// step 2 - drag bounding box
+			$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+			return ! empty( $coco_map_field->value ) ? 20 : $zoom;
+		}
+		return $zoom;
 	}
 	public static function set_default_lat( $lat, $form ) {
-		$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
-		if ( ! empty( $coco_map_field->value ) ) {
-			$previous_marker_value = explode( ',', $coco_map_field->value );
-			return $previous_marker_value[0];
+		if ( Helper::is_page_of_field( $form['id'], 'map-segments-offset' ) ||
+				Helper::is_page_of_field( $form['id'], 'map-rectangle' ) ) {
+			$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+			if ( ! empty( $coco_map_field->value ) ) {
+				$previous_marker_value = explode( ',', $coco_map_field->value );
+				return $previous_marker_value[0];
+			}
 		}
 		return $lat;
 	}
 
 	public static function set_default_lng( $lng, $form ) {
-		$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
-		if ( ! empty( $coco_map_field->value ) ) {
-			$previous_marker_value = explode( ',', $coco_map_field->value );
-			return $previous_marker_value[1];
+		if ( Helper::is_page_of_field( $form['id'], 'map-segments-offset' ) ||
+				Helper::is_page_of_field( $form['id'], 'map-rectangle' ) ) {
+			$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+			if ( ! empty( $coco_map_field->value ) ) {
+				$previous_marker_value = explode( ',', $coco_map_field->value );
+				return $previous_marker_value[1];
+			}
 		}
 		return $lng;
 	}
@@ -98,13 +113,16 @@ class Gravity_Hooks {
 	}
 
 	public static function step2_hide_next_btn_if_error( $button, $form ) {
-		$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form['id'] );
-		if ( ! empty( $solar_building_data['error']['message'] ) ) {
-			// return '';
+		// if we are in the step for map-segments-offset
+		if ( Helper::is_page_of_field( $form['id'], 'map-segments-offset' ) ) {
+			$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form['id'] );
+			if ( ! empty( $solar_building_data['error']['message'] ) ) {
+				return '';
+			}
 		}
 		return $button;
-
 	}
+
 	public static function step4_power_calculations_html( $field_content, $field, $value, $lead_id, $form_id ) {
 		if ( $field->adminLabel === 'power-calculations' ) {
 			if ( $field->pageNumber !== \GFFormDisplay::get_current_page( $form_id ) ) {

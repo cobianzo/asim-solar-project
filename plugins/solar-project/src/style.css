@@ -31,6 +31,11 @@ body {
     opacity: 0; /* Inicialmente oculto */
     visibility: visible;
     transition: opacity 0.3s ease-in-out; /* Transición para la opacidad */
+		cursor: pointer;
+
+		&:hover {
+			background-color: #ccccccee;
+		}
 
     .popup-generic-content {
       padding: 0 1rem;

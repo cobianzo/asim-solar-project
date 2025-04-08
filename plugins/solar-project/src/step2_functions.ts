@@ -68,24 +68,15 @@ document.addEventListener('solarMapReady' as keyof DocumentEventMap, (event: Eve
 	 * the value of the offset has been previouly inserted, and accessible in the DB (window.step2·OffsetInserted)
 	 */
 	if (window.step2OffsetInserted) {
-		updateMovingBoundingBoxFromDBOffset();
-		updateValuesCoordsSegmentsFromDBOffset();
+    if ( !buildingSelectionChangedInStep1() ) {
+      updateMovingBoundingBoxFromDBOffset();
+      updateValuesCoordsSegmentsFromDBOffset();
+    }
 
 		createNotification('STEP2_RETURNING');
 	} else {
 		createNotification('STEP2_DRAGGABLE_BOUNDING_BOX', [cocoMapSetup.segments?.length.toString()!]);
 	}
-
-	// verification sw ne: TODELETE
-	// const deviation = (window.cocoOriginalBoundingBox.ne.longitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getNorthEast().lng())
-	//     + (window.cocoOriginalBoundingBox.ne.latitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getNorthEast().lat())
-	//     + (window.cocoOriginalBoundingBox.sw.latitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest().lat())
-	//     + (window.cocoOriginalBoundingBox.sw.longitude - window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest().lng());
-	// if (deviation !== 0) {
-	//   alert('error in placing rect.');
-	// } else {
-	//   console.log('>>>>> Rect well placed!!!');
-	// }
 
 	/**
 	 * Now creating the segments is of because the source of truth
@@ -93,11 +84,17 @@ document.addEventListener('solarMapReady' as keyof DocumentEventMap, (event: Eve
 	 */
 	setupSegments();
 
-	// init the inputelement
-	if (!window.step2OffsetInserted) {
+	// init the inputelement if not inserted.
+	if (! window.step2OffsetInserted) {
 		const SW = window.cocoMovingBoundingBoxPolygon!.getBounds()!.getSouthWest();
 		cocoMapSetup.inputElement.value = `${SW.lat()},${SW.lng()}`;
-	}
+	} else {
+    // particular case, when the user comes back into step 1 and changes the building
+    if (buildingSelectionChangedInStep1()) {
+      cocoMapSetup.inputElement.value = `${window.step1MarkerCoords}`;
+    }
+  }
+
 
 	/** END of setup on page load
 	 * ======= ======= ======= ======= ======= ======= =======
@@ -139,6 +136,20 @@ document.addEventListener('solarMapReady' as keyof DocumentEventMap, (event: Eve
 	});
 });
 
+// Helper
+const buildingSelectionChangedInStep1 = function() {
+  if (!window.step1MarkerCoords || !window.step2OffsetInserted) {
+    return false;
+  }
+  const step1Coords = window.step1MarkerCoords.split(',');
+  const step2Coords = window.step2OffsetInserted.split(',');
+  if ( (Math.abs(parseFloat(step1Coords[0]) - parseFloat(step2Coords[0])) > 1) ||
+    (Math.abs(parseFloat(step1Coords[1]) - parseFloat(step2Coords[1])) > 1) ) {
+    // the user has changed the building, so we need to update the input element to the new coords
+    return true;
+  }
+  return false;
+}
 /** ================ ================ ================ ================
  *
  *  End of applying listeners handlers

@@ -523,6 +523,7 @@ export const enterEditSolarPanelsMode = function () {
 						: EDITABLE_PANEL_OPTIONS;
 					sp.setOptions(options);
 				});
+        // on click > activate/deactivate the solar panel
 				sp.addListener('click', function (this: google.maps.Polygon, e: MouseEvent) {
 					const polygonClicked = this;
 					let isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
@@ -533,7 +534,7 @@ export const enterEditSolarPanelsMode = function () {
 					}
 					isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
 					sp.setOptions(isDeactivated ? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS);
-
+          createPanelNotificationPopup(currentSegment);
 					createNotification('STEP3_CLICK_ON_SOLAR_PANEL');
 				});
 			});

@@ -48,9 +48,6 @@ function setup_step_1(mapSetup: CocoMapSetup) {
 
 	const inputElement = mapSetup.inputElement;
 
-	// if on page load there is already a value, we zoom to 19
-	show_message_to_click_next(mapSetup.map, inputElement);
-
 	// show a message when the user selects a roof "click on the next button"
 	inputElement.addEventListener('input', (event: Event) => {
 		show_message_to_click_next(mapSetup.map, inputElement);

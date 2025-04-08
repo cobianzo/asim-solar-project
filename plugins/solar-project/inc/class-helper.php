@@ -38,7 +38,7 @@ class Helper {
 	public static function get_solar_api_data_from_step_1_value( $form_id ) {
 		$form = \GFAPI::get_form( $form_id );
 
-		// step 1 fields
+		// step 1 map field
 		$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
 		$coco_map_entry              = $coco_maproofselect_instance->value;
 		if ( ! $coco_map_entry ) {
@@ -47,6 +47,19 @@ class Helper {
 		$step_1_coords = explode( ',', $coco_map_entry );
 		$solar_building_data = \Coco_Solar\Google_Solar_API::get_solar_building_data( $step_1_coords[0], $step_1_coords[1] );
 		return $solar_building_data;
+	}
+
+	public static function is_page_of_field( $form_id, $adminLabel = null ) {
+		$current_page = \GFFormDisplay::get_current_page( $form_id );
+		$form         = \GFAPI::get_form( $form_id );
+		$page_field   = null;
+		foreach ( $form['fields'] as $field ) {
+			if ( $adminLabel === $field->adminLabel ) {
+				$page_field = $field->pageNumber;
+				break;
+			}
+		}
+		return $page_field === $current_page;
 	}
 
 	public static function get_icon_url( $icon_file = '' ) {

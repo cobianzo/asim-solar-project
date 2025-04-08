@@ -313,7 +313,6 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 export const handlerSecondClickDrawRectangle = function () {
 	const segm = window.cocoDrawingRectangle.selectedSegment;
 	if (!segm) {
-		alert('todel, handler of second click on rect');
 		console.error('Segment not found:', segm);
 		return;
 	}

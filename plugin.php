@@ -192,16 +192,13 @@ add_action('admin_menu', function () {
 				update_option( 'show_on_front', 'page' );
 				$message_output .= 'Page set as the front page.<br>';
 
-				// Set the permalink to postname
-				$permalink_structure = get_option( 'permalink_structure' );
-				if ( $permalink_structure !== '/%postname%/' ) {
-					update_option( 'permalink_structure', '/%postname%/' );
-					// Flush rewrite rules to apply the new permalink structure
-					flush_rewrite_rules();
-					$message_output .= 'Permalink structure set to post name.<br>';
-				} else {
-					$message_output .= 'Permalink structure already set to post name.<br>';
-				}
+				// Set the permalink to %postname% just in case. We need to have the rest API working
+				global $wp_rewrite;
+				$wp_rewrite->set_permalink_structure('/%postname%/');
+				$wp_rewrite->flush_rules(true); // true para hard flush
+				update_option( 'permalink_structure', '/%postname%/' );
+				flush_rewrite_rules();
+				$message_output .= 'Permalink structure set to %postname$.<br>';
 
 				$message_output .= 'Page with the form: ' . esc_html( $page_id ) . '<br>';
 

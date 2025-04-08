@@ -66,12 +66,6 @@ export interface CocoDrawingRectangleInfo {
 	polygon?: google.maps.Polygon;
 	associatedMarkers?: Array<AdvancedMarkerElement>; // store markers to delete when we clean the rectangle
 
-	// when rotating the rectangle, currently deactivated TODELETE
-	rotatingRectangleStartingPoint?: google.maps.Point | null;
-	rotatingRectangleStartingVertexPoints?: google.maps.Point[];
-	tempRotatedPoints?: Array<google.maps.Point> | null;
-	tempRotatedCoords?: string | null;
-
 	// handlers to resize
 	rectangleAssociatedMarkers?: Array<AdvancedMarkerElement>; // Array gets keys 0 and 2.
 	draggingHandler?: AdvancedMarkerElement;

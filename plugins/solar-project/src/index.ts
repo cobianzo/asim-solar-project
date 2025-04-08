@@ -24,6 +24,7 @@ declare global {
 		cocoAssetsDir: string;
 		cocoNotificationsUrl: string;
 		step1CocoMapInputId: string;
+		step1MarkerCoords: string;
 		step2CocoMapInputId: string;
 		step2RotationInserted: SelectRotationPortraitSegmentsOptions;
 		step2OffsetInserted: string;

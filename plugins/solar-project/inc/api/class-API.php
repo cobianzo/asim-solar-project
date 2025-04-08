@@ -59,8 +59,6 @@ abstract class API {
 		}
 		$response = wp_remote_get( $api_url, $body_and_headers );
 
-		//  ddie($response); // TODELETE
-
 		if ( is_wp_error( $response ) ) {
 			return false;
 		}
