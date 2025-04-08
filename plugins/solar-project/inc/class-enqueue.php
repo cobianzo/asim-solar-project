@@ -47,7 +47,6 @@ class Enqueue {
 
 			// step 1 fields
 			$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
-			$coco_map_entry              = $coco_maproofselect_instance->value;
 
 			// step 2 fields
 			$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
@@ -85,17 +84,15 @@ class Enqueue {
 				"window.gf_current_page = '" . \GFFormDisplay::get_current_page( $form_id ) . "'; \n"
 			);
 
-			if ( $coco_map_entry ) {
+			$current_page = \GFFormDisplay::get_current_page( $form_id );
+			if ( $coco_maproofselect_instance->value ) {
 
-
-				$previous_marker_value = explode( ',', $coco_map_entry );
 				// new calculated data
-				$solar_building_data = \Coco_Solar\Google_Solar_API::get_solar_building_data( $previous_marker_value[0], $previous_marker_value[1] );
+				$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form_id );
 				$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
 				if (! $stats ) {
 					$error =  $solar_building_data['error']['message'] ?? '';
 					echo '<script>console.error(" Error retrieving the data from Solar Building Data. Try with solar-cache-clear. ' . $error . ' ");</script>';
-					return;
 				}
 				if ( $stats ) {
 
@@ -120,7 +117,9 @@ class Enqueue {
 					);
 				}
 
-				// building profile data
+				// building profile data using Google Maps
+				// In the end we don't use it because it's not totally reliable. @TODELETE?
+				$previous_marker_value = explode( ',', $coco_maproofselect_instance->value );
 				$building_profile_data = \Coco_Solar\Google_Maps_API::get_maps_building_data( $previous_marker_value[0], $previous_marker_value[1] );
 				if ( isset( $building_profile_data['results'] ) ) {
 					$buildings_coords = \Coco_Solar\Google_Maps_API::extract_building_profile_from_map_geocode_response( $building_profile_data );

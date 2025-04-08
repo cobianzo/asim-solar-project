@@ -30,9 +30,15 @@ class Gravity_Hooks {
 		} );
 
 		// there is another hook called `coco_gravity_form_map_field_value`
+		// Step 2. Set the coords in the field selected in step 1.
 		add_filter( 'coco_gravity_form_map_field_default_zoom', array( __CLASS__, 'set_default_zoom' ), 10, 2 );
 		add_filter( 'coco_gravity_form_map_field_default_lat', array( __CLASS__, 'set_default_lat' ), 10, 2 );
 		add_filter( 'coco_gravity_form_map_field_default_lng', array( __CLASS__, 'set_default_lng' ), 10, 2 );
+
+		// Step 2, custom HTML there in combination with step4·functions.ts
+		add_filter( 'gform_field_content', array( __CLASS__, 'step2_show_message_if_error' ), 10, 5 );
+		add_filter('gform_next_button', array( __CLASS__, 'step2_hide_next_btn_if_error' ), 10, 2 );
+
 
 		// Step 4, custom HTML there in combination with step4·functions.ts
 		add_filter( 'gform_field_content', array( __CLASS__, 'step4_power_calculations_html' ), 10, 5 );
@@ -70,6 +76,35 @@ class Gravity_Hooks {
 		return $lng;
 	}
 
+	public static function step2_show_message_if_error( $field_content, $field, $value, $lead_id, $form_id ) {
+		if ( $field->adminLabel === 'map-segments-offset' ) {
+			$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form_id );
+
+			if ( ! empty( $solar_building_data['error']['message'] ) ) {
+				$field_content = '<div class="gf_error_message">'
+					. esc_html( $solar_building_data['error']['message'] ) . '<br />'
+					. '<p><br />' . __( 'Please use the "Previous" button and select another roof', 'solar-panel' ) . '</p>'
+					. '</div>';
+				return $field_content;
+			}
+		}
+		if ( $field->adminLabel === 'segment-rotation' ) {
+			$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form_id );
+			if ( ! empty( $solar_building_data['error']['message'] ) ) {
+				return '';
+			}
+		}
+		return $field_content;
+	}
+
+	public static function step2_hide_next_btn_if_error( $button, $form ) {
+		$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form['id'] );
+		if ( ! empty( $solar_building_data['error']['message'] ) ) {
+			// return '';
+		}
+		return $button;
+
+	}
 	public static function step4_power_calculations_html( $field_content, $field, $value, $lead_id, $form_id ) {
 		if ( $field->adminLabel === 'power-calculations' ) {
 			if ( $field->pageNumber !== \GFFormDisplay::get_current_page( $form_id ) ) {
@@ -85,6 +120,9 @@ class Gravity_Hooks {
 
 		return $field_content;
 	}
+
+
+
 }
 
 Gravity_Hooks::init();

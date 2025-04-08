@@ -28,10 +28,10 @@ document.addEventListener('solarMapReady' as keyof DocumentEventMap, (event: Eve
 		!cocoMapSetup ||
 		cocoMapSetup.inputElement.id !== customEvent.detail.inputElement.id
 	) {
-		console.log('are we in step 1? NO');
+		console.log('are we in step 1? NO', window.cocoIsStepSelectRoof, cocoMapSetup?.inputElement.id, customEvent.detail.inputElement.id);
 		return;
 	}
-	console.log('are we in step 1? YES');
+	console.log('are we in step 1? YES', customEvent.detail.inputElement.id);
 
 	// Initial state for step 1. If there is a default value, we move to the state thatzoom to 19
 	setup_step_1(cocoMapSetup);

@@ -1,5 +1,6 @@
 # Installatin Emiliano
 
+
 Generar llave publica y privada en el ordenador
 Anadir llave publica a repo
 Clonar el repo con git clone.
@@ -10,8 +11,12 @@ npm run up
 npm run dev
 
 Explicar donde van los styles. Traduccion de textos.
+Como generar el nuevo plugin
 
 # TODO NEXT
+
+# TESTS 
+Testear y confirmar que responda bien cuando no se encuentra un edificio.
 
 Make sure kW are correct and they are not Watts.
 Fix style last report.
@@ -59,8 +64,8 @@ http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-f
 
   - The form has 3 steps. Every step has a `coco-map` field
   - The first step of the form, the user selects a roof with a marker
-    - The map in step 1 must have the adminLabel === 'map-roof' >> We select the roof with a marker
-  - The second step the user sees the shape of the roof he just selected, the interaction type of this coco-map is ´Developer´ - The map in step 2 must have the adminLabel === 'map-segments-offset' >> We apply offset position of the segments and rotate them if needed - The radio select in step 2, for the orientation of the segments
+    - The map in step 1 must have the `adminLabel === 'map-roof'` >> We select the roof with a marker
+  - The second step the user sees the shape of the roof he just selected, the interaction type of this coco-map is ´Developer´ - The map in step 2 must have the `adminLabel === 'map-segments-offset'` >> We apply offset position of the segments and rotate them if needed - The radio select in step 2, for the orientation of the segments
     must have the class === 'segment-rotation' AND the adminLabel === 'segment-rotation' - That radio button must have two options, with values: `no-extra-rotation` and `rotate-90-only-portrait`
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
     - The map in step 3 must have the adminLabel === 'map-rectangle'
@@ -94,15 +99,17 @@ Sieglberg 31, Passau-Sieglgut, Germany
 37.4449739,-122.13914659999998
 
 **In development env**
-npx wp-env run cli wp db reset --yes
-npx wp-env run cli wp core install --url=http://localhost:8777 --title=DevSITE --admin_user=admin --admin_password=password --admin_email=admin@example.com
-npx wp-env run cli plugin activate coco-gravity-form-map-field gravityforms solar-project solar
+
+```bash
+sh ./bin/reset-db.sh
+```
 
 # Testing playwright
 
-npx wp-env run tests-cli wp db reset --yes
-npx wp-env run tests-cli wp core install --url="http://localhost:8889" --title="Mi Test Site WP" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
-npx wp-env run tests-cli plugin activate coco-gravity-form-map-field gravityforms solar-project solar
+To reset the DB in test env
+```bash
+sh ./bin/reset-db.sh --test
+```
 
 Since we need to setup the plugin with the Google Places API, and Map Id, these need to be 
 provided in an .env file, to be used in http://localhost:8777/wp-admin/options-general.php?page=testing-page

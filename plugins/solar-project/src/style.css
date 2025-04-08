@@ -48,6 +48,10 @@ body {
     visibility: hidden;
   }
 
+	.gform_page_fields .segment-rotation:is(:empty) {
+		display: none !important;
+	}
+
   /* radio buttons for rotation of portrait segments*/
   @media (min-width: 1050px) {
     .gform_page_fields .segment-rotation {

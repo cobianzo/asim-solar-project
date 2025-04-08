@@ -34,6 +34,21 @@ class Helper {
 		return null;
 	}
 
+	// a more elaborated data retrieve from inserted values in the step 1
+	public static function get_solar_api_data_from_step_1_value( $form_id ) {
+		$form = \GFAPI::get_form( $form_id );
+
+		// step 1 fields
+		$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+		$coco_map_entry              = $coco_maproofselect_instance->value;
+		if ( ! $coco_map_entry ) {
+			return null;
+		}
+		$step_1_coords = explode( ',', $coco_map_entry );
+		$solar_building_data = \Coco_Solar\Google_Solar_API::get_solar_building_data( $step_1_coords[0], $step_1_coords[1] );
+		return $solar_building_data;
+	}
+
 	public static function get_icon_url( $icon_file = '' ) {
 		$sun_marker = plugin_dir_url( __DIR__ ) . "assets/$icon_file";
 		// when using browser sync it returns a weird url, so we send it relative not absolute
