@@ -5,10 +5,12 @@ OK Generar llave publica y privada en el ordenador
 OK Anadir llave publica a repo
 OK Clonar el repo con git clone.
 Instalar node y npm, nvm, git (si no estaba instalado aun), docker
-npm install, composer install
-tal vez instalar wp-env a nivel global
-npm run up
-npm run dev
+node
+npm
+nvm (si se puede, non è necessario)
+composer
+instalar el paquete wp-env a nivel global en mi ordenador
+
 
 Explicar donde van los styles. Traduccion de textos.
 Como generar el nuevo plugin
