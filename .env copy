@@ -1,7 +1,8 @@
-// Remove these lines. This .env file is used in /wp-admin/options-general.php?page=testing-page
+// Remove these lines. This .env file is used in /wp-admin/options-general.php?page=yours
 // Fill the values from your Google Cloud project
 // Rename this file into .env
 // And then you can run playwright testing
-GRAVITY_FORMS_LICENSE_KEY=not-needed
-GRAVITY_FORMS_GOOGLE_PLACES_API_KEY=use-yours
-GRAVITY_FORMS_GOGLE_MAP_ID=use-yours
+SOLAR_PROJECT_API_KEY=yours
+GRAVITY_FORMS_LICENSE_KEY=yours-not-in-use
+GRAVITY_FORMS_GOOGLE_PLACES_API_KEY=yours
+GRAVITY_FORMS_GOGLE_MAP_ID=yours

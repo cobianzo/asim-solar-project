@@ -1,6 +1,6 @@
 # Installatin Emiliano
 
-
+Confirmar email de github
 Generar llave publica y privada en el ordenador
 Anadir llave publica a repo
 Clonar el repo con git clone.
@@ -58,11 +58,12 @@ http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-f
 
 # Setup the minimum project:
 
-- In this project, we create a custom Gravity Form with 3 steps, every step needs a `coco-gravity-form-map-map` field (which an Add on developed by me included in as submodule repo in this project)
+- In this project, we create a custom Gravity Form with 4 steps, The first 3 steps need a `coco-gravity-form-map-map` field (which is an Add on developed by me included in as git submodule repo in this project)
 
   - We need a license for Gravity Forms. http://localhost:8777/wp-admin/admin.php?page=gf_settings
   - We need to add an Google API Key and a Map ID in the GForms settings.
-  - We have a xml form ready to import. However, here the instructions to create it yourself
+	- We need a Google Solar API Key to include in /wp-admin/options-general.php?page=coco_solar_settings
+  - We have a .json gravity form ready to import (best option). However, here the instructions to create it yourself
 
   **The form edition**
 
@@ -72,7 +73,7 @@ http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-f
   - The second step the user sees the shape of the roof he just selected, the interaction type of this coco-map is ´Developer´ - The map in step 2 must have the `adminLabel === 'map-segments-offset'` >> We apply offset position of the segments and rotate them if needed - The radio select in step 2, for the orientation of the segments
     must have the `class === 'segment-rotation'` AND the `adminLabel === 'segment-rotation'` - That radio button must have two options, with values: `no-extra-rotation` and `rotate-90-only-portrait`
   - The 3rd step shows the disposition of the panels, (also interaction 'Developer')
-    - The map in step 3 must have the adminLabel === 'map-rectangle'
+    - The map in step 3 must have the `adminLabel === 'map-rectangle'`
     - below the map in step 3 we need a gf textarea with adminLabel and class === 'saved-rectangles'
 
     -- More fields in step 3 gravity forms with class and adminLabel: 
@@ -83,26 +84,36 @@ http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-f
     --- `panel-height-gap`
     --- `panel-power`
     --- `panel-efficiency`
+		--- `panel-quantiles` radio buttons with scenarios from 0 - 10 values
     --- Dropdown of panels: allow dynamic content: param `panel_list`
   - The step 4 needs to have any field with class and adminLabel === 'power-calculations'
+
+# Project Structure
+
+- plugin.php contains only code for playwright testing. Creates the page Settings > Testing to create the page with the form quickly.
+├── coco-gravity-form-map-field (the git submodule, you dont need to touch it)
+└── solar-project
+    ├── inc : All the php files. The add hooks to GF and expose JS vars used by our typescript scripts.
+		├── src : The typescript files. All the code starts by the
+					stepX_functions.ts , and the rest of .ts files contain the helpers.
+
+For more info, see `AI-AGENT.md`.
 
 # Develop
 
 in this folder
-`npm run start` for wp scripts compilation into /build - In my case I must call the global command with `wp-env start`
-~~`npm run bs`~~ for browser sync (not working)
+`npm run dev` for wp scripts compilation into /build - It compiles also into the coco-gravity-form-map-field subproject, in case you modify something there.
+
+`npm run bs` for browser sync
 
 ## deploy of the work in a website
 
 Export both plugins in the zip into `./dist`
 `npm run plugins-zip`
 
-Sieglberg 31, Passau-Sieglgut, Germany
-
-// California
-37.4449739,-122.13914659999998
-
 **In development env**
+
+Reset the DB with this command. Later you can re seetup everything going to Settings > Testing and clicking the button to import the form again and create the main page.
 
 ```bash
 sh ./bin/reset-db.sh
@@ -117,6 +128,8 @@ sh ./bin/reset-db.sh --test
 
 Since we need to setup the plugin with the Google Places API, and Map Id, these need to be 
 provided in an .env file, to be used in http://localhost:8777/wp-admin/options-general.php?page=testing-page
+
+We created two simple Playwright tests, for step 1 and step 2. It's difficult to simulate the interaction with Google Maps, so we left it like this.
 
 # Testing unit test of js (jest)
 
