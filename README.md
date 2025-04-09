@@ -1,9 +1,9 @@
 # Installatin Emiliano
 
-Confirmar email de github
-Generar llave publica y privada en el ordenador
-Anadir llave publica a repo
-Clonar el repo con git clone.
+OK Confirmar email de github
+OK Generar llave publica y privada en el ordenador
+OK Anadir llave publica a repo
+OK Clonar el repo con git clone.
 Instalar node y npm, nvm, git (si no estaba instalado aun), docker
 npm install, composer install
 tal vez instalar wp-env a nivel global
