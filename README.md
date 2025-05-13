@@ -1,4 +1,4 @@
-# Installatin Emiliano
+# Installation Emiliano
 
 OK Confirmar email de github
 OK Generar llave publica y privada en el ordenador
