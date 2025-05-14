@@ -1,19 +1,7 @@
-# Installatin Emiliano
-
-OK Confirmar email de github
-OK Generar llave publica y privada en el ordenador
-OK Anadir llave publica a repo
-OK Clonar el repo con git clone.
-Instalar node y npm, nvm, git (si no estaba instalado aun), docker
-npm install, composer install
-tal vez instalar wp-env a nivel global
-npm run up
-npm run dev
-
-Explicar donde van los styles. Traduccion de textos.
-Como generar el nuevo plugin
 
 # TODO NEXT
+
+Corregir error: You have included the Google Maps JavaScript API multiple times on this page. This may cause unexpected errors.
 
 # TESTS 
 Testear y confirmar que responda bien cuando no se encuentra un edificio.

@@ -9,7 +9,6 @@ Author URI: http://cobianzo.com
 License: GPL2
 */
 
-
 /**
  * All the code in this file is just to create a Settings page
  * for the only use of Playwright.
@@ -325,3 +324,4 @@ function get_page_id_by_title($title) {
 
 	return null;
 }
+

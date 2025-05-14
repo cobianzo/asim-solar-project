@@ -39,12 +39,12 @@ class Helper {
 		$form = \GFAPI::get_form( $form_id );
 
 		// step 1 map field
-		$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+		$coco_maproofselect_instance = self::capture_coco_map_field_instance( $form, 'map-roof' );
 		$coco_map_entry              = $coco_maproofselect_instance->value;
 		if ( ! $coco_map_entry ) {
 			return null;
 		}
-		$step_1_coords = explode( ',', $coco_map_entry );
+		$step_1_coords       = explode( ',', $coco_map_entry );
 		$solar_building_data = \Coco_Solar\Google_Solar_API::get_solar_building_data( $step_1_coords[0], $step_1_coords[1] );
 		return $solar_building_data;
 	}

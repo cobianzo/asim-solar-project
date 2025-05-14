@@ -3,7 +3,8 @@
 
 use Coco_Solar\Helper;
 
-$form_id = $_POST['gform_submit'] ?? Helper::get_gravity_form_id_from_page();
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- reason
+$form_id = absint( $_POST['gform_submit'] ?? Helper::get_gravity_form_id_from_page() );
 $form    = \GFAPI::get_form( $form_id );
 
 // retrieve info in the form inserted by the user.
@@ -37,7 +38,7 @@ foreach ( $quantiles_field->choices as $choice ) {
 $saved_rectangles      = Helper::capture_coco_map_field_instance( $form, 'saved-rectangles' )->value;
 $saved_rectangles_data = json_decode( $saved_rectangles, true );
 if ( json_last_error() !== JSON_ERROR_NONE ) {
-	throw new \Exception( 'Error decoding saved rectangles JSON: ' . json_last_error_msg() );
+	throw new \Exception( esc_html( 'Error decoding saved rectangles JSON: ' . json_last_error_msg() ) );
 }
 
 
@@ -50,33 +51,14 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 
 <div class="report-intro">
 	<?php
-	// Helper::ddie($quantiles_field);
 	$total_energy = 0;
 	foreach ( $saved_rectangles_data as $saved_rectangle ) {
-		// Helper::ddie($saved_rectangle);
-		// Helper::ddie($roof);
 
-		// $roof = $roofs[ $saved_rectangle['indexSegment'] ];
-
-		// Calculate Energy:
-		// $number_panels = intval( $saved_rectangle['numberPanels'] ?? 0 );
-		// $panel_power   = intval( $panelpower_field->value );
-
-		// $hours_sun        = intval( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ] );
-		// $final_efficiency = floatval( $efficiency_field->value );
-
-
-		// $rectangle_power   = Model_Panel::calculate_power_energy( array(
-		// 	'number_panels'    => $number_panels,
-		// 	'panel_power'      => $panel_power,
-		// 	'hours_sun'        => $hours_sun,
-		// 	'final_efficiency' => $final_efficiency,
-		// ) );
 		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
-		$total_energy += $rectangle_power;
+		$total_energy   += $rectangle_power;
 	}
 
-	printf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-panel' ), number_format( $total_energy, 0 ) );
+	echo wp_kses_post( sprintf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-panel' ), number_format( $total_energy, 0 ) ) );
 	?>
 </div> <!-- /report-intro -->
 
@@ -99,7 +81,7 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		// Helper::ddie($saved_rectangle);
 		// Helper::ddie($roof);
 
-		$roof = $roofs[ $saved_rectangle['indexSegment'] ];
+		$roof            = $roofs[ $saved_rectangle['indexSegment'] ];
 		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
 		?>
 		<h3><?php printf( __( 'Segment %d', 'solar-panel' ), $i + 1 ); ?> <em><?php echo number_format( $rectangle_power, 0 ); ?> kWh</em> </h3>

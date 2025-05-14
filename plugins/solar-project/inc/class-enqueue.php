@@ -90,8 +90,8 @@ class Enqueue {
 				// new calculated data
 				$solar_building_data = Helper::get_solar_api_data_from_step_1_value( $form_id );
 				$stats               = $solar_building_data['solarPotential']['roofSegmentStats'] ?? null;
-				if (! $stats ) {
-					$error =  $solar_building_data['error']['message'] ?? '';
+				if ( ! $stats ) {
+					$error = $solar_building_data['error']['message'] ?? '';
 					echo '<script>console.error(" Error retrieving the data from Solar Building Data. Try with solar-cache-clear. ' . $error . ' ");</script>';
 				}
 				if ( $stats ) {
