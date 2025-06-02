@@ -1,0 +1,29 @@
+### 1.4.0 | 2024-12-17
+- Fixed code placement to be consistent with the WordPress coding standards.
+- Fixed an issue where the longitude input is populated with the latitude value.
+- Fixed an issue where Chrome's autofill dropdown displays over Places autocomplete suggestions.
+
+### 1.3.0 | 2024-08-26
+- Added the JS-based [gform_geolocation_autocomplete_options_pre_init](https://docs.gravityforms.com/gform-geolocation-autocomplete-options-pre-init/) filter, so the autocomplete initialization options can be customized.
+- Added the JS-based [gform_geolocation_autocomplete_mappings_pre_populate](https://docs.gravityforms.com/gform-geolocation-autocomplete-mappings-pre-populate) filter, so the input values can be customized before the Address field is populated.
+- Fixed an issue where the route is added after the street number when a Netherlands-based address is selected.
+- Fixed an issue where the unit (subpremise) number is not included with the street address when a Australia-based address is selected.
+- Fixed an issue where conditional logic is not evaluated when the Address field inputs are populated with the autocomplete data.
+- Fixed an issue where the Address Line 2 input is not populated when a relevant value is available.
+
+### 1.2.0 | 2024-03-07
+- Fixed inconsistent capitalization in the no-conflict description.
+- Fixed an issue where the user (submitter) location is not retained when paging an Ajax-enabled form.
+- Fixed an issue where address field latitude and longitude values are not included in the `$entry` used for exports and background feed processing.
+- Fixed an issue where the state and country drop downs are not populated when using two-character codes as values.
+- Fixed an issue where town and county values are not populated for UK addresses.
+- Fixed an issue where the country value is not populated when the input is hidden.
+
+### 1.1.0 | 2023-09-14
+- Fixed an issue where API keys won't validate if using website restrictions.
+- Fixed an issue which causes the address field placeholder to not populate.
+- Fixed a fatal error that can occur when duplicate scripts are loaded.
+- Fixed an issue which prevents geolocation autosuggestion from initializing on multipage ajax forms.
+
+### 1.0 | 2023-01-05
+- It's all new!
