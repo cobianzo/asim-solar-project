@@ -1,6 +1,6 @@
 // WIP
 import apiFetch from '@wordpress/api-fetch';
-import { getCurrentStepCocoMap } from '.';
+
 import { createNotification, createPanelNotificationPopup, removeNotification } from './notification-api';
 import {
 	FADED_RECTANGLE_OPTIONS,
@@ -18,6 +18,7 @@ import {
 import { ExtendedSegment, SavedRectangle } from './types';
 import { getSegmentByIndex } from './setup-segments-interactive-functions';
 import { isPortaitSegmentRotated } from './setup-drag-all-segments-interaction';
+import { getCurrentStepCocoMap } from '.';
 
 export const PANEL_OPTIONS: google.maps.PolygonOptions = {
 	strokeColor: 'black',
@@ -156,14 +157,14 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
  * Paints a solar panel on the map within a specified rectangle and manages its rotation and state.
  *
  * @param theSavedRectangle - The rectangle object containing the polygon and solar panel grid data.
- * @param startSWLatLng - The starting southwest latitude and longitude of the rectangle.
- * @param indexLat - The index of the panel in the latitude direction (row index).
- * @param indexLng - The index of the panel in the longitude direction (column index).
- * @param latLengthPanel - The length of the panel in the latitude direction.
- * @param lngLengthPanel - The length of the panel in the longitude direction.
- * @param latGap - The gap between panels in the latitude direction.
- * @param lngGap - The gap between panels in the longitude direction.
- * @returns The created `google.maps.Polygon` object representing the solar panel, or `null` if the panel could not be created.
+ * @param startSWLatLng     - The starting southwest latitude and longitude of the rectangle.
+ * @param indexLat          - The index of the panel in the latitude direction (row index).
+ * @param indexLng          - The index of the panel in the longitude direction (column index).
+ * @param latLengthPanel    - The length of the panel in the latitude direction.
+ * @param lngLengthPanel    - The length of the panel in the longitude direction.
+ * @param latGap            - The gap between panels in the latitude direction.
+ * @param lngGap            - The gap between panels in the longitude direction.
+ * @return The created `google.maps.Polygon` object representing the solar panel, or `null` if the panel could not be created.
  *
  * @remarks
  * - This function calculates the position of the solar panel based on the provided indices and dimensions.
@@ -322,7 +323,7 @@ export const getCurrentQuantilScenario = function (): { scenarioName: string; sc
 export const getCurrentHoursPerYear = function (segment: ExtendedSegment): number {
 	const segmentQuantiles = segment.data?.stats.sunshineQuantiles;
 	const scenario = getCurrentQuantilScenario();
-	let hoursPerYear = segmentQuantiles
+	const hoursPerYear = segmentQuantiles
 		? segmentQuantiles[scenario.scenarioIndex]
 		: window.cocoSolarPotential.maxSunshineHoursPerYear;
 	return hoursPerYear;
@@ -386,7 +387,7 @@ export const getSolarPanelsSurface = function (savedR: SavedRectangle): number {
 /**
  * Counts the activated panels in a rectangle drawn by the user.
  * @param savedRect
- * @returns
+ * @return
  */
 export const getNumberOfPanelsInRectangle = function (savedRect: SavedRectangle): number {
 	let countPanels = 0;
@@ -404,7 +405,7 @@ export const getNumberOfPanelsInRectangle = function (savedRect: SavedRectangle)
 /**
  * On every change of the dropdown .panel-model-dropdown select, we load the
  * attributes of that Model Panel from WordPress Db into our inputs.
- * @returns
+ * @return
  */
 export const loadModelPanelParametersInInputs = function () {
 	// get the ID of the panel selected in the dropdown.
@@ -418,11 +419,15 @@ export const loadModelPanelParametersInInputs = function () {
 		return;
 	}
 	const postId = (dropdown as HTMLSelectElement).value;
+  if ( postId === 'x' ) {
+    console.warn('We have selected the default option. We will not load any data from the database');
+    return;
+  }
 
 	// Data from WordPress for the CPT `panel`.
 	apiFetch({ path: `/wp/v2/panel/${postId}` }).then((data) => {
 		const typedData = data as { custom_fields?: { length: string; height: string; nominal_power: string } };
-		let [length, height, nominal_power] = [1960, 1134, 480]; // default, but it will be overwritten.
+		const [length, height, nominal_power] = [1960, 1134, 480]; // default, but it will be overwritten.
 		if (!typedData?.custom_fields) {
 			console.warn('custom_fields not found. Set to default', data, [length, height, nominal_power]);
 		}

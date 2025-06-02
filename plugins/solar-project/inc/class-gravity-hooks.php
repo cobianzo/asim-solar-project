@@ -37,7 +37,7 @@ class Gravity_Hooks {
 
 		// Step 2, custom HTML there in combination with step4·functions.ts
 		add_filter( 'gform_field_content', array( __CLASS__, 'step2_show_message_if_error' ), 10, 5 );
-		add_filter('gform_next_button', array( __CLASS__, 'step2_hide_next_btn_if_error' ), 10, 2 );
+		add_filter( 'gform_next_button', array( __CLASS__, 'step2_hide_next_btn_if_error' ), 10, 2 );
 
 
 		// Step 4, custom HTML there in combination with step4·functions.ts
@@ -58,8 +58,7 @@ class Gravity_Hooks {
 		if ( Helper::is_page_of_field( $form['id'], 'map-roof' ) ) {
 			// if we are in the step 1
 			return 10;
-		} elseif
-		( Helper::is_page_of_field( $form['id'], 'map-segments-offset' ) ||
+		} elseif ( Helper::is_page_of_field( $form['id'], 'map-segments-offset' ) ||
 			Helper::is_page_of_field( $form['id'], 'map-rectangle' ) ) {
 			// step 2 - drag bounding box
 			$coco_map_field = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
@@ -138,9 +137,6 @@ class Gravity_Hooks {
 
 		return $field_content;
 	}
-
-
-
 }
 
 Gravity_Hooks::init();
