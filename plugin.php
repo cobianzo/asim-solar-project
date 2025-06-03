@@ -20,10 +20,14 @@ $vendor_path = __DIR__ . '/vendor/autoload.php';
 if ( file_exists( $vendor_path ) ) {
 	require_once $vendor_path;
 }
-// Cargar .env
-if ( class_exists( 'Dotenv\Dotenv' ) ) {
-	$dotenv = Dotenv\Dotenv::createImmutable( __DIR__ );
-	$dotenv->load();
+
+// Cargar .env if exists
+// Check if .env file exists
+if ( file_exists( __DIR__ . '/.env' ) ) {
+	if ( class_exists( 'Dotenv\Dotenv' ) ) {
+		$dotenv = Dotenv\Dotenv::createImmutable( __DIR__ );
+		$dotenv->load();
+	}
 }
 
 
@@ -66,14 +70,14 @@ add_action('admin_menu', function () {
 				// 1.1) Activate the Gravity Forms License with GRAVITY_FORMS_LICENSE_KEY from .env
 				// $license_key = isset( $_ENV['GRAVITY_FORMS_LICENSE_KEY'] ) ? sanitize_text_field( $_ENV['GRAVITY_FORMS_LICENSE_KEY'] ) ?? '' : '';
 				// if ( ! empty( $license_key ) ) {
-				// 	$gf_settings = ...
-				// 	if ( empty( $gf_settings['license_key'] ) ) {
-				// 		$gf_settings['license_key'] = $license_key;
-				// 		update_option( 'rg_gforms_settings', $gf_settings );
-				// 		$message_output .= '✅ Gravity Forms license key updated.<br>';
-				// 	} else $message_output .= '📔 Gravity Forms license was alread set up.<br>';
+				//  $gf_settings = ...
+				//  if ( empty( $gf_settings['license_key'] ) ) {
+				//      $gf_settings['license_key'] = $license_key;
+				//      update_option( 'rg_gforms_settings', $gf_settings );
+				//      $message_output .= '✅ Gravity Forms license key updated.<br>';
+				//  } else $message_output .= '📔 Gravity Forms license was alread set up.<br>';
 				// } else {
-				// 	$message_output .= '❌ Gravity Forms Not found.<br>';
+				//  $message_output .= '❌ Gravity Forms Not found.<br>';
 				// }
 
 
@@ -82,6 +86,9 @@ add_action('admin_menu', function () {
 				// 2) setup the values for the gravity forms Google API key  and Map ID, from .env values
 
 				// Retrieve the current settings
+				if ( ! class_exists( '\Coco_Gravity_Form_Map_Field\Addon_Coco' ) ) {
+						wp_die( 'Error: The Coco Gravity Form Map Field submodule has not been loaded. Please ensure it is properly installed under the plugins folder.' );
+				}
 				$current_settings = \Coco_Gravity_Form_Map_Field\Addon_Coco::get_instance()->get_plugin_settings();
 				if ( ! $current_settings ) {
 					$current_settings = array();
@@ -135,12 +142,12 @@ add_action('admin_menu', function () {
 
 
 				// 3) check if the gravity form is already created
-				$form       = get_gform_by_title( $FORM_TITLE, true );
+				$form = get_gform_by_title( $FORM_TITLE, true );
 
 				// if not exists, Import the gravity form in tests/data/gravityforms-form.json
 				if ( ! $form ) {
 					$message_output .= 'Gravity Form not found, importing from tests/data/gravityforms-form.json<br>';
-					$form_json       =  __DIR__ . '/tests/data/gravityforms-form.json';
+					$form_json       = __DIR__ . '/tests/data/gravityforms-form.json';
 					$success         = import_gravity_form_from_json( $form_json );
 					if ( $success ) {
 						$message_output .= 'Gravity Form imported `gravityforms-form.json` successfully.<br>';
@@ -152,9 +159,9 @@ add_action('admin_menu', function () {
 				} else {
 					$message_output .= 'Found exisiting form ' . $form['id'] . '.<br>';
 				}
-				$form_id = isset($form['id']) ?  $form['id'] : null;
+				$form_id = isset( $form['id'] ) ? $form['id'] : null;
 
-				if( ! $form_id ) {
+				if ( ! $form_id ) {
 					echo '<div class="notice notice-error is-dismissible">';
 					echo '<p>Error<br/><br/>Error retrieving the form<br/>';
 					echo wp_kses_post( "<p>$message_output</p>" );
@@ -170,13 +177,13 @@ add_action('admin_menu', function () {
 				$page_id = get_page_id_by_title( $PAGE_TITLE );
 				if ( ! $page_id ) {
 					$page_content = '<!-- wp:gravityforms/form {"formId":"' . $form_id . '","inputPrimaryColor":"#204ce5"} /-->';
-					$page = array(
+					$page         = array(
 						'post_title'   => $PAGE_TITLE,
 						'post_content' => $page_content,
 						'post_status'  => 'publish',
 						'post_type'    => 'page',
 					);
-					$page_id = wp_insert_post( $page );
+					$page_id      = wp_insert_post( $page );
 					if ( is_wp_error( $page_id ) ) {
 						$message_output .= 'Error creating the page: ' . $page_id->get_error_message() . '<br>';
 						wp_die( 'Error creating the page.' );
@@ -193,8 +200,8 @@ add_action('admin_menu', function () {
 
 				// Set the permalink to %postname% just in case. We need to have the rest API working
 				global $wp_rewrite;
-				$wp_rewrite->set_permalink_structure('/%postname%/');
-				$wp_rewrite->flush_rules(true); // true para hard flush
+				$wp_rewrite->set_permalink_structure( '/%postname%/' );
+				$wp_rewrite->flush_rules( true ); // true para hard flush
 				update_option( 'permalink_structure', '/%postname%/' );
 				flush_rewrite_rules();
 				$message_output .= 'Permalink structure set to %postname$.<br>';
@@ -236,7 +243,7 @@ add_action('admin_menu', function () {
 
 					// check if the page has the block gravityforms/form
 					$page_content = get_post_field( 'post_content', $page_id );
-					$has_block = has_block( 'gravityforms/form', $page_content );
+					$has_block    = has_block( 'gravityforms/form', $page_content );
 					// parse the block, and get the formId
 					if ( $has_block ) {
 						$blocks = parse_blocks( $page_content );
@@ -265,7 +272,7 @@ add_action('admin_menu', function () {
 						echo '<a href="' . esc_url( $form_url ) . '" id="form" class="button button-secondary" target="_blank">View Form</a><br>';
 					}
 				}
-				if (! $page_id ) {
+				if ( ! $page_id ) {
 					echo '<p>Page with the form not found.</p>';
 				}
 
@@ -287,8 +294,7 @@ function get_gform_by_title( $title, $starts_with = false ) {
 	foreach ( $forms as $form ) {
 		if ( isset( $form['title'] ) &&
 			( strcasecmp( $form['title'], $title ) === 0 )
-			|| ( $starts_with && stripos( $form['title'], $title ) === 0 ) )
-	 {
+			|| ( $starts_with && stripos( $form['title'], $title ) === 0 ) ) {
 				return $form;
 		}
 	}
@@ -303,22 +309,22 @@ function import_gravity_form_from_json( $json_path ) {
 
 	// Load GFImport class if not already loaded
 	if ( ! class_exists( 'GFExport' ) ) {
-		require_once( GFCommon::get_base_path() . '/export.php' );
+		require_once GFCommon::get_base_path() . '/export.php';
 	}
 
 	// Import the form
 	return GFExport::import_file( $json_path );
 }
 
-function get_page_id_by_title($title) {
-	$query = new WP_Query([
-			'post_type'      => 'page',
-			'posts_per_page' => 1,
-			'title'          => $title,
-			'post_status'    => 'publish',
-	]);
+function get_page_id_by_title( $title ) {
+	$query = new WP_Query(array(
+		'post_type'      => 'page',
+		'posts_per_page' => 1,
+		'title'          => $title,
+		'post_status'    => 'publish',
+	));
 
-	if (!empty($query->posts)) {
+	if ( ! empty( $query->posts ) ) {
 			return $query->posts[0]->ID;
 	}
 

@@ -58,7 +58,8 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		$total_energy   += $rectangle_power;
 	}
 
-	echo wp_kses_post( sprintf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-panel' ), number_format( $total_energy, 0 ) ) );
+	/* translators: %s: Total energy production value in kWh/year */
+	echo wp_kses_post( sprintf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-project' ), number_format( $total_energy, 0 ) ) );
 	?>
 </div> <!-- /report-intro -->
 
@@ -84,18 +85,24 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 		$roof            = $roofs[ $saved_rectangle['indexSegment'] ];
 		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
 		?>
-		<h3><?php printf( __( 'Segment %d', 'solar-panel' ), $i + 1 ); ?> <em><?php echo number_format( $rectangle_power, 0 ); ?> kWh</em> </h3>
+		<h3><?php
+			/* translators: %d: Segment number */
+			printf( __( 'Segment %d', 'solar-project' ), $i + 1 );
+		?> <em><?php echo number_format( $rectangle_power, 0 ); ?> kWh</em> </h3>
 		<p>
-			<?php printf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-panel' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $saved_rectangle['panelsSurface'] ); ?>
+			<?php
+				/* translators: %1$d: Pitch degrees, %2$s: Orientation, %3$d: Area */
+				printf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-project' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $saved_rectangle['panelsSurface'] );
+			?>
 		</p>
 		<table class="table">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( 'Hours sun / year', 'solar-panel' ); ?></th>
-					<th><?php esc_html_e( 'Panels', 'solar-panel' ); ?></th>
-					<th><?php esc_html_e( 'Power per Panel', 'solar-panel' ); ?></th>
-					<th><?php esc_html_e( 'System Efficiency', 'solar-panel' ); ?></th>
-					<th><?php esc_html_e( 'Annual Energy (kWh)', 'solar-panel' ); ?></th>
+					<th><?php esc_html_e( 'Hours sun / year', 'solar-project' ); ?></th>
+					<th><?php esc_html_e( 'Panels', 'solar-project' ); ?></th>
+					<th><?php esc_html_e( 'Power per Panel', 'solar-project' ); ?></th>
+					<th><?php esc_html_e( 'System Efficiency', 'solar-project' ); ?></th>
+					<th><?php esc_html_e( 'Annual Energy (kWh)', 'solar-project' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>

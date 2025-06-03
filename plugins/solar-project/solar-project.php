@@ -4,8 +4,9 @@
  * Plugin URI: http://example.com/plugin
  * Description: Complementary code together with coco-gravity-form-map-field, to create the Solar Project experience
  * Version: 4.0.2
- * Author: Your Name
- * Author URI: http://example.com
+ * Author: cobianzo
+ * Author URI: http://cobianzo.com
+ * Text Domain: solar-panel
  * License: GPL2
  */
 

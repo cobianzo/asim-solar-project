@@ -2,6 +2,8 @@
 
 Corregir error: You have included the Google Maps JavaScript API multiple times on this page. This may cause unexpected errors.
 
+Translate all plugin into Italian.
+
 # TESTS 
 Testear y confirmar que responda bien cuando no se encuentra un edificio.
 
@@ -13,14 +15,6 @@ When the offset in step 2 and the marker in step 1 are very faraway, it means th
 We need 
 
 
-DONE: Bugs: invert horizontal and vertical for rotated segments.
-DONE: misure in mm
-DONE: superficie panelli, deleted segment surface.
-DONE: add space between pannelli.
-
-DONE: Bugs: when changing length, height, power, we deactivate the Model.
-DONE: Save data in form submitted
-DONE: Add Save form in every step.
 Add all PHP CS to all files.
 Refactor code and sort it out better.
 Add Playwright testing
@@ -42,6 +36,8 @@ Install all development to Emiliano.
 http://localhost:8777/wp-admin/options-general.php?page=coco_solar_settings
 http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-forms-map-addon
 - The permalinks must be /%postname%/ . Make sure you flush the rules o resave the option. Otherwise the apr fetch to WP requests fail (like notification api)
+- We have included the plugin `gravityformsgeolocation` just to fix the error that loads the API key twice when that plugin is present.
+
 
 # Setup the minimum project:
 
@@ -88,8 +84,27 @@ For more info, see `AI-AGENT.md`.
 
 # Develop
 
+`git clone <this repo>`
+
+`git submodule update --init --recursive`
+
+
+- Node 20 (not sure if its n18?)
+- NPM 10.7
+- WP Env installed globally
+- Docker
+- Composer
+
+`npm install`
+also, inside the folder `plugins/coco-gravity-form-map-field`
+`npm install` 
+also, inside the folder `plugins/solar-project`
+`npm install`
+
+
 in this folder
-`npm run dev` for wp scripts compilation into /build - It compiles also into the coco-gravity-form-map-field subproject, in case you modify something there.
+
+`npm run dev` for wp scripts compilation into `/plugins/solar-project/build` - It compiles also into the `coco-gravity-form-map-field` subproject, in case you modify something there.
 
 `npm run bs` for browser sync
 
@@ -114,7 +129,9 @@ sh ./bin/reset-db.sh --test
 ```
 
 Since we need to setup the plugin with the Google Places API, and Map Id, these need to be 
-provided in an .env file, to be used in http://localhost:8777/wp-admin/options-general.php?page=testing-page
+
+provided in an `.env` file, to be used in `http://localhost:8777/
+wp-admin/options-general.php?page=testing-page`
 
 We created two simple Playwright tests, for step 1 and step 2. It's difficult to simulate the interaction with Google Maps, so we left it like this.
 

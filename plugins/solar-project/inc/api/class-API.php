@@ -123,8 +123,9 @@ abstract class API {
 		);
 		add_settings_field(
 			self::GOOGLE_API_KEY_OPTION_NAME,
-			__( 'API Key', 'coco-solar' ),
+			__( 'Google Solar API Key', 'coco-solar' ),
 			static function () {
+				// translators: %s is the placeholder for the API key
 				printf(
 					'<input type="password" value="%s" name="%s" class="regular-text">',
 					esc_attr( get_option( self::GOOGLE_API_KEY_OPTION_NAME ) ),

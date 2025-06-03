@@ -5,6 +5,8 @@
     "./plugins/coco-gravity-form-map-field",
     "./plugins/solar-project",
     "./plugins/gravityforms",
+    "./plugins/gravityformsgeolocation",
+    "https://downloads.wordpress.org/plugin/loco-translate.latest-stable.zip",
     "https://downloads.wordpress.org/plugin/wordpress-importer.latest-stable.zip"
   ],
   "mappings": {
@@ -23,13 +25,5 @@
 			"phpVersion": "8.2",
 			"port": 8889
 		}
-	},
-  "hooks": {
-    "wp-env": {
-      "start": [
-        "wp option update permalink_structure '/%postname%/'",
-        "wp rewrite flush"
-      ]
-    }
-  }
+	}
 }

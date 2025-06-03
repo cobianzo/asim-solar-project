@@ -1,4 +1,5 @@
-// Remove these lines. This .env file is used in /wp-admin/options-general.php?page=yours
+// Remove these lines. This .env file is used in
+// http://localhost:8777/wp-admin/options-general.php?page=testing-page
 // Fill the values from your Google Cloud project
 // Rename this file into .env
 // And then you can run playwright testing
