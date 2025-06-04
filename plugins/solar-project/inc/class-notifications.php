@@ -10,7 +10,10 @@
  */
 namespace Coco_Solar;
 
+use \Coco_Solar\Helper;
+
 class Notifications {
+
 	public static function init() {
 
 		add_action( 'rest_api_init', function () {
@@ -30,13 +33,23 @@ class Notifications {
 	 * constructs the file path within the assets/notifications directory.
 	 * returns the content of the html file as a response. Otherwise
 	 * returns a WP_Error with a 404 status.
+	 * Checks if a localized version of the file exists and returns it if found.
 	 *
 	 * @param \WP_REST_Request $request The request containing the notification name.
 	*/
 	public static function get_notification_html( \WP_REST_Request $request ): \WP_REST_Response|\WP_Error {
 		$notification_name  = $request->get_param( 'notificationName' );
 		$notification_name .= ( substr( $notification_name, -5 ) !== '.html' ) ? '.html' : '';
-		$notification_path  = plugin_dir_path( __DIR__ ) . 'assets/notifications/' . $notification_name;
+		// evaluate the possibility of localizing the file
+		$localized_path     = plugin_dir_path( __DIR__ ) . 'assets/notifications/'
+			. str_replace( '.html', sprintf( '_%s.html', Helper::get_language() ), $notification_name );
+
+		if ( file_exists( $localized_path ) ) {
+			$notification_path = $localized_path;
+		} else {
+			$notification_path = plugin_dir_path( __DIR__ ). 'assets/notifications/'. $notification_name;
+		}
+
 		if ( ! file_exists( $notification_path ) ) {
 			return new \WP_Error( 'not_found', __( 'Notificaiton not found' ), array( 'status' => 404 ) );
 		}

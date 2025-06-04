@@ -2,97 +2,98 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Solar Project 5.0.0\n"
+"Project-Id-Version: Solar Project 4.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/solar-project\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2025-06-04T04:49:35+00:00\n"
+"PO-Revision-Date: 2025-06-04 00:01-0600\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-04T05:56:47+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.12.0\n"
+"X-Generator: Poedit 3.6\n"
 "X-Domain: solar-project\n"
 
 #. Plugin Name of the plugin
 #: solar-project.php
 msgid "Solar Project"
-msgstr ""
+msgstr "Progetto Solare"
 
 #. Plugin URI of the plugin
 #: solar-project.php
 msgid "http://example.com/plugin"
-msgstr ""
+msgstr "http://example.com/plugin"
 
 #. Description of the plugin
 #: solar-project.php
 msgid "Complementary code together with coco-gravity-form-map-field, to create the Solar Project experience"
-msgstr ""
+msgstr "Codice complementare insieme a coco-gravity-form-map-field, per creare l'esperienza Progetto Solare"
 
 #. Author of the plugin
 #: solar-project.php
 msgid "cobianzo"
-msgstr ""
+msgstr "cobianzo"
 
 #. Author URI of the plugin
 #: solar-project.php
 msgid "http://cobianzo.com"
-msgstr ""
+msgstr "http://cobianzo.com"
 
 #: inc/class-gravity-model-panel.php:46
 msgid "--Custom--"
-msgstr ""
+msgstr "--Personalizzato--"
 
 #. translators: %s: Total energy production value in kWh/year
-#: inc/render-step-4.php:62
+#: inc/render-step-4.php:63
 #, php-format
 msgid "Total Energy Production: <strong><span id=\"total-energy\">%s</span> kWh/year</strong>"
-msgstr ""
+msgstr "Produzione Energetica Totale: <strong><span id=\"total-energy\">%s</span> kWh/anno</strong>"
 
-#: inc/render-step-4.php:69
+#: inc/render-step-4.php:70
 msgid "Energy Report"
-msgstr ""
+msgstr "Rapporto Energetico"
 
-#: inc/render-step-4.php:71
+#: inc/render-step-4.php:72
 msgid "Panel Model"
-msgstr ""
+msgstr "Modello Pannello"
 
-#: inc/render-step-4.php:73
+#: inc/render-step-4.php:74
 msgid "Panel dimensions"
-msgstr ""
+msgstr "Dimensioni Pannello"
 
-#: inc/render-step-4.php:76
+#: inc/render-step-4.php:77
 msgid "Nominal power per panel"
-msgstr ""
+msgstr "Potenza nominale per pannello"
 
 #. translators: %d: Segment number
-#: inc/render-step-4.php:88
+#: inc/render-step-4.php:91
 #, php-format
 msgid "Segment %d"
-msgstr ""
+msgstr "Segmento %d"
 
 #. translators: %1$d: Pitch degrees, %2$s: Orientation, %3$d: Area
-#: inc/render-step-4.php:93
+#: inc/render-step-4.php:96
 #, php-format
 msgid "Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²"
-msgstr ""
-
-#: inc/render-step-4.php:99
-msgid "Hours sun / year"
-msgstr ""
-
-#: inc/render-step-4.php:100
-msgid "Panels"
-msgstr ""
-
-#: inc/render-step-4.php:101
-msgid "Power per Panel"
-msgstr ""
+msgstr "Inclinazione: %1$d°, Orientamento: %2$s, Area: %3$d m²"
 
 #: inc/render-step-4.php:102
-msgid "System Efficiency"
-msgstr ""
+msgid "Hours sun / year"
+msgstr "Ore di sole / anno"
 
 #: inc/render-step-4.php:103
+msgid "Panels"
+msgstr "Pannelli"
+
+#: inc/render-step-4.php:104
+msgid "Power per Panel"
+msgstr "Potenza per Pannello"
+
+#: inc/render-step-4.php:105
+msgid "System Efficiency"
+msgstr "Efficienza del Sistema"
+
+#: inc/render-step-4.php:106
 msgid "Annual Energy (kWh)"
-msgstr ""
+msgstr "Energia Annuale (kWh)"

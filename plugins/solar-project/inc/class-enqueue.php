@@ -38,7 +38,7 @@ class Enqueue {
 	 * - cocoIsStepSelectOffset: if the current page is the one where the user inserts the segments offset
 	 * - cocoIsStepSelectRectangle: if the current page is the one where the user inserts the rectangle
 	 */
-	public static function inject_js_script_step_1_2_and_3() {
+	public static function inject_js_script_step_1_2_and_3(): void {
 		$form_id = $_POST['gform_submit'] ?? Helper::get_gravity_form_id_from_page();
 		if ( $form_id ) {
 
@@ -47,6 +47,10 @@ class Enqueue {
 
 			// step 1 fields
 			$coco_maproofselect_instance = Helper::capture_coco_map_field_instance( $form, 'map-roof' );
+
+			if ( ! $coco_maproofselect_instance ) {
+				return;
+			}
 
 			// step 2 fields
 			$coco_segmentrotationtype_instance = Helper::capture_coco_map_field_instance( $form, 'segment-rotation' );
@@ -69,6 +73,7 @@ class Enqueue {
 
 			// previous step data
 			wp_add_inline_script( 'coco-solar-functions',
+				"window.cocoLanguage = '". \Coco_Solar\Helper::get_language(). "'; \n" . // actually not in use.
 				"window.cocoAssetsDir = '" . \Coco_Solar\Helper::get_icon_url() . "'; \n" .
 				"window.cocoNotificationsUrl = '" . plugins_url( '/assets/notifications', __DIR__ ) . "'; \n" .
 				// step 1

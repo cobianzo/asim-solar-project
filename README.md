@@ -1,8 +1,8 @@
 # TODO NEXT
 
 Corregir error: You have included the Google Maps JavaScript API multiple times on this page. This may cause unexpected errors.
+Add debounce when showing panel with segment info.
 
-Translate all plugin into Italian.
 
 # TESTS 
 Testear y confirmar que responda bien cuando no se encuentra un edificio.
@@ -171,6 +171,16 @@ I set `npm run eslint` to format all the typescript FILEs in `solar-panel` plugi
 
 `composer run-script lint plugins/solar-project/solar-project.php`
 para el plugin coco- ... you need to enter the project and see its README.
+
+# Translations
+
+Added a Helper to detect the code of the langua (ie 'it')  
+Added a suffix to the files (js and json) which shows notifications. 
+`npm run cli bash`
+```
+cd wp-content/plugins/solar-project
+wp i18n make-pot . ./languages/solar-project.pot --exclude="vendor,node_modules" --domain=solar-project
+```
 
 # Terminology:
 

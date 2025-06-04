@@ -3,7 +3,7 @@
  * Plugin Name: Solar Project
  * Plugin URI: http://example.com/plugin
  * Description: Complementary code together with coco-gravity-form-map-field, to create the Solar Project experience
- * Version: 4.0.2
+ * Version: 5.0.1
  * Author: cobianzo
  * Author URI: http://cobianzo.com
  * Text Domain: solar-panel
@@ -43,6 +43,9 @@ class Solar_Project {
 				echo '<style>
 				</style>';
 			});
+
+			load_plugin_textdomain( 'solar-project', false, dirname( plugin_basename(__FILE__) ) . '/languages' );
+
 	}
 
 	public function activate() {

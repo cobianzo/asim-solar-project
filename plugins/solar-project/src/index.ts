@@ -21,6 +21,7 @@ declare global {
 		cocoIsStepSelectOffset: Boolean;
 		cocoIsStepSelectRectangle: Boolean;
 
+		cocoLanguage: string;
 		cocoAssetsDir: string;
 		cocoNotificationsUrl: string;
 		step1CocoMapInputId: string;

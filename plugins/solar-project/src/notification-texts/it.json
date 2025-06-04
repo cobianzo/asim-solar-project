@@ -1,0 +1,17 @@
+{
+    "STEP1_SELECT_ROOF": "Seleziona un tetto sulla mappa dove desideri installare i tuoi pannelli solari.",
+    "STEP1_ROOF_SELECTED": "Bene. Hai selezionato il tetto. Ora, clicca sul pulsante successivo.",
+    "STEP2_DRAGGABLE_BOUNDING_BOX": "Abbiamo rilevato %s segmenti sul tuo tetto. Potrebbe esserci un piccolo disallineamento con l'immagine satellitare, per favore regolalo trascinando i segmenti",
+    "STEP2_RETURNING": "Verifica che i quadrati rossi siano il più allineati possibile alla forma del tetto",
+    "STEP3_EDIT_OR_SELECT": "Hai configurato il pannello solare per %s dei tetti. Puoi continuare a modificare o inviare il modulo cliccando su AVANTI",
+    "STEP3_SELECT_SEGMENT": "Ci sono %s segmenti su questo edificio. Inizia selezionandone uno per creare la tua installazione di pannelli solari",
+    "STEP3_SEGMENT_SELECTED": "Bene. Hai selezionato uno dei segmenti di %s metri quadrati. Ora clicca di nuovo sul segmento per iniziare a progettare il rettangolo della tua installazione di pannelli solari",
+    "STEP3_SEGMENT_SELECTED_WITH_RECTANGLE": "Puoi rimuovere i singoli pannelli solari cliccando sul pulsante Modifica Pannelli Solari e selezionando i pannelli che desideri rimuovere",
+    "STEP3_CLICK_ON_SOLAR_PANEL": "Quando hai finito di modificare i pannelli solari, puoi cliccare su Salva per applicare le modifiche.",
+    "STEP3_START_EDIT_PANELS": "Passa il pulsante sui pannelli solari. Puoi rimuoverne alcuni cliccandoci sopra",
+    "STEP3_HOVERING_SEGMENT": "Questo è il segmento del tetto %s con un'area di %s metri quadrati e un'inclinazione di %s gradi.",
+    "STEP3_HOVERING_SEGMENT_WITH_RECTANGLE": "Clicca per modificare o eliminare il rettangolo del pannello solare.",
+    "STEP3_FIRST_VERTEX_RECTANGLE": "Hai appena selezionato il primo vertice del rettangolo dove verranno posizionati i tuoi pannelli. <br> Ora scegli la dimensione del rettangolo e clicca con il mouse quando sei pronto. Puoi sempre ridimensionare il rettangolo in seguito.",
+    "STEP3_SECOND_VERTEX_RECTANGLE": "Il rettangolo è stato aggiornato. Ora puoi cliccare su Salva per applicare le modifiche.",
+    "STEP4_WHATEVER": "Ecco il rapporto della tua installazione solare"
+}

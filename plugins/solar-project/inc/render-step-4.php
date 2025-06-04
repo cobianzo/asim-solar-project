@@ -38,7 +38,7 @@ foreach ( $quantiles_field->choices as $choice ) {
 $saved_rectangles      = Helper::capture_coco_map_field_instance( $form, 'saved-rectangles' )->value;
 $saved_rectangles_data = json_decode( $saved_rectangles, true );
 if ( json_last_error() !== JSON_ERROR_NONE ) {
-	throw new \Exception( esc_html( 'Error decoding saved rectangles JSON: ' . json_last_error_msg() ) );
+	$saved_rectangles_data = [];
 }
 
 
@@ -79,20 +79,18 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 
 	<?php
 	foreach ( $saved_rectangles_data as $i => $saved_rectangle ) :
-		// Helper::ddie($saved_rectangle);
-		// Helper::ddie($roof);
 
 		$roof            = $roofs[ $saved_rectangle['indexSegment'] ];
 		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
 		?>
 		<h3><?php
 			/* translators: %d: Segment number */
-			printf( __( 'Segment %d', 'solar-project' ), $i + 1 );
+			echo esc_html( sprintf( __( 'Segment %d', 'solar-project' ), $i + 1 ) );
 		?> <em><?php echo number_format( $rectangle_power, 0 ); ?> kWh</em> </h3>
 		<p>
 			<?php
 				/* translators: %1$d: Pitch degrees, %2$s: Orientation, %3$d: Area */
-				printf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-project' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $saved_rectangle['panelsSurface'] );
+				echo esc_html( sprintf( __( 'Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²', 'solar-project' ), $roof['pitchDegrees'], esc_html( $saved_rectangle['orientation'] ), $saved_rectangle['panelsSurface'] ) );
 			?>
 		</p>
 		<table class="table">
@@ -121,7 +119,3 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 
 	<?php endforeach; ?>
 </div>
-
-
-
-<?php

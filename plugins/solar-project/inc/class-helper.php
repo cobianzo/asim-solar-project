@@ -4,6 +4,16 @@ namespace Coco_Solar;
 
 class Helper {
 
+
+
+	/**
+	 * Captures a map field instance from a Gravity Form based on its admin label
+	 *
+	 * @param array  $form       The Gravity Form array containing all form fields and settings
+	 * @param string $adminLabel The admin label to identify the specific map field
+	 *
+	 * @return object|null Returns the field object if found, null otherwise
+	 */
 	public static function capture_coco_map_field_instance( $form, $adminLabel ) {
 		$entry = \GFFormsModel::get_current_lead(); // get all data already inputted in the form
 
@@ -35,6 +45,15 @@ class Helper {
 	}
 
 	// a more elaborated data retrieve from inserted values in the step 1
+
+
+	/**
+	 * Retrieves solar API data based on coordinates from step 1 of the form
+	 *
+	 * @param int $form_id The ID of the Gravity Form to get data from
+	 *
+	 * @return array|null Solar building data if coordinates are found, null otherwise
+	 */
 	public static function get_solar_api_data_from_step_1_value( $form_id ) {
 		$form = \GFAPI::get_form( $form_id );
 
@@ -49,6 +68,15 @@ class Helper {
 		return $solar_building_data;
 	}
 
+	/**
+	 * Checks if the current page of a multi-page form matches the page number
+	 * of a specific field, given by the adminLabel (it's set when editing the form)
+	 *
+	 * @param int    $form_id    The ID of the Gravity Form to check
+	 * @param string $adminLabel The admin label of the field to check (optional)
+	 *
+	 * @return bool Returns true if current page matches the field's page number, false otherwise
+	 */
 	public static function is_page_of_field( $form_id, $adminLabel = null ) {
 		$current_page = \GFFormDisplay::get_current_page( $form_id );
 		$form         = \GFAPI::get_form( $form_id );
@@ -62,6 +90,14 @@ class Helper {
 		return $page_field === $current_page;
 	}
 
+
+
+	/**
+	 * Retrieves the URL inside the subfolder /assets of an icon file.
+	 *
+	 * @param string $icon_file The icon file name.
+	 * @return void
+	 */
 	public static function get_icon_url( $icon_file = '' ) {
 		$sun_marker = plugin_dir_url( __DIR__ ) . "assets/$icon_file";
 		// when using browser sync it returns a weird url, so we send it relative not absolute
@@ -69,7 +105,13 @@ class Helper {
 		return $sun_marker;
 	}
 
-	public static function get_gravity_form_id_from_page( $post_id = null ) {
+	/**
+	 * Gets the Gravity Form ID from a page's content by looking for the gravityforms/form block
+	 *
+	 * @param int|null $post_id Optional. The post ID to check. Defaults to current post ID.
+	 * @return int|false The Gravity Form ID if found, false otherwise
+	 */
+	public static function get_gravity_form_id_from_page( $post_id = null ):	int|false {
 		$post_id = $post_id ?? get_the_ID();
 		$content = get_post_field( 'post_content', $post_id );
 
@@ -84,6 +126,16 @@ class Helper {
 		}
 
 		return false; // No Gravity Forms block found
+	}
+
+	/**
+	 * If we are in italian, return 'it'
+	 *
+	 * @return string
+	 */
+	public static function get_language() {
+		$locale = get_locale();
+		return substr( $locale, 0, 2 );
 	}
 
 	public static function dd( $var ) {
