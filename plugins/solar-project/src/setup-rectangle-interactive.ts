@@ -41,7 +41,7 @@ import {
 	setupSolarPanels,
 } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
-import { createNotification } from './notification-api';
+import { createTopNotification } from './notification-api';
 
 export const RECTANGLE_OPTIONS: google.maps.PolygonOptions = {
 	strokeWeight: 2,
@@ -297,7 +297,7 @@ export const handlerFirstClickDrawRectangleOverSegment = function (e: google.map
 		)
 		.then((m) => addAssociatedMarker(m, window.cocoDrawingRectangle as AssociatedMarkersParent));
 
-	createNotification('STEP3_FIRST_VERTEX_RECTANGLE');
+	createTopNotification('STEP3_FIRST_VERTEX_RECTANGLE');
 
 	// Now setup the listeners for editing the existing rectangle
 	const theMap = segm.map;
@@ -336,7 +336,7 @@ export const handlerSecondClickDrawRectangle = function () {
 		savedRectangle.tempPathAsString = convertPolygonPathToStringLatLng(window.cocoDrawingRectangle.polygon!);
 	}
 
-	createNotification('STEP3_SECOND_VERTEX_RECTANGLE');
+	createTopNotification('STEP3_SECOND_VERTEX_RECTANGLE');
 
 	handlerClickSaveRectangleButton(null); // save the rectangle the user just painted. It unselects the segment
 	const cocoSetupMap = getStep3CocoMapSetup();

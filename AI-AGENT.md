@@ -8,9 +8,16 @@ Este es parte del wp-env.json
     ".",
     "./plugins/coco-gravity-form-map-field",
     "./plugins/solar-project",
-    "./plugins/gravityforms",
-    "https://downloads.wordpress.org/plugin/wordpress-importer.latest-stable.zip"
+    "./plugins/gravityforms"
   ],
+"env": {
+	"development": {
+		"port": 8777
+	},
+	"tests": {
+		"port": 8889
+	}
+}
 
 Quiero que tenga PHPUnit, Playwright para e2e.
 El plugin usa una form de Gravity Forms con 3 Pages. Mi plugin dependiente coco-gravity-form-map-field es un addon de Gravity Forms que permite insertar un campo de Google Maps donde se salvan las coordenadas latitud,longitud como un string.

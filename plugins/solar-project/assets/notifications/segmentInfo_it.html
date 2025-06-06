@@ -1,0 +1,52 @@
+<div class="visible-{{showTotalData}}">
+	<div style="display: flex; justify-content: space-between; align-items: center;">
+		<div>
+			<h4 style="margin-bottom: 0;">Energia totale</h4>
+			<small><b>{{totalNumberPanels}}</b> pannelli, <b>{{totalPanelsSurface}} m<sup>2</sup></b></small>
+		</div>
+		<div>
+			<h3 style="margin: 0;">{{totalAnnualPower}} kW</h3>
+		</div>
+	</div>
+</div>
+
+<div class="visible-{{showRectangleInfo}}">
+  <h4>Rettangolo con pannelli solari <b>{{annualPower}} kW</b></h4>
+  <ul>
+    <li>Modello pannello: <b>{{panelsModel}}</b> </li>
+    <li>Dimensioni pannello: <b>{{panelDimansions}}</b> </li>
+    <li>Superficie totale: <b>{{panelsSurface}} m<sup>2</sup></b> </li>
+    <li>Potenza nominale per pannello: <b>{{nominalPower}} W/h</b>  </li>
+    <li>Numero di pannelli: <b>{{numberOfSolarPanels}}</b> </li>
+    <li>
+      Potenza annuale: <b>{{annualPower}} kW</b>
+      <ul>
+        <li>
+          <small>Con un'efficienza del <b>{{systemEfficiency}}</b></small>
+        </li>
+        <li>
+          <small>Scenario {{scenarioName}}: <b>{{hoursPerYear}} h/anno</b></small>
+        </li>
+      </ul>
+  </li>
+  </ul>
+</div>
+
+<h4>Segmento del tetto #{{indexInMap}}</h4>
+
+<ul>
+  <li>Orientamento: <b>{{orientation}}</b>
+    <br><small>{{azimuthDegrees}} º rispetto al Nord</small>
+  </li>
+  <li>Inclinazione del tetto <b>{{pitchDegrees}}º</b>
+    <br><small>la barra arancione mostra la parte inferiore del tetto</small>
+  </li>
+  <li>Ore di sole all'anno per tutto il tetto: <b>{{maxSunshineHoursPerYear}} h</b> </li>
+  <li>Scenari
+    <ul>
+      <li>scenario peggiore {{percentil_0}} h/anno</li>
+      <li>scenario medio {{percentil_5}} h/anno</li>
+      <li>scenario migliore {{percentil_10}} h/anno</li>
+    </ul>
+  </li>
+</ul>

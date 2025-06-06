@@ -15,7 +15,7 @@ import {
 	exitEditSolarPanelsMode,
 } from './setup-solar-panels';
 import { getCurrentStepCocoMap } from '.';
-import { createNotification, createPanelNotificationPopup, removeNotification } from './notification-api';
+import { createTopNotification, createPanelNotificationPopup, removeTopNotification } from './notification-api';
 import { getStep3CocoMapSetup } from './step3_functions';
 
 export const DEFAULT_PANELS_ORIENTATION = 'vertical';
@@ -78,11 +78,11 @@ function createBtn(
 export const createUnselectSegmentButton = (gmap: google.maps.Map, text: string = 'Unselect') => {
 	const segmentHasRect = getSavedRectangleBySegment(window.cocoDrawingRectangle.selectedSegment!);
 	if (segmentHasRect)
-		createNotification('STEP3_SEGMENT_SELECTED_WITH_RECTANGLE', [
+		createTopNotification('STEP3_SEGMENT_SELECTED_WITH_RECTANGLE', [
 			window.cocoDrawingRectangle.selectedSegment?.data?.stats.areaMeters2.toString()!,
 		]);
 	else {
-		createNotification('STEP3_SEGMENT_SELECTED', [
+		createTopNotification('STEP3_SEGMENT_SELECTED', [
 			window.cocoDrawingRectangle.selectedSegment?.data?.stats.areaMeters2.toString()!,
 		]);
 	}
@@ -249,7 +249,7 @@ const handlerClickUnselectButton = function (e: MouseEvent) {
 	const param = window.cocoSavedRectangles.length
 		? window.cocoSavedRectangles.length
 		: window.cocoBuildingSegments.length;
-	createNotification(notification_const, [param.toString()]);
+	createTopNotification(notification_const, [param.toString()]);
 };
 
 // saves the current rectangle whose path is defined in window.cocoDrawingRectangle.polygon
@@ -311,7 +311,7 @@ export const handlerClickSaveRectangleButton = function (e: MouseEvent | null) {
 	 */
 	saveSavedRectanglesInTextArea();
 
-	removeNotification();
+	removeTopNotification();
 };
 
 export const createButtonActivateDeactivateSolarPanels = function (

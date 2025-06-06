@@ -14,7 +14,7 @@ import {
 	updateValuesCoordsSegmentsWithOffset,
 } from './setup-drag-all-segments-interaction';
 import setupSegments from './setup-segments-interactive-functions';
-import { createNotification } from './notification-api';
+import { createTopNotification } from './notification-api';
 
 /**
  * Returns the CocoMapSetup object for the step2 map (the one with the input text element
@@ -73,9 +73,9 @@ document.addEventListener('solarMapReady' as keyof DocumentEventMap, (event: Eve
       updateValuesCoordsSegmentsFromDBOffset();
     }
 
-		createNotification('STEP2_RETURNING');
+		createTopNotification('STEP2_RETURNING');
 	} else {
-		createNotification('STEP2_DRAGGABLE_BOUNDING_BOX', [cocoMapSetup.segments?.length.toString()!]);
+		createTopNotification('STEP2_DRAGGABLE_BOUNDING_BOX', [cocoMapSetup.segments?.length.toString()!]);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 /**
  * Step map 4 does not have custom js to apply.
  */
-import { createNotification } from './notification-api';
+import { createTopNotification } from './notification-api';
 
 /** Start everything  */
 
@@ -24,5 +24,5 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  */
 function setup_step_4() {
-	createNotification('STEP4_WHATEVER');
+	createTopNotification('STEP4_WHATEVER');
 }

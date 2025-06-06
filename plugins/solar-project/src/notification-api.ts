@@ -16,11 +16,18 @@ import {
 } from './setup-solar-panels';
 import { getCardinalOrientationFromAngle } from './trigonometry-helpers';
 
+/**
+ * Important. There are two kind of notifications
+ * 1) The simple ones: a bar on top of the screen.
+ * 2) The complex one, a popup on the left of the screen.
+ */
+
+
 
 /**
  * Usage:
  * test it with
- * debug.createNotification('STEP1_ROOF_SELECTED');
+ * debug.createTopNotification('STEP1_ROOF_SELECTED');
  *
  * @param message
  * @returns
@@ -38,8 +45,9 @@ const debounce = (func: Function, wait: number) => {
   };
 };
 
-// Actual notification creation function
-const createNotificationImpl = async(message: string, placeholders: string[] = []) => {
+// Actual notification for the top of the page.
+const createTopNotificationImpl = async(message: string, placeholders: string[] = []) => {
+
 
   // locallized file with texts.
   const PRESET_MSG = await import(`./notification-texts/${window.cocoLanguage || 'en'}.json`);
@@ -83,10 +91,21 @@ const createNotificationImpl = async(message: string, placeholders: string[] = [
 };
 
 // Export debounced version with 3 second delay
-export const createNotification = debounce(createNotificationImpl, 3000);
+export const createTopNotification = (m:string, pl: string[] = []) => {
+  // Notifications to listeners so I can inject code from external plugins.
+  /**
+   * Usage:
+   * addEventListener( 'cocoTopNotificationShown' , (event) => {
+   *   console.log('Notification shown:', event.detail.m);
+   */
+  document.dispatchEvent(new CustomEvent('cocoTopNotificationShown', {
+    detail: { m }
+  }));
+  createTopNotificationImpl(m,pl);
+}
 
 
-export const removeNotification = (messageKey?: string | null) => {
+export const removeTopNotification = (messageKey?: string | null) => {
 	if (window.cocoNotifications?.container) {
 		if (!messageKey || window.cocoNotifications.container.dataset.messageId === messageKey) {
 			console.log('Removing notification', messageKey);
@@ -98,6 +117,7 @@ export const removeNotification = (messageKey?: string | null) => {
 	// TODO: remove only if the message key is given.
 };
 
+// ================
 // Now the notifications more complex. The ones that load an html in a popup
 
 export const closeNotificationPopup = function () {
@@ -111,7 +131,7 @@ export const closeNotificationPopup = function () {
 };
 window.closeNotificationPopup = closeNotificationPopup;
 
-export const openNotificationPopup = (filename: string, placeholders: Record<string, string | number> = {}) => {
+const openNotificationPopupImpl = (filename: string, placeholders: Record<string, string | number> = {}) => {
 	//cleanup
 	closeNotificationPopup();
 
@@ -125,6 +145,13 @@ export const openNotificationPopup = (filename: string, placeholders: Record<str
 	const path = `coco-solar/v1/notifications/${filename}`;
 	apiFetch({ path })
 		.then((html) => {
+
+			// Ensure html is a string, otherwise return early
+			if (typeof html !== 'string') {
+				console.error('Error: Received non-string HTML response');
+				return;
+			}
+
 			// handle the error of an html 40x response
 			if (html.includes('<title>40')) {
 				console.error('Error: Received a 40x error response');
@@ -136,16 +163,19 @@ export const openNotificationPopup = (filename: string, placeholders: Record<str
 				const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
 				const value =
 					typeof placeholders[key] === 'number' ? String(placeholders[key]) : placeholders[key];
-				html = html.replace(regex, value);
+				html = (html as string).replace(regex, value);
 			});
 
 			// show the message
-			contentContainer.innerHTML = html as string;
+			contentContainer.innerHTML = html;
 			parentDiv.classList.remove('hidden');
 			parentDiv.classList.add('show');
 		})
 		.catch((error) => console.error('Error loading the notification ' + filename + ':', error));
 };
+
+export const openNotificationPopup = debounce( openNotificationPopupImpl, 1000);
+
 
 // Special notification with all the info about the segment and its rectangle
 export const createPanelNotificationPopup = function (segment: ExtendedSegment | null = null) {

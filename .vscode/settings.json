@@ -30,4 +30,11 @@
 		"wordpress/wp-includes",
 		"wordpress/wp-admin"
 	]
+	,
+	"search.exclude": {
+		"**/gravityforms": true,
+		"**/gravityformsgeolocation": true,
+		"**/loco-translate": true,
+		"**/wordpress-importer": true
+	}
 }

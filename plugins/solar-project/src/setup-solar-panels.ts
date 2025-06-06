@@ -1,7 +1,7 @@
 // WIP
 import apiFetch from '@wordpress/api-fetch';
 
-import { createNotification, createPanelNotificationPopup, removeNotification } from './notification-api';
+import { createTopNotification, createPanelNotificationPopup, removeTopNotification } from './notification-api';
 import {
 	FADED_RECTANGLE_OPTIONS,
 	getSavedRectangleBySegment,
@@ -540,13 +540,13 @@ export const enterEditSolarPanelsMode = function () {
 					isDeactivated = isSolarPanelDeactivated(currentSavedRectangle, polygonClicked);
 					sp.setOptions(isDeactivated ? DELETED_PANEL_OPTIONS : EDITABLE_PANEL_OPTIONS);
           createPanelNotificationPopup(currentSegment);
-					createNotification('STEP3_CLICK_ON_SOLAR_PANEL');
+					createTopNotification('STEP3_CLICK_ON_SOLAR_PANEL');
 				});
 			});
 		});
 	}
 
-	createNotification('STEP3_START_EDIT_PANELS');
+	createTopNotification('STEP3_START_EDIT_PANELS');
 };
 
 export const exitEditSolarPanelsMode = function () {
@@ -578,5 +578,5 @@ export const exitEditSolarPanelsMode = function () {
 		);
 	});
 
-	removeNotification();
+	removeTopNotification();
 };

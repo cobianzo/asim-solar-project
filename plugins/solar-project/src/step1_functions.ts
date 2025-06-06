@@ -2,7 +2,7 @@
  * Step map 1 does not have custom js to apply.
  * The GF coco-map field works ok out of the box.
  */
-import { createNotification } from './notification-api';
+import { createTopNotification } from './notification-api';
 import { convertStringCoordsInLatLng } from './trigonometry-helpers';
 import { CocoMapSetup } from './types';
 
@@ -44,7 +44,7 @@ document.addEventListener('solarMapReady' as keyof DocumentEventMap, (event: Eve
  */
 function setup_step_1(mapSetup: CocoMapSetup) {
 	// TODO: make the Next button unavailable
-	createNotification('STEP1_SELECT_ROOF');
+	createTopNotification('STEP1_SELECT_ROOF');
 
 	const inputElement = mapSetup.inputElement;
 
@@ -59,7 +59,7 @@ function show_message_to_click_next(map: google.maps.Map, inputEl: HTMLInputElem
 		// State: Shows message to move forward, make the NEXT btn available
 		const coords = convertStringCoordsInLatLng(inputEl);
 		if (!coords) {
-			createNotification('Error in the value of the input');
+			createTopNotification('Error in the value of the input');
 			return;
 		}
 		const currentZoom = map.getZoom();
@@ -67,6 +67,6 @@ function show_message_to_click_next(map: google.maps.Map, inputEl: HTMLInputElem
 			map.panTo(coords);
 			map.setZoom(19);
 		}
-		createNotification('STEP1_ROOF_SELECTED');
+		createTopNotification('STEP1_ROOF_SELECTED');
 	}
 }

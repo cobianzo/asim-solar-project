@@ -1,5 +1,5 @@
 // RENAME TO step 4 TODO:
-import { createNotification } from './notification-api';
+import { createTopNotification } from './notification-api';
 import { updateValuesCoordsSegmentsFromDBOffset } from './setup-drag-all-segments-interaction';
 import { loadSavedRectanglesFromTextArea } from './setup-rectangle-interactive';
 import setupSegments from './setup-segments-interactive-functions';
@@ -39,9 +39,9 @@ document.addEventListener('solarMapReady', (event: Event) => {
 
 	// notification
 	if (window.cocoSavedRectangles?.length) {
-		createNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles?.length.toString()]);
+		createTopNotification('STEP3_EDIT_OR_SELECT', [window.cocoSavedRectangles?.length.toString()]);
 	} else {
-		createNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments?.length.toString()]);
+		createTopNotification('STEP3_SELECT_SEGMENT', [window.cocoBuildingSegments?.length.toString()]);
 	}
 
 	// Sync inputs on page load

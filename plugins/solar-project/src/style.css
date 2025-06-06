@@ -138,6 +138,9 @@ body .coco-solar-notification {
   z-index: 9999;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.75);
 }
+body.admin-bar .coco-solar-notification {
+	top: 32px; /* Adjust for the admin bar height */
+}
 
 body .coco-btn-danger{
   background-color: var(--gf-color-danger) !important;

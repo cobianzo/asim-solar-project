@@ -15,9 +15,9 @@ import { getCurrentStepCocoMap } from '.';
 import { MOVING_BOUNDINGBOX_OPTIONS } from './setup-drag-all-segments-interaction';
 import {
 	closeNotificationPopup,
-	createNotification,
+	createTopNotification,
 	createPanelNotificationPopup,
-	removeNotification,
+	removeTopNotification,
 } from './notification-api';
 
 export const MARKER_CENTERED_OPTIONS = {
@@ -240,7 +240,7 @@ export const highlightSegment = function (roofSegment: ExtendedSegment, extraPar
 	const hasRectangle = getSavedRectangleBySegment(roofSegment);
 	// notifications
 	const notificationId = hasRectangle ? 'STEP3_HOVERING_SEGMENT_WITH_RECTANGLE' : 'STEP3_HOVERING_SEGMENT';
-	createNotification(notificationId, [
+	createTopNotification(notificationId, [
 		(roofSegment.indexInMap! + 1).toString(),
 		roofSegment.data?.stats.areaMeters2.toFixed(2).toString()!,
 		roofSegment.data!.pitchDegrees.toString(),
@@ -262,7 +262,7 @@ export const resetSegmentVisibility = function (roofSegment: ExtendedSegment) {
 		roofSegment.lowRoofLine.setVisible(false);
 	}
 
-	removeNotification();
+	removeTopNotification();
 	closeNotificationPopup();
 };
 export const fadeSegment = function (roofSegment: ExtendedSegment) {

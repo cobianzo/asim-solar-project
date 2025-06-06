@@ -12,6 +12,7 @@
   "mappings": {
     "/wordpress-tests-lib": "./tests/phpunit/wordpress-tests-lib"
   },
+	"phpDockerfile": "./.wp-env/php/Dockerfile",
   "config": {
     "WP_DEBUG": true,
     "WP_ENVIRONMENT_TYPE": "local"
