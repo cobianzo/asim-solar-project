@@ -38,7 +38,7 @@ class PluginBuilder {
 		this.distDir = 'dist';
 
 		// Lista de archivos y directorios a incluir
-		this.directories = ['assets', 'src', 'inc', 'build'];
+		this.directories = ['assets', 'src', 'inc', 'build', 'languages'];
 
 		this.files = [`${this.pluginSlug}.php`, `package.json`];
 		this.files = this.files.map((file) => ({
