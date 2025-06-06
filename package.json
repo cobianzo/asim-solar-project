@@ -21,7 +21,8 @@
     "cli": "wp-env run cli",
     "tests-cli": "wp-env run tests-cli",
     "db-cli": "npm run cli wp db cli",
-    "db-backup": "npm run cli wp db export ./wp-content/plugins/solar/tests/data/database.sql",
+    "db-backup": "npm run cli wp db export /var/www/html/wp-content/plugins/asim-solar-project/tests/data/database.sql",
+    "db-restore": "npm run cli wp db import /var/www/html/wp-content/plugins/asim-solar-project/tests/data/database.sql",
     "tests-db-cli": "npm run tests-cli wp db cli",
     "//comment3": "--CLI commands for translations--"
   },
