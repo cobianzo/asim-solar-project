@@ -1,13 +1,11 @@
 Estoy trabajando en un proyecto en entorno de WordPress wp-env. 
-Lo guardo todo en un repo de git.
-Usa las dependencias del plugin gravity forms, que ya está incluido en el repo.
-Tiene la dependencia de mi otro plugin, que es repo incluido como un submodulo.
-Y en él desarrolo mi nuevo plugin llamado solar-project.
-Este es parte del wp-env.json
+Lo guardo todo en un repo de git. https://github.com/cobianzo/asim-solar-project
+Tiene la dependencia de mi otro plugin, que es repo incluido como un submodulo ( https://github.com/cobianzo/coco-gravity-form-map-field ) .
+Este es parte del wp-env.json, aqui puedes ver las dependencias
 "plugins": [
-    ".",
+    ".", # este plugin es irrelevante, en el podria incluir algunas herramientas para testing, nada mas.
     "./plugins/coco-gravity-form-map-field",
-    "./plugins/solar-project",
+    "./plugins/solar-project",  # este es el desarrollo de mi plugin
     "./plugins/gravityforms"
   ],
 "env": {
@@ -20,12 +18,13 @@ Este es parte del wp-env.json
 }
 
 Quiero que tenga PHPUnit, Playwright para e2e.
-El plugin usa una form de Gravity Forms con 3 Pages. Mi plugin dependiente coco-gravity-form-map-field es un addon de Gravity Forms que permite insertar un campo de Google Maps donde se salvan las coordenadas latitud,longitud como un string.
+El plugin usa una form de Gravity Forms con 3 Pages. 
+Mi plugin dependiente coco-gravity-form-map-field es un addon de Gravity Forms que permite insertar un campo de Google Maps donde se salvan las coordenadas latitud,longitud como un string.
 Te puedo dar el readme.md para más info.
 
   Mi proyecto trabaja mucho con typescript, compilado de /src/index.ts a build/index.js.
   Tengo que hacer muchas funciones trigonométricas, sobre todo en ts.
-  Quiero hacer tests unitarios para mis funciones en ts. Cómo me recomiendas empezar?
+  Quiero hacer tests unitarios para mis funciones en ts.
   Por ejemplo quiero testear esta funcion unitaria:
   /**
   * Given a polygon defined by Array<google.maps.Point>, y returns the

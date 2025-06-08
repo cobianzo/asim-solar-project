@@ -95,7 +95,7 @@ export const createTopNotification = (m:string, pl: string[] = []) => {
   // Notifications to listeners so I can inject code from external plugins.
   /**
    * Usage:
-   * addEventListener( 'cocoTopNotificationShown' , (event) => {
+   * document.addEventListener( 'cocoTopNotificationShown' , (event) => {
    *   console.log('Notification shown:', event.detail.m);
    */
   document.dispatchEvent(new CustomEvent('cocoTopNotificationShown', {

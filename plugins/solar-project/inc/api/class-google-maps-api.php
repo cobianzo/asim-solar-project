@@ -34,8 +34,12 @@ class Google_Maps_API extends API {
 					foreach ( $shapes as $roof_shape ) {
 						$coords_group = $roof_shape['display_polygon']['coordinates'];
 						foreach ( $coords_group as $coordinates ) {
-							$coord_string             = implode( ' ', array_map( function ( $coord ) {
-								return $coord[1] . ',' . $coord[0];
+							$coord_string = implode( ' ', array_map( function ( $coord ) {
+								if ( isset( $coord[1] ) && isset( $coord[0] ) ) {
+									// Google Maps API returns coordinates in [lng, lat] format
+									return $coord[1] . ',' . $coord[0];
+								}
+								return '';
 							}, $coordinates ) );
 							$buildings_string_coord[] = $coord_string;
 						}

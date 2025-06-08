@@ -1,28 +1,10 @@
 # TODO NEXT
 
 Corregir error: You have included the Google Maps JavaScript API multiple times on this page. This may cause unexpected errors.
-Add debounce when showing panel with segment info.
-
-
-# TESTS 
-Testear y confirmar que responda bien cuando no se encuentra un edificio.
-
-Make sure kW are correct and they are not Watts.
-Fix style last report.
-Verify format of data in the entries.
-
-When the offset in step 2 and the marker in step 1 are very faraway, it means that the building has changed.
-We need 
-
-
 Add all PHP CS to all files.
-Refactor code and sort it out better.
-Add Playwright testing
-When dragging and redimensioning the rect, hide the solar panels
 Show in DB the data from the rectangles and solar panels
 Fix form back and fw.
 Message to mobile: not shown. Try to make it mobile friendly, with tap events
-Install all development to Emiliano.
 
 # What
 
@@ -135,6 +117,11 @@ wp-admin/options-general.php?page=testing-page`
 
 We created two simple Playwright tests, for step 1 and step 2. It's difficult to simulate the interaction with Google Maps, so we left it like this.
 
+You might need to run
+> npx playwright install
+
+And you need to setup the .env with the Keys.
+
 # Testing unit test of js (jest)
 
 We created some js unit testing for the trigonmetry functions
@@ -190,3 +177,6 @@ wp i18n make-pot . ./languages/solar-project.pot --exclude="vendor,node_modules"
 - azimuth: the angle of orientation of every segment, 0 degrees is set to North.
 - building profile: Google Maps API gives the path of a polygon defining the shape of the roof.
 
+# XDebug
+
+I was not able to set it up in wp-env environment. WIP.
