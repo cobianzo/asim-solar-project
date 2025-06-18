@@ -1,5 +1,21 @@
 # TODO NEXT
 
+## Communicazione 
+
+- ⁠✅Traduzione del plugin ( vedrai la cartella /languages, si possono modificare i testi. Ci sono diverse tecniche, ti posso spiegare come. Anche chatgpt lo spiega molto bene)
+- ⁠✅Ho aggiunto uno script di js aparte, scritto nel CMS di dev, per nascondere il marker che si vede la prima volta che si visita la pagina (cioe’ tu vai su
+	- ⁠⁠https://dev.pannellisolariitalia.it/calcola-il-tuo-preventivo-per-i-panelli/
+	- ⁠⁠e vedi la mappa dell’italia, con un puntino settato a Roma. Con il mio js, si cancella quel marker nel page load.
+	- ⁠⁠ecco il codice lo trovi qui (e’ buono abituarsi a usare quei snippets per aggiungere questo tipo di modifiche semplici) https://dev.pannellisolariitalia.it/wp-admin/admin.php?page=wpcode-snippet-manager&snippet_id=488
+- Volendo, puoi modificare lo zoom anche con JS (si puo' fare con PHP, ma forese piu' complesso). In quella pagina potresti usare, in JS:  `cocoMaps.input_9_3.map.setZoom(7) `, e ti amplia lo zoom per raggiungere tutta l'Italia.
+•⁠  ⁠✅Cambio colore bottone top-left di geolocalizzazione. Il codice CSS en anche uno snippet, lo trovi qui: https://dev.pannellisolariitalia.it/wp-admin/admin.php?page=wpcode-snippet-manager&snippet_id=487
+
+Poi un po' di considerazioni generali.
+- Divi e troppo lento, problemi mostrando i panelli popup con info del segmento su cui ci si passa il mouse.
+	- Ho dovuto mettere un delay nel mostrare il panello di informazione di un segmento del tetto, perche' si appiccicavano.
+- SMTP e' duplicato, con Gravity Forms e con il plugin apposta per SMTP. Sarebbe buono usare solo uno.
+- Dobbiamo risolverre probemma con l'environment tuo. Sara' una cazzata, possiamo rinizziare l'installazione da capo
+
 Corregir error: You have included the Google Maps JavaScript API multiple times on this page. This may cause unexpected errors.
 Add all PHP CS to all files.
 Show in DB the data from the rectangles and solar panels
@@ -41,7 +57,7 @@ http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-f
     - The map in step 3 must have the `adminLabel === 'map-rectangle'`
     - below the map in step 3 we need a gf textarea with adminLabel and class === 'saved-rectangles'
 
-    -- More fields in step 3 gravity forms with class and adminLabel: 
+    -- More fields in step 3 gravity forms with class and `adminLabel`:  
     [...]
     --- `panel-length`
     --- `panel-height`
@@ -53,9 +69,12 @@ http://localhost:8777/wp-admin/admin.php?page=gf_settings&subview=coco-gravity-f
     --- Dropdown of panels: allow dynamic content: param `panel_list`
   - The step 4 needs to have any field with class and adminLabel === 'power-calculations'
 
+> Note: this info about how to mark the fields in the GForm might not be up to date. But we have a demo of
+> the gravity form in `tests/data/gravityforms-form.json`. You can simply import it.
+
 # Project Structure
 
-- plugin.php contains only code for playwright testing. Creates the page Settings > Testing to create the page with the form quickly.
+- plugin.php contains only code for playwright testing. Creates the page Settings > Testing to create the page with the form quickly. (in order to use that page, you need to setup the `.env` file )
 ├── coco-gravity-form-map-field (the git submodule, you dont need to touch it)
 └── solar-project
     ├── inc : All the php files. The add hooks to GF and expose JS vars used by our typescript scripts.
@@ -70,7 +89,6 @@ For more info, see `AI-AGENT.md`.
 
 `git submodule update --init --recursive`
 
-
 - Node 20 (not sure if its n18?)
 - NPM 10.7
 - WP Env installed globally
@@ -78,17 +96,29 @@ For more info, see `AI-AGENT.md`.
 - Composer
 
 `npm install`
+`composer install`
 also, inside the folder `plugins/coco-gravity-form-map-field`
 `npm install` 
+`composer install`
 also, inside the folder `plugins/solar-project`
 `npm install`
+`composer install`
 
-
-in this folder
+in this root folder
 
 `npm run dev` for wp scripts compilation into `/plugins/solar-project/build` - It compiles also into the `coco-gravity-form-map-field` subproject, in case you modify something there.
 
 `npm run bs` for browser sync
+
+## start the environment in localhost:8777
+
+for the first time, it is avisable to run the global wp-env with 
+
+`wp-env start`
+
+after the containers are created, you can replace it by the local installatin
+
+`npm run up`
 
 ## deploy of the work in a website
 
@@ -156,13 +186,26 @@ I set `npm run eslint` to format all the typescript FILEs in `solar-panel` plugi
 
 # PHPCS and PHPCBF
 
-`composer run-script lint plugins/solar-project/solar-project.php`
-para el plugin coco- ... you need to enter the project and see its README.
+ie.
+`composer run-script lint plugins/solar-project/solar-project.php`  
+or simply `composer lint <relative/path/to/file.php>`
+para el plugin coco- ... you need to enter the project and see its README.md
 
 # Translations
 
-Added a Helper to detect the code of the langua (ie 'it')  
-Added a suffix to the files (js and json) which shows notifications. 
+- I Added a `\Coco_Solar\Helper::get_language()` to detect the code of the language (ie 'it')  
+- The translations apply mostyl to the notifications (there are two kinds, the ones on top of the screen,
+and the into panels popup shown when hovering a segment)
+- For the top bar notifications (they pretend to be a user helper, like a wizard), thw translations are in  
+`plugins/solar-project/src/notification-texts/*.json`
+- For the popups panel notifications: I added a suffix to the files (js and json) which shows notifications, ie `segmentInfo_it.html` in folder `plugins/solar-project/assets/notifications/`
+
+> Since the top notifications act like a wizard, they trigger when the state of the page changes 
+> (ie when starting to draw a rectangle), so I added a custom listener. Like this, we can hook custom code 
+> when that change of state happens.
+
+## How I created the translations
+
 `npm run cli bash`
 ```
 cd wp-content/plugins/solar-project
@@ -179,4 +222,4 @@ wp i18n make-pot . ./languages/solar-project.pot --exclude="vendor,node_modules"
 
 # XDebug
 
-I was not able to set it up in wp-env environment. WIP.
+WIP. I was not able to set it up in wp-env environment.
