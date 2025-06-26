@@ -1,26 +1,19 @@
 # TODO NEXT
 
-## Communicazione 
-
-- ⁠✅Traduzione del plugin ( vedrai la cartella /languages, si possono modificare i testi. Ci sono diverse tecniche, ti posso spiegare come. Anche chatgpt lo spiega molto bene)
-- ⁠✅Ho aggiunto uno script di js aparte, scritto nel CMS di dev, per nascondere il marker che si vede la prima volta che si visita la pagina (cioe’ tu vai su
-	- ⁠⁠https://dev.pannellisolariitalia.it/calcola-il-tuo-preventivo-per-i-panelli/
-	- ⁠⁠e vedi la mappa dell’italia, con un puntino settato a Roma. Con il mio js, si cancella quel marker nel page load.
-	- ⁠⁠ecco il codice lo trovi qui (e’ buono abituarsi a usare quei snippets per aggiungere questo tipo di modifiche semplici) https://dev.pannellisolariitalia.it/wp-admin/admin.php?page=wpcode-snippet-manager&snippet_id=488
-- Volendo, puoi modificare lo zoom anche con JS (si puo' fare con PHP, ma forese piu' complesso). In quella pagina potresti usare, in JS:  `cocoMaps.input_9_3.map.setZoom(7) `, e ti amplia lo zoom per raggiungere tutta l'Italia.
-•⁠  ⁠✅Cambio colore bottone top-left di geolocalizzazione. Il codice CSS en anche uno snippet, lo trovi qui: https://dev.pannellisolariitalia.it/wp-admin/admin.php?page=wpcode-snippet-manager&snippet_id=487
-
-Poi un po' di considerazioni generali.
-- Divi e troppo lento, problemi mostrando i panelli popup con info del segmento su cui ci si passa il mouse.
-	- Ho dovuto mettere un delay nel mostrare il panello di informazione di un segmento del tetto, perche' si appiccicavano.
-- SMTP e' duplicato, con Gravity Forms e con il plugin apposta per SMTP. Sarebbe buono usare solo uno.
-- Dobbiamo risolverre probemma con l'environment tuo. Sara' una cazzata, possiamo rinizziare l'installazione da capo
-
+Add a proper e2e testing
+We need to add more docblock comments in general, and clean up commented code.
 Corregir error: You have included the Google Maps JavaScript API multiple times on this page. This may cause unexpected errors.
 Add all PHP CS to all files.
 Show in DB the data from the rectangles and solar panels
 Fix form back and fw.
 Message to mobile: not shown. Try to make it mobile friendly, with tap events
+
+## Communicazione 
+
+Poi un po' di considerazioni generali.
+- Divi e troppo lento, problemi mostrando i panelli popup con info del segmento su cui ci si passa il mouse.
+	- Ho dovuto mettere un delay nel mostrare il panello di informazione di un segmento del tetto, perche' si appiccicavano.
+- SMTP e' duplicato, con Gravity Forms e con il plugin apposta per SMTP. Sarebbe buono usare solo uno.
 
 # What
 
@@ -193,8 +186,10 @@ para el plugin coco- ... you need to enter the project and see its README.md
 
 # Translations
 
-- I Added a `\Coco_Solar\Helper::get_language()` to detect the code of the language (ie 'it')  
-- The translations apply mostyl to the notifications (there are two kinds, the ones on top of the screen,
+## Custom translations for notifications
+
+- I added a `\Coco_Solar\Helper::get_language()` to detect the code of the language (ie 'it')  
+- The translations apply mostly to the notifications (there are two kinds, the ones on top of the screen,
 and the into panels popup shown when hovering a segment)
 - For the top bar notifications (they pretend to be a user helper, like a wizard), thw translations are in  
 `plugins/solar-project/src/notification-texts/*.json`
@@ -204,17 +199,29 @@ and the into panels popup shown when hovering a segment)
 > (ie when starting to draw a rectangle), so I added a custom listener. Like this, we can hook custom code 
 > when that change of state happens.
 
-## How I created the translations
 
+## Regular WordPress translations
+
+To create the .pot with all tranlatable strings, get into the container with
 `npm run cli bash`
+and
 ```
 cd wp-content/plugins/solar-project
-wp i18n make-pot . ./languages/solar-project.pot --exclude="vendor,node_modules" --domain=solar-project
+wp i18n make-pot . languages/solar-project.pot --domain=solar-project
 ```
+To make the translations you can use PoEdit, and update the catalogue from the .pot. Then translate what you want. To make the translations, I like to open the .po with VSCode, and translate the strings with IA, under the promt 'for every empty msgstr, set the translation from msgid into italian.'.
+Then, to create the .mo files, we need to run
+```
+wp i18n make-mo ./languages/
+```
+it takes a while to be created.
+And for the `.json`, needed for the typescript tranlations:
+`wp i18n make-json ./languages/`
 
 # Terminology:
 
 - segment: when selecting a roof, Solar API provides several areas with radiance information. Everyone of them is a segment.
+	- segmentRotated: due to an inconsistency of Solar API, some segments must be rotated 90 degrees to the right. This happens randomly and only in segments where the high is more than the width. The user have the option to rotate the rectangles in the step 2, and then we consider the segments rotated.
 - rectangle: the user will draw a rectangle over the roof, which is the area where the panels will go. That's the rectangle
 	- savedRectangle: object that contains the data for a google.map.polygon rectangle drawn over the map. Contains info about the solarPanelsPolygons drawin inside of it.
 - azimuth: the angle of orientation of every segment, 0 degrees is set to North.

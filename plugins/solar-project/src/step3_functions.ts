@@ -1,4 +1,3 @@
-// RENAME TO step 4 TODO:
 import { createTopNotification } from './notification-api';
 import { updateValuesCoordsSegmentsFromDBOffset } from './setup-drag-all-segments-interaction';
 import { loadSavedRectanglesFromTextArea } from './setup-rectangle-interactive';
@@ -7,8 +6,8 @@ import { applyListenersToPanelModelsDropdown, loadModelPanelParametersInInputs }
 import { CocoMapSetup } from './types';
 
 /**
- * Returns the CocoMapSetup object for the step2 map (the one with the input text element
- * identified by window.step2CocoMapInputId). The default export of this script
+ * Returns the CocoMapSetup object for the step3 map (the one with the input text element
+ * identified by window.step3CocoMapInputId). The default export of this script
  *
  * @returns {CocoMapSetup | null}
  */
@@ -18,6 +17,7 @@ export const getStep3CocoMapSetup = function (): CocoMapSetup | null {
 };
 
 document.addEventListener('solarMapReady', (event: Event) => {
+
 	// setup and validations
 	const cocoMapSetup = getStep3CocoMapSetup();
 	if (

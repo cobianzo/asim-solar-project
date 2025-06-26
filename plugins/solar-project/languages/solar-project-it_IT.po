@@ -1,17 +1,15 @@
-# Copyright (C) 2025 cobianzo
-# This file is distributed under the GPL2.
 msgid ""
 msgstr ""
 "Project-Id-Version: Solar Project 4.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/solar-project\n"
-"POT-Creation-Date: 2025-06-04T04:49:35+00:00\n"
-"PO-Revision-Date: 2025-06-04 00:01-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-06-26T05:59:16+00:00\n"
+"PO-Revision-Date: 2025-06-26 00:02-0600\n"
+"Language: it\n"
 "X-Generator: Poedit 3.6\n"
 "X-Domain: solar-project\n"
 
@@ -44,56 +42,117 @@ msgstr "http://cobianzo.com"
 msgid "--Custom--"
 msgstr "--Personalizzato--"
 
+#: inc/class-model-panel.php:26
+msgctxt "post type general name"
+msgid "Solar Panel Models"
+msgstr "Modelli di Pannelli Solari"
+
+#: inc/class-model-panel.php:27
+msgctxt "post type singular name"
+msgid "Solar Panel Model"
+msgstr "Modello di Pannello Solare"
+
+#: inc/class-model-panel.php:28
+msgctxt "admin menu"
+msgid "Solar Panel Models"
+msgstr "Modelli di Pannelli Solari"
+
+#: inc/class-model-panel.php:29
+msgctxt "add new on admin bar"
+msgid "Solar Panel Model"
+msgstr "Modello di Pannello Solare"
+
+#: inc/class-model-panel.php:30
+msgctxt "solar panel model"
+msgid "Add New"
+msgstr "Aggiungi Nuovo"
+
+#: inc/class-model-panel.php:31
+msgid "Add New Solar Panel Model"
+msgstr "Aggiungi Nuovo Modello di Pannello Solare"
+
+#: inc/class-model-panel.php:32
+msgid "New Solar Panel Model"
+msgstr "Nuovo Modello di Pannello Solare"
+
+#: inc/class-model-panel.php:33
+msgid "Edit Solar Panel Model"
+msgstr "Modifica Modello di Pannello Solare"
+
+#: inc/class-model-panel.php:34
+msgid "View Solar Panel Model"
+msgstr "Visualizza Modello di Pannello Solare"
+
+#: inc/class-model-panel.php:35
+msgid "All Solar Panel Models"
+msgstr "Tutti i Modelli di Pannelli Solari"
+
+#: inc/class-model-panel.php:36
+msgid "Search Solar Panel Models"
+msgstr "Cerca Modelli di Pannelli Solari"
+
+#: inc/class-model-panel.php:37
+msgid "Parent Solar Panel Models:"
+msgstr "Modelli di Pannelli Solari Principali:"
+
+#: inc/class-model-panel.php:38
+msgid "No solar panel models found."
+msgstr "Nessun modello di pannello solare trovato."
+
+#: inc/class-model-panel.php:39
+msgid "No solar panel models found in Trash."
+msgstr "Nessun modello di pannello solare trovato nel cestino."
+
 #. translators: %s: Total energy production value in kWh/year
-#: inc/render-step-4.php:63
+#: inc/render-step-4.php:62
 #, php-format
 msgid "Total Energy Production: <strong><span id=\"total-energy\">%s</span> kWh/year</strong>"
 msgstr "Produzione Energetica Totale: <strong><span id=\"total-energy\">%s</span> kWh/anno</strong>"
 
-#: inc/render-step-4.php:70
+#: inc/render-step-4.php:69
 msgid "Energy Report"
 msgstr "Rapporto Energetico"
 
-#: inc/render-step-4.php:72
+#: inc/render-step-4.php:71
 msgid "Panel Model"
-msgstr "Modello Pannello"
+msgstr "Modello di Pannello"
 
-#: inc/render-step-4.php:74
+#: inc/render-step-4.php:73
 msgid "Panel dimensions"
 msgstr "Dimensioni Pannello"
 
-#: inc/render-step-4.php:77
+#: inc/render-step-4.php:76
 msgid "Nominal power per panel"
 msgstr "Potenza nominale per pannello"
 
 #. translators: %d: Segment number
-#: inc/render-step-4.php:91
+#: inc/render-step-4.php:88
 #, php-format
 msgid "Segment %d"
 msgstr "Segmento %d"
 
 #. translators: %1$d: Pitch degrees, %2$s: Orientation, %3$d: Area
-#: inc/render-step-4.php:96
+#: inc/render-step-4.php:93
 #, php-format
 msgid "Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²"
 msgstr "Inclinazione: %1$d°, Orientamento: %2$s, Area: %3$d m²"
 
-#: inc/render-step-4.php:102
+#: inc/render-step-4.php:99
 msgid "Hours sun / year"
 msgstr "Ore di sole / anno"
 
-#: inc/render-step-4.php:103
+#: inc/render-step-4.php:100
 msgid "Panels"
 msgstr "Pannelli"
 
-#: inc/render-step-4.php:104
+#: inc/render-step-4.php:101
 msgid "Power per Panel"
 msgstr "Potenza per Pannello"
 
-#: inc/render-step-4.php:105
+#: inc/render-step-4.php:102
 msgid "System Efficiency"
 msgstr "Efficienza del Sistema"
 
-#: inc/render-step-4.php:106
+#: inc/render-step-4.php:103
 msgid "Annual Energy (kWh)"
 msgstr "Energia Annuale (kWh)"

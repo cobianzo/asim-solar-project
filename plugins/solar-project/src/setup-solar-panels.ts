@@ -61,6 +61,17 @@ export const setupSolarPanels = function () {
 	});
 };
 
+/**
+ * Paints in the map the solar panels for a given rectangle.
+ * It's not an easy task.
+ * 1) First we calculate the normal rectangle, without inclination.
+ * 2) For the orto rectangle pointing to North (to the north)
+ * we paint the rectangles for every solar panel
+ * 3) Then we rotate the panels to match the inclination of the rectangle
+ *
+ * @param savedRectangle
+ * @returns
+ */
 export const paintSolarPanelsForSavedRectangle = function (savedRectangle: SavedRectangle) {
 	const cocoSetp = getCurrentStepCocoMap();
 	const { polygon } = savedRectangle;
@@ -85,7 +96,7 @@ export const paintSolarPanelsForSavedRectangle = function (savedRectangle: Saved
 	console.log('%c TITLE: solar panels for saved rectangle ', 'font-size:2rem;color:blue', savedRectangle);
 	const [rectLengthY, rectLengthX] = getRectangleSideDimensionsByPolygonPath(polygon); // in mm
 
-	// calculate the fatorfacto to scale to get a rectangle 10x15m
+	// calculate the factor to scale to get a rectangle 10x15m
 	let dimensionsPanel = getCurrentPanelsDimensions(); // milimeters
 
 	// check if it's a portrait segment that has been rotated.
@@ -387,20 +398,50 @@ export const getSolarPanelsSurface = function (savedR: SavedRectangle): number {
 /**
  * Counts the activated panels in a rectangle drawn by the user.
  * @param savedRect
- * @return
+ * @return integer
  */
 export const getNumberOfPanelsInRectangle = function (savedRect: SavedRectangle): number {
-	let countPanels = 0;
-	savedRect.solarPanelsPolygons.forEach((row) => {
-		row.forEach((panel) => {
-			const isDeactivated = isSolarPanelDeactivated(savedRect, panel);
-			if (!isDeactivated) {
-				countPanels++;
-			}
-		});
-	});
+  const stringRepresentation = getSolarPanelsRepresentationInRows(savedRect);
+  let countPanels = 0;
+  countPanels = (stringRepresentation.match(/X/g) || []).length;
 	return countPanels;
 };
+
+/**
+ * Represents the Solar panels of 2 rows, 10 cols, like this:
+ * XXX__XXX_|XXXXXXXXX
+ * where 'X' are a solar panel, '_' is a deactivated solar panel (a gap in the insallation wihout panel)
+ * and '|' is a separator between the rows.
+ * We save this representation in the textarea, even if we don't need it to reproduce the
+ * painted solar rects and panels, but it has been required to be saved in the DB.
+ *
+ * @param savedRect
+ * @returns string XXX__XXX_|XXXXXXXXX, where the row is considered the direction of the lower edge of the panel.
+ */
+export const getSolarPanelsRepresentationInRows = function(savedRect: SavedRectangle): string {
+	let stringRepresentation: string = '';
+
+  // If orientation is vertical, or segment is rotated, transpose the array to swap rows and columns
+  let transposedPolygons = savedRect.solarPanelsPolygons;
+  let transpose1 = (isPortaitSegmentRotated(getSegmentByIndex(savedRect.segmentIndex!))) ? false : true;;
+  if (transpose1) {
+    transposedPolygons = savedRect.solarPanelsPolygons[0].map((_, colIndex) =>
+      savedRect.solarPanelsPolygons.map(row => row[colIndex])
+    );
+  }
+  // Lets add X and _.
+  transposedPolygons.forEach((row, indexRow) => {
+		row.forEach((panel) => {
+			const isDeactivated = isSolarPanelDeactivated(savedRect, panel);
+			stringRepresentation += isDeactivated ? '_' : 'X';
+		});
+    if (indexRow < transposedPolygons.length - 1) {
+      stringRepresentation += '|';
+    }
+	});
+
+  return stringRepresentation;
+}
 
 /**
  * On every change of the dropdown .panel-model-dropdown select, we load the

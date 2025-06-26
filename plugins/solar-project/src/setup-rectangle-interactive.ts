@@ -37,6 +37,7 @@ import {
 	cleanupSolarPanelsForSavedRectangle,
 	getAnnualGeneratedPower,
 	getNumberOfPanelsInRectangle,
+	getSolarPanelsRepresentationInRows,
 	getSolarPanelsSurface,
 	setupSolarPanels,
 } from './setup-solar-panels';
@@ -90,6 +91,14 @@ export const setupRectangles = function () {
 	setupSolarPanels();
 };
 
+/**
+ * Paints the rectangle in the map, inclined, based on the
+ * coordenates given in the prop tempPathAsString.
+ *
+ * @param gmap
+ * @param rectangleInfo
+ * @returns
+ */
 export const paintSavedRectangle = function (gmap: google.maps.Map, rectangleInfo: SavedRectangle) {
 	if (!rectangleInfo.tempPathAsString?.length) return;
 	if (!rectangleInfo.polygon?.getMap()) {
@@ -152,6 +161,7 @@ export const saveSavedRectanglesInTextArea = function () {
 				indexSegment: -1,
 				orientation: '',
 				numberPanels: 0,
+				solarPanelsRows: '',
 				panelsSurface: 0,
 				annualPower: 0,
 			};
@@ -174,6 +184,7 @@ export const saveSavedRectanglesInTextArea = function () {
 				rectData.orientation = getCardinalOrientationFromAngle(theSegm.data?.azimuthDegrees!).join(', ');
 			}
 			rectData.numberPanels = getNumberOfPanelsInRectangle(savedR);
+			rectData.solarPanelsRows = getSolarPanelsRepresentationInRows(savedR); // this is not needed but Roberto requests to be saved in DB.
 			rectData.panelsSurface = getSolarPanelsSurface(savedR);
 			rectData.annualPower = getAnnualGeneratedPower(savedR);
 			// ==========
@@ -195,6 +206,13 @@ export const saveSavedRectanglesInTextArea = function () {
 	(textAreaEl as HTMLTextAreaElement).value = dataStringified;
 };
 
+/**
+ * In the step 3 there is a textarea that saves the data drawn in the map.
+ * From that data, we can reproduce the rectangles and solar panels, for
+ * example y we reload the page.
+ *
+ * @returns
+ */
 export const loadSavedRectanglesFromTextArea = function () {
 	const textAreaEl = document.querySelector('.gfield.saved-rectangles textarea');
 	if (!textAreaEl) {
@@ -322,7 +340,7 @@ export const handlerSecondClickDrawRectangle = function () {
 	// [... ] TODO:
 	delete window.cocoDrawingRectangle.tempFirstClickPoint;
 
-	// Finish setup and paint hte center
+	// Finish setup and paint the center (removed, we don´t need to paint it anymore)
 	// paintCenterOfUsersRectangleInMap(segm.map);
 
 	// assign the event listeners that allow the user to rotate the rectangle on the map

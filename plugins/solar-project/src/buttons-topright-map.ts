@@ -1,5 +1,7 @@
+import { __ } from '@wordpress/i18n';
+
 import { resetSegmentVisibility } from './drawing-helpers';
-import setupSegments from './setup-segments-interactive-functions';
+import setupSegments, { escKeyListener } from './setup-segments-interactive-functions';
 import { convertPolygonPathToStringLatLng } from './trigonometry-helpers';
 import {
 	getSavedRectangleBySegment,
@@ -69,13 +71,13 @@ function createBtn(
  */
 
 /**
- * Button 'Unselect' also 'Delete'
+ * Button 'Cancel' also 'Delete'
  *
  * @param gmap
  * @param text
  * @returns HTMLButtonElement | undefined
  */
-export const createUnselectSegmentButton = (gmap: google.maps.Map, text: string = 'Unselect') => {
+export const createUnselectSegmentButton = (gmap: google.maps.Map, text: string = __('Cancel', 'solar-project')) => {
 	const segmentHasRect = getSavedRectangleBySegment(window.cocoDrawingRectangle.selectedSegment!);
 	if (segmentHasRect)
 		createTopNotification('STEP3_SEGMENT_SELECTED_WITH_RECTANGLE', [
@@ -92,17 +94,17 @@ export const createUnselectSegmentButton = (gmap: google.maps.Map, text: string 
 };
 
 /**
- * 'Unselect' button: created when a segment is selected.
- * The 'Unselect' Button converts into 'Delete' when a rectangle exists in the segment
+ * 'Cancel' button: created when a segment is selected.
+ * The 'Cancel' Button converts into 'Delete' when a rectangle exists in the segment
  */
 export const convertUnselectButtonIntoDelete = () => {
 	const btn = document.getElementById('delete-rectangle-btn');
-	if (btn) btn.textContent = 'Delete';
+	if (btn) btn.textContent = __('Delete', 'solar-project');
 };
 
 export const createSaveSegmentButton = (gmap: google.maps.Map) => {
 	convertUnselectButtonIntoDelete();
-	const saveButtonEl = createBtn(gmap, 'Save', handlerClickSaveRectangleButton, { id: 'save-rectangle-btn' });
+	const saveButtonEl = createBtn(gmap, __('Save', 'solar-project'), handlerClickSaveRectangleButton, { id: 'save-rectangle-btn' });
 	saveButtonEl?.classList.add('coco-btn-success');
 	createOrientationRadio(gmap);
 	return saveButtonEl;
@@ -203,7 +205,7 @@ const syncOrientationRadioButton = (syncDirection: 'panelsToRadio' | 'radioToPan
 	}
 };
 
-const exitFromEditRectangle = function () {
+export const exitFromEditRectangle = function () {
 	// rebuild all the segments
 	setupSegments();
 
@@ -212,6 +214,9 @@ const exitFromEditRectangle = function () {
 
 	const btns = document.querySelectorAll('.rectangle-edit-button');
 	(btns || []).forEach((btn) => btn.remove());
+
+  // remove the esc listener too.
+  document.removeEventListener('keydown', escKeyListener);
 };
 
 const handlerClickUnselectButton = function (e: MouseEvent) {
@@ -318,7 +323,7 @@ export const createButtonActivateDeactivateSolarPanels = function (
 	gmap: google.maps.Map,
 	savedRectangle: SavedRectangle
 ) {
-	createBtn(gmap, 'Edit Solar Panels', handlerClickActivateDeactivateSolarPanels, {
+	createBtn(gmap, __('Edit Solar Panels', 'solar-project'), handlerClickActivateDeactivateSolarPanels, {
 		id: 'activate-deactivate-solar-panels-btn',
 	});
 };

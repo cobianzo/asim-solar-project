@@ -1,3 +1,5 @@
+import { __ } from '@wordpress/i18n';
+
 import { boxBySWNE, CoupleOfPoints, LatitudeLongitudeObject } from './types';
 
 /**
@@ -665,6 +667,40 @@ export const getCardinalOrientationFromAngle = function (angle: number): [string
 
 	// sanitize, Ensure the array has max two items
 	cardinalPoints.splice(2);
+	cardinalPoints.forEach((northeastsouthwest: string, i: number) => {
+		switch (northeastsouthwest) {
+			case 'Northeast':
+				cardinalPoints[i] = __('Northeast', 'solar-project');
+				break;
+			case 'Northwest':
+				cardinalPoints[i] = __('Northwest', 'solar-project');
+				break;
+			case 'Southeast':
+				cardinalPoints[i] = __('Southeast', 'solar-project');
+				break;
+			case 'Southwest':
+				cardinalPoints[i] = __('Southwest', 'solar-project');
+				break;
+			case 'Southwest':
+				cardinalPoints[i] = __('Southwest', 'solar-project');
+				break;
+			case 'South':
+				cardinalPoints[i] = __('South', 'solar-project');
+				break;
+			case 'North':
+				cardinalPoints[i] = __('North', 'solar-project');
+				break;
+			case 'East':
+				cardinalPoints[i] = __('East', 'solar-project');
+				break;
+			case 'West':
+				cardinalPoints[i] = __('West', 'solar-project');
+				break;
+
+			default:
+				cardinalPoints[i] = northeastsouthwest;
+		}
+	});
 	return cardinalPoints as [string, string?];
 };
 

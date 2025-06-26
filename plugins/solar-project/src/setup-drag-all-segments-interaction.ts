@@ -119,7 +119,7 @@ export const getMovingBoundingBoxOffsetFromOrigin = function (): [number, number
 
 export const isPortaitSegmentRotated = function (segment: ExtendedSegment | null): boolean {
 	if (!segment) return false;
-	return segment.realRotationAngle == (segment.data?.azimuthDegrees ?? 0) + 90;
+	return Math.round(segment.realRotationAngle ?? 0) === Math.round((segment.data?.azimuthDegrees ?? 0) + 90);
 };
 
 // The value stored in the gravity forms entry is exposed in window. step2·OffsetInserted

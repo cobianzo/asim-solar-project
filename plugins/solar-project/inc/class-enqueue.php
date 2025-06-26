@@ -163,8 +163,12 @@ class Enqueue {
 				'window.cocoIsStepSelectRectangle = ' . wp_json_encode( $current_page_is_rectangle ) . "; \n" // step 3
 				// 'window.cocoIsStepSelectPanelli = ' . wp_json_encode( $current_page_is_panelli ) . "; \n"
 			);
-			wp_enqueue_script( 'coco-solar-functions' );
 
+			// Translations for Javascript.
+			wp_set_script_translations( 'coco-solar-functions', 'solar-project', plugin_dir_path( __DIR__ ) . 'languages' );
+
+			// Finally enqueue the script with all the dependencies and inline scripts associated.
+			wp_enqueue_script( 'coco-solar-functions' );
 		}
 	}
 }

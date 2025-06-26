@@ -23,20 +23,20 @@ class Model_Panel {
 	public static function register_solar_panel_model_cpt() {
 
 		$labels = array(
-			'name'               => _x( 'Solar Panel Models', 'post type general name', 'textdomain' ),
-			'singular_name'      => _x( 'Solar Panel Model', 'post type singular name', 'textdomain' ),
-			'menu_name'          => _x( 'Solar Panel Models', 'admin menu', 'textdomain' ),
-			'name_admin_bar'     => _x( 'Solar Panel Model', 'add new on admin bar', 'textdomain' ),
-			'add_new'            => _x( 'Add New', 'solar panel model', 'textdomain' ),
-			'add_new_item'       => __( 'Add New Solar Panel Model', 'textdomain' ),
-			'new_item'           => __( 'New Solar Panel Model', 'textdomain' ),
-			'edit_item'          => __( 'Edit Solar Panel Model', 'textdomain' ),
-			'view_item'          => __( 'View Solar Panel Model', 'textdomain' ),
-			'all_items'          => __( 'All Solar Panel Models', 'textdomain' ),
-			'search_items'       => __( 'Search Solar Panel Models', 'textdomain' ),
-			'parent_item_colon'  => __( 'Parent Solar Panel Models:', 'textdomain' ),
-			'not_found'          => __( 'No solar panel models found.', 'textdomain' ),
-			'not_found_in_trash' => __( 'No solar panel models found in Trash.', 'textdomain' ),
+			'name'               => _x( 'Solar Panel Models', 'post type general name', 'solar-project' ),
+			'singular_name'      => _x( 'Solar Panel Model', 'post type singular name', 'solar-project' ),
+			'menu_name'          => _x( 'Solar Panel Models', 'admin menu', 'solar-project' ),
+			'name_admin_bar'     => _x( 'Solar Panel Model', 'add new on admin bar', 'solar-project' ),
+			'add_new'            => _x( 'Add New', 'solar panel model', 'solar-project' ),
+			'add_new_item'       => __( 'Add New Solar Panel Model', 'solar-project' ),
+			'new_item'           => __( 'New Solar Panel Model', 'solar-project' ),
+			'edit_item'          => __( 'Edit Solar Panel Model', 'solar-project' ),
+			'view_item'          => __( 'View Solar Panel Model', 'solar-project' ),
+			'all_items'          => __( 'All Solar Panel Models', 'solar-project' ),
+			'search_items'       => __( 'Search Solar Panel Models', 'solar-project' ),
+			'parent_item_colon'  => __( 'Parent Solar Panel Models:', 'solar-project' ),
+			'not_found'          => __( 'No solar panel models found.', 'solar-project' ),
+			'not_found_in_trash' => __( 'No solar panel models found in Trash.', 'solar-project' ),
 		);
 
 		$args = array(

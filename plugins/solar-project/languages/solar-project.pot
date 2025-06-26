@@ -2,14 +2,14 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Solar Project 5.0.0\n"
+"Project-Id-Version: Solar Project 5.0.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/solar-project\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-04T05:56:47+00:00\n"
+"POT-Creation-Date: 2025-06-26T05:59:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: solar-project\n"
@@ -41,6 +41,67 @@ msgstr ""
 
 #: inc/class-gravity-model-panel.php:46
 msgid "--Custom--"
+msgstr ""
+
+#: inc/class-model-panel.php:26
+msgctxt "post type general name"
+msgid "Solar Panel Models"
+msgstr ""
+
+#: inc/class-model-panel.php:27
+msgctxt "post type singular name"
+msgid "Solar Panel Model"
+msgstr ""
+
+#: inc/class-model-panel.php:28
+msgctxt "admin menu"
+msgid "Solar Panel Models"
+msgstr ""
+
+#: inc/class-model-panel.php:29
+msgctxt "add new on admin bar"
+msgid "Solar Panel Model"
+msgstr ""
+
+#: inc/class-model-panel.php:30
+msgctxt "solar panel model"
+msgid "Add New"
+msgstr ""
+
+#: inc/class-model-panel.php:31
+msgid "Add New Solar Panel Model"
+msgstr ""
+
+#: inc/class-model-panel.php:32
+msgid "New Solar Panel Model"
+msgstr ""
+
+#: inc/class-model-panel.php:33
+msgid "Edit Solar Panel Model"
+msgstr ""
+
+#: inc/class-model-panel.php:34
+msgid "View Solar Panel Model"
+msgstr ""
+
+#: inc/class-model-panel.php:35
+msgid "All Solar Panel Models"
+msgstr ""
+
+#: inc/class-model-panel.php:36
+msgid "Search Solar Panel Models"
+msgstr ""
+
+#: inc/class-model-panel.php:37
+msgid "Parent Solar Panel Models:"
+msgstr ""
+
+#: inc/class-model-panel.php:38
+msgid "No solar panel models found."
+msgstr ""
+
+#: inc/class-model-panel.php:39
+msgid "No solar panel models found in Trash."
 msgstr ""
 
 #. translators: %s: Total energy production value in kWh/year
@@ -95,4 +156,54 @@ msgstr ""
 
 #: inc/render-step-4.php:103
 msgid "Annual Energy (kWh)"
+msgstr ""
+
+#: build/index.js:92
+#: build/index.js:2401
+msgid "Cancel"
+msgstr ""
+
+#: build/index.js:110
+msgid "Delete"
+msgstr ""
+
+#: build/index.js:114
+msgid "Save"
+msgstr ""
+
+#: build/index.js:309
+msgid "Edit Solar Panels"
+msgstr ""
+
+#: build/index.js:4007
+msgid "Northeast"
+msgstr ""
+
+#: build/index.js:4010
+msgid "Northwest"
+msgstr ""
+
+#: build/index.js:4013
+msgid "Southeast"
+msgstr ""
+
+#: build/index.js:4016
+#: build/index.js:4019
+msgid "Southwest"
+msgstr ""
+
+#: build/index.js:4022
+msgid "South"
+msgstr ""
+
+#: build/index.js:4025
+msgid "North"
+msgstr ""
+
+#: build/index.js:4028
+msgid "East"
+msgstr ""
+
+#: build/index.js:4031
+msgid "West"
 msgstr ""

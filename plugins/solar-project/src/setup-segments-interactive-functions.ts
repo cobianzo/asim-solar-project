@@ -5,6 +5,9 @@
  * interact with them.
  */
 
+// WP dependency.
+import { __ } from '@wordpress/i18n';
+
 // types
 import { ExtendedSegment, RoofSegmentStats } from './types';
 
@@ -35,6 +38,7 @@ import {
 	createButtonActivateDeactivateSolarPanels,
 	createSaveSegmentButton,
 	createUnselectSegmentButton,
+	exitFromEditRectangle,
 } from './buttons-topright-map';
 import {
 	setupRectangles,
@@ -321,12 +325,6 @@ export const selectSegment = function (segm: ExtendedSegment) {
 		...SEGMENT_SELECTED,
 	}); // green
 
-	// Debugging: show popoover info. It stopped working
-	// const popoverInfo = document.getElementById(`segment-info-${segm.indexInMap}`);
-	// if (popoverInfo) {
-	//   createPopup(popoverInfo);
-	// }
-
 	window.cocoDrawingRectangle ||= {};
 	window.cocoDrawingRectangle.selectedSegment = segm;
 	delete window.cocoDrawingRectangle.hoveredSegment;
@@ -345,6 +343,9 @@ export const selectSegment = function (segm: ExtendedSegment) {
 			r.polygon?.setOptions(FADED_RECTANGLE_OPTIONS);
 		}
 	});
+
+	// for accessibility adds the key interaction too, equivalent as clicking on Unselect or Save  button on top right.
+	document.addEventListener('keydown', escKeyListener);
 
 	// If the segment has already a saved rectangle associated, we select that rectangle
 	// NOTE: we could allow having more than one rectangle per segment. For that we would not
@@ -366,7 +367,7 @@ export const selectSegment = function (segm: ExtendedSegment) {
 	}
 
 	// commands in the top right UI of the map
-	createUnselectSegmentButton(segm.map, 'Unselect');
+	createUnselectSegmentButton(segm.map, __('Cancel', 'solar-project'));
 	// if the segment had a rectangle, we automatically select the rectangle,
 	// so with the buttons  can save it or delete it
 	if (getSavedRectangleBySegment(segm)) {
@@ -380,6 +381,12 @@ export const selectSegment = function (segm: ExtendedSegment) {
 	}
 };
 
+// Store reference to event listener for cleanup.
+// When clicked we exit from the selected segment.
+export const escKeyListener = (event: KeyboardEvent) => {
+	if (event.key === 'Escape') exitFromEditRectangle();
+};
+
 /** Add the three handlers to the segment  */
 export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
 	if (!window.cocoIsStepSelectRectangle) return;
@@ -387,6 +394,13 @@ export const activateInteractivityOnSegment = (segment: ExtendedSegment) => {
 	segment.addListener('mouseover', handlerMouseOverHighlightSegment);
 	google.maps.event.addListener(segment, 'mouseout', handlerMouseOutUnhighlightSegment);
 	google.maps.event.addListener(segment, 'click', handlerClickSelectSegment);
+
+	// Add keyboard event listener for ESC key
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			console.log('ESC key was pressed - exiting segment selection mode');
+		}
+	});
 };
 export const deactivateInteractivityOnSegment = (segm: ExtendedSegment) => {
 	['click', 'mouseover', 'mouseout', 'mousemove'].forEach((eventName) => {

@@ -3,7 +3,7 @@
  * Plugin Name: Solar Project
  * Plugin URI: http://example.com/plugin
  * Description: Complementary code together with coco-gravity-form-map-field, to create the Solar Project experience
- * Version: 5.0.5
+ * Version: 6.0.0
  * Author: cobianzo
  * Author URI: http://cobianzo.com
  * Text Domain: solar-panel
@@ -63,3 +63,27 @@ $solar_project = new Solar_Project();
 // Activation and deactivation hooks
 register_activation_hook( __FILE__, array( $solar_project, 'activate' ) );
 register_deactivation_hook( __FILE__, array( $solar_project, 'deactivate' ) );
+
+
+
+
+add_action( 'enqueue_block_assets', function() {
+    $handle = 'mi-coco-solar-functions';
+
+    wp_register_script(
+        $handle,
+        plugin_dir_url( __FILE__ ) . 'build/index.js',
+        [ 'wp-i18n', 'wp-element' ],
+        '1.0.0',
+        true
+    );
+
+		$dir = plugin_dir_path( __FILE__ ) . 'languages';
+    wp_set_script_translations(
+        $handle,
+        'solar-project',
+        $dir
+    );
+
+    wp_enqueue_script( $handle );
+} );
