@@ -59,7 +59,7 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 	}
 
 	/* translators: %s: Total energy production value in kWh/year */
-	echo wp_kses_post( sprintf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-project' ), number_format( $total_energy, 0 ) ) );
+echo wp_kses_post( sprintf( __( 'Total Energy Production: <strong><span id="total-energy">%s</span> kWh/year</strong>', 'solar-project' ), number_format_i18n( $total_energy, 0 ) ) );
 	?>
 </div> <!-- /report-intro -->
 
@@ -78,15 +78,17 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 	</ul>
 
 	<?php
+	$total_panels = 0;
 	foreach ( $saved_rectangles_data as $i => $saved_rectangle ) :
 
 		$roof            = $roofs[ $saved_rectangle['indexSegment'] ];
 		$rectangle_power = $saved_rectangle['annualPower'] ?? 0;
+		$total_panels   += $saved_rectangle['numberPanels'];
 		?>
 		<h3><?php
 			/* translators: %d: Segment number */
 			echo esc_html( sprintf( __( 'Segment %d', 'solar-project' ), $i + 1 ) );
-		?> <em><?php echo number_format( $rectangle_power, 0 ); ?> kWh</em> </h3>
+		?> <em><?php echo number_format_i18n( $rectangle_power, 0 ); ?> kWh</em> </h3>
 		<p>
 			<?php
 				/* translators: %1$d: Pitch degrees, %2$s: Orientation, %3$d: Area */
@@ -106,16 +108,41 @@ $roofs         = $building_data['solarPotential']['roofSegmentStats'] ?? null;
 			<tbody>
 				<tr>
 					<?php
-					$hours_sun = number_format( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ], 1 );
+					$hours_sun = number_format_i18n( $roof['stats']['sunshineQuantiles'][ $quantiles_field->value ], 1 );
 					?>
 					<td><?php echo esc_html( $hours_sun ); ?> h</td>
 					<td><?php echo esc_html( $saved_rectangle['numberPanels'] ); ?></td>
 					<td><?php echo esc_html( $panelpower_field->value ); ?> W</td>
 					<td><?php echo esc_html( $efficiency_field->value * 100 ); ?> %</td>
-					<td><b><?php echo number_format( $rectangle_power, 0 ); ?> kWh </b></td>
+					<td><b><?php echo number_format_i18n( $rectangle_power, 0 ); ?> kWh </b></td>
 				</tr>
 			</tbody>
 		</table>
 
 	<?php endforeach; ?>
+
+
+
+	<div class="report-footer-data">
+
+	<!-- Panels -->
+		<div>
+			<h4 style=""><?php esc_html_e( 'Total panels', 'solar-project' ); ?></h4>
+			<b><?php echo number_format_i18n( $total_panels ); ?> panels</b>
+		</div>
+
+		<!-- multiplication -->
+		<div>
+			<h4 style=""><?php
+				esc_html_e( 'Total power', 'solar-project' ); ?><br >
+				<small><?php esc_html_e( 'total panels x power per panel', 'solar-project' ); ?></small><br >
+			</h4>
+			<b>
+				<?php echo number_format_i18n( $total_panels ); ?> x
+				<?php echo number_format_i18n( $panelpower_field->value ); ?> W =
+				<?php echo number_format_i18n( (int) $total_panels * (int) $panelpower_field->value ); ?> W
+			</b>
+		</div>
+	</div>
+
 </div>

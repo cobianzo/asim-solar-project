@@ -222,6 +222,10 @@ body .report-container {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
+	small {
+		font-size: var(--wp--preset--font-size--small);
+	}
+
   h2 {
 		font-weight: bold;
   }
@@ -252,15 +256,26 @@ body .report-container {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
-		b {
-			font-weight: bold;
-		}
   }
   th {
     background-color: #f8f8f8;
   }
+	b {
+			font-weight: bold;
+	}
   .total-energy {
     font-weight: bold;
     color: #007bff;
   }
+
+	.report-footer-data {
+		display: flex;
+		flex-direction: column;;
+		padding-block: 3rem;;
+		gap: 2rem;
+		> div {
+			display: flex;
+			justify-content: space-between;
+		}
+	}
 }

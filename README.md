@@ -209,7 +209,8 @@ and
 cd wp-content/plugins/solar-project
 wp i18n make-pot . languages/solar-project.pot --domain=solar-project
 ```
-To make the translations you can use PoEdit, and update the catalogue from the .pot. Then translate what you want. To make the translations, I like to open the .po with VSCode, and translate the strings with IA, under the promt 'for every empty msgstr, set the translation from msgid into italian.'.
+To make the translations you can use Poedit, opening `solar-project-it_IT.po`, and update the catalogue from the .pot ( Translation > Update from POT File ). 
+Then translate what you want. To make the translations you can use Poedit, but I like to open the .po with VSCode, and translate the strings with IA, under the promt 'for every empty msgstr, set the translation from msgid into italian.'.
 Then, to create the .mo files, we need to run
 ```
 wp i18n make-mo ./languages/

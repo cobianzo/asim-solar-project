@@ -28,13 +28,15 @@
 	"intelephense.environment.includePaths": [
 		"plugins/gravityforms",
 		"wordpress/wp-includes",
-		"wordpress/wp-admin"
-	]
-	,
+		"wordpress/wp-admin",
+		"tests/phpunit/"
+	],
 	"search.exclude": {
 		"**/gravityforms": true,
 		"**/gravityformsgeolocation": true,
 		"**/loco-translate": true,
+		"tests/phpunit/wordpress-tests-lib": true,
+		"wordpress": true,
 		"**/wordpress-importer": true
 	}
 }

@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-26T05:59:16+00:00\n"
-"PO-Revision-Date: 2025-06-26 00:02-0600\n"
+"POT-Creation-Date: 2025-07-01T22:15:28+00:00\n"
+"PO-Revision-Date: 2025-07-01 16:20-0600\n"
 "Language: it\n"
 "X-Generator: Poedit 3.6\n"
 "X-Domain: solar-project\n"
@@ -126,33 +126,46 @@ msgid "Nominal power per panel"
 msgstr "Potenza nominale per pannello"
 
 #. translators: %d: Segment number
-#: inc/render-step-4.php:88
+#: inc/render-step-4.php:90
 #, php-format
 msgid "Segment %d"
 msgstr "Segmento %d"
 
 #. translators: %1$d: Pitch degrees, %2$s: Orientation, %3$d: Area
-#: inc/render-step-4.php:93
+#: inc/render-step-4.php:95
 #, php-format
 msgid "Pitch: %1$d°, Orientation: %2$s, Area: %3$d m²"
 msgstr "Inclinazione: %1$d°, Orientamento: %2$s, Area: %3$d m²"
 
-#: inc/render-step-4.php:99
+#: inc/render-step-4.php:101
 msgid "Hours sun / year"
 msgstr "Ore di sole / anno"
 
-#: inc/render-step-4.php:100
+#: inc/render-step-4.php:102
 msgid "Panels"
 msgstr "Pannelli"
 
-#: inc/render-step-4.php:101
+#: inc/render-step-4.php:103
 msgid "Power per Panel"
 msgstr "Potenza per Pannello"
 
-#: inc/render-step-4.php:102
+#: inc/render-step-4.php:104
 msgid "System Efficiency"
 msgstr "Efficienza del Sistema"
 
-#: inc/render-step-4.php:103
+#: inc/render-step-4.php:105
 msgid "Annual Energy (kWh)"
 msgstr "Energia Annuale (kWh)"
+
+#: inc/render-step-4.php:130
+msgid "Total panels"
+msgstr "Pannelli Totali"
+
+#: inc/render-step-4.php:137
+msgid "Total power"
+msgstr "Potenza Totale"
+
+#: inc/render-step-4.php:138
+#, fuzzy
+msgid "total panels x power per panel"
+msgstr "pannelli totali x potenza per pannello"
