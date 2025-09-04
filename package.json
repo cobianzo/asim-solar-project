@@ -26,8 +26,8 @@
     "tests-db-cli": "npm run tests-cli wp db cli",
     "//comment3": "--CLI commands for translations-- see README"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["solar", "WordPress", "plugin", "gravity forms", "map"],
+  "author": "@cobianzo",
   "license": "ISC",
   "description": "",
   "devDependencies": {

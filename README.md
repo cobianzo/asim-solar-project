@@ -17,6 +17,10 @@ Poi un po' di considerazioni generali.
 
 # What
 
+The "asim-solar-project" project is the development of a WordPress plugin called "solar-project" and another plugin related to Gravity Forms, "coco-gravity-form-map-field".
+
+This project is a WordPress application that integrates custom functionalities through plugins. The main flow focuses on user interaction with Gravity Forms forms and the business logic related to the solar project.
+
 - Dependencies :
   `coco-gravity-form-map-field/`, (branch develop)
   `gravity-forms` (needs license) and API Key for Google Maps
@@ -202,14 +206,22 @@ and the into panels popup shown when hovering a segment)
 
 ## Regular WordPress translations
 
-To create the .pot with all tranlatable strings, get into the container with
+To create the .pot with all tranlatable strings, 
+First compile you scripts, as the js to be compiled is inside  plugins/solar-project/build:
+
+```
+cd plugins/solar-project/
+npm run build
+```
+Now we work in Docker \
+get into the container with\
 `npm run cli bash`
 and
 ```
 cd wp-content/plugins/solar-project
 wp i18n make-pot . languages/solar-project.pot --domain=solar-project
 ```
-To make the translations you can use Poedit, opening `solar-project-it_IT.po`, and update the catalogue from the .pot ( Translation > Update from POT File ). 
+To make the translations you can use Poedit, opening `solar-project-it_IT.po`, and update the catalogue from the *.pot* ( *Translation > Update from POT File* ). 
 Then translate what you want. To make the translations you can use Poedit, but I like to open the .po with VSCode, and translate the strings with IA, under the promt 'for every empty msgstr, set the translation from msgid into italian.'.
 Then, to create the .mo files, we need to run
 ```

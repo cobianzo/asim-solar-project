@@ -1,6 +1,6 @@
 {
 	"name": "solar-functions",
-	"version": "6.0.1",
+	"version": "6.0.2",
 	"main": "index.js",
 	"scripts": {
 		"build": "wp-scripts build",
@@ -8,7 +8,9 @@
 		"bs": "browser-sync start --config bs-config.js",
 		"plugin-zip": "node bin/build-plugin.js",
 		"version": "node bin/version-increment.js",
-		"test": "jest"
+		"test": "jest",
+		"make-pot": "wp-scripts i18n make-pot . languages/solar-project.pot --domain='solar-project'",
+		"make-json": "wp-scripts i18n make-json languages --no-purge"
 	},
 	"keywords": [],
 	"author": "cobianzo",

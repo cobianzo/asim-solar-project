@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-01T22:15:28+00:00\n"
+"POT-Creation-Date: 2025-09-04T16:24:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: solar-project\n"
@@ -170,52 +170,58 @@ msgstr ""
 msgid "total panels x power per panel"
 msgstr ""
 
-#: build/index.js:92
-#: build/index.js:2401
-msgid "Cancel"
-msgstr ""
-
-#: build/index.js:110
-msgid "Delete"
-msgstr ""
-
-#: build/index.js:114
-msgid "Save"
-msgstr ""
-
-#: build/index.js:309
-msgid "Edit Solar Panels"
-msgstr ""
-
-#: build/index.js:4007
+#: build/index.js:1
 msgid "Northeast"
 msgstr ""
 
-#: build/index.js:4010
+#: build/index.js:1
 msgid "Northwest"
 msgstr ""
 
-#: build/index.js:4013
+#: build/index.js:1
 msgid "Southeast"
 msgstr ""
 
-#: build/index.js:4016
-#: build/index.js:4019
+#: build/index.js:1
 msgid "Southwest"
 msgstr ""
 
-#: build/index.js:4022
+#: build/index.js:1
 msgid "South"
 msgstr ""
 
-#: build/index.js:4025
+#: build/index.js:1
 msgid "North"
 msgstr ""
 
-#: build/index.js:4028
+#: build/index.js:1
 msgid "East"
 msgstr ""
 
-#: build/index.js:4031
+#: build/index.js:1
 msgid "West"
+msgstr ""
+
+#: build/index.js:1
+msgid "Cancel"
+msgstr ""
+
+#: build/index.js:1
+msgid "Delete"
+msgstr ""
+
+#: build/index.js:1
+msgid "Save"
+msgstr ""
+
+#: build/index.js:1
+msgid "Horizontal"
+msgstr ""
+
+#: build/index.js:1
+msgid "Vertical"
+msgstr ""
+
+#: build/index.js:1
+msgid "Edit Solar Panels"
 msgstr ""

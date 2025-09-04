@@ -174,7 +174,7 @@ const openNotificationPopupImpl = (filename: string, placeholders: Record<string
 		.catch((error) => console.error('Error loading the notification ' + filename + ':', error));
 };
 
-export const openNotificationPopup = debounce( openNotificationPopupImpl, 1000);
+export const openNotificationPopup = debounce( openNotificationPopupImpl, 100); // 100 ms
 
 
 // Special notification with all the info about the segment and its rectangle

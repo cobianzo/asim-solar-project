@@ -153,8 +153,8 @@ export const createOrientationRadio = (gmap: google.maps.Map) => {
 	parentDiv.classList.add('rectangle-edit-button');
 
 	// create the radio buttons
-	createRadioButton(parentDiv, 'horizontal', 'Horizontal');
-	createRadioButton(parentDiv, 'vertical', 'Vertical');
+	createRadioButton(parentDiv, 'horizontal', __('Horizontal', 'solar-project'));
+	createRadioButton(parentDiv, 'vertical', __('Vertical', 'solar-project'));
 
 	gmap.controls[google.maps.ControlPosition.TOP_RIGHT].push(parentDiv);
 
